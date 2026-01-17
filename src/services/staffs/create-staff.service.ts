@@ -1,9 +1,8 @@
 // resolvers/staff.resolver.ts
 import { prisma } from "@/lib/prisma";
 import { uploadToCloudinary } from "@/utils/upload-helper";
-import { FileUpload, GraphQLUpload } from 'graphql-upload-minimal';
 import * as z from "zod";
-import { createWorkingHourSchema, createStaffSchema } from "@/validation/staffs/staffs.validation"
+import { createStaffSchema } from "@/dto/staffs/staffs.validation"
 
 type createStaffServiceType = z.infer< typeof createStaffSchema >;
 

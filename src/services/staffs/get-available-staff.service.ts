@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import * as z from "zod"
-import { createWorkingHourSchema } from "@/validation/staffs/staffs.validation"
+import { createWorkingHourSchema } from "@/dto/staffs/staffs.validation"
 
 type getAvailableStaffbyBookingTimeType = z.infer< typeof createWorkingHourSchema > 
 export const getAvailableStaffbyBookingTimeService = async(input: getAvailableStaffbyBookingTimeType) => {

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { deleteAssetFromCloudinary } from "@/utils/delete-image-helper"
 import * as z from "zod"
-import { deleteStaffSchema } from "@/validation/staffs/staffs.validation"
+import { deleteStaffSchema } from "@/dto/staffs/staffs.validation"
 
 type DeleteStaffInput = z.infer<typeof deleteStaffSchema>
 

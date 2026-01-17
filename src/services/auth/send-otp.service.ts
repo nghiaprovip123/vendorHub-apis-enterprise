@@ -3,7 +3,7 @@ import sql from "@/lib/postgresql"
 import ApiError from "@/utils/ApiError"
 import crypto from "crypto"
 import { sendOtpEmailRegisteration } from "@/lib/send-otp-helper"
-import { SendOTPSchema } from "@/validation/auth/auth.validation"
+import { SendOTPSchema } from "@/dto/auth/auth.validation"
 import * as z from "zod"
 type SendOTPServiceType = z.infer< typeof SendOTPSchema >
 export const SendOTPService = async ({phone, type, email}: SendOTPServiceType) => {
