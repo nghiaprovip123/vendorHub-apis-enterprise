@@ -1,6 +1,6 @@
 import sql from '@/lib/postgresql';
-import ApiError from '@/utils/ApiError';
-import { jwtService } from '@/lib/jwt/index.jwt';
+import ApiError from '@/common/utils/ApiError';
+import { jwtService } from '@/common/jwt/index.jwt';
 
 type VerifyOtpInput = {
   otp: string;

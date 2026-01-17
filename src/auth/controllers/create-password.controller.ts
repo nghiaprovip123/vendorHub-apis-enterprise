@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { CreatePasswordService } from "@/services/auth/create-password.service";
+import { CreatePasswordService } from "@/auth/services/create-password.service";
 
 const authPasswordService = new CreatePasswordService();
 

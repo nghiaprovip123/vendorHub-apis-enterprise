@@ -1,4 +1,4 @@
-import { jwtService } from "@/lib/jwt/index.jwt"
+import { jwtService } from "@/common/jwt/index.jwt"
 
 export class AuthGuard {
     constructor(private readonly token: string) {

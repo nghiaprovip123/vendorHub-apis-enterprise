@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import ApiError from '@/utils/ApiError';
-import { otpAuthService } from '@/services/auth/verify-otp.service';
+import ApiError from '@/common/utils/ApiError';
+import { otpAuthService } from '@/auth/services/verify-otp.service';
 
 export const VerifyOTPController = async (
   req: Request,

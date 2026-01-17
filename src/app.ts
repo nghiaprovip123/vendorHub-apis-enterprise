@@ -15,8 +15,8 @@ import dotenv from "dotenv";
 import { graphqlUploadExpress } from 'graphql-upload-minimal';
 import { logger, createContextLogger } from './lib/logger';
 import morgan from 'morgan';
-import AuthRouter from '@/routes/auth.route'
-import { errorHandler } from '@/guards/error.guard'
+import AuthRouter from '@/auth/routes/auth.route'
+import { errorHandler } from '@/common/guards/error.guard'
 dotenv.config();
 
 (async function () {

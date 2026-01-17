@@ -1,8 +1,8 @@
 import argon2 from 'argon2';
 import sql from '@/lib/postgresql';
-import ApiError from '@/utils/ApiError';
-import { IdentifierType } from '@/enums/auth/identifier-type.enum';
-import { jwtService } from '@/lib/jwt/index.jwt';
+import ApiError from '@/common/utils/ApiError';
+import { IdentifierType } from '@/auth/enum/identifier-type.enum';
+import { jwtService } from '@/common/jwt/index.jwt';
 
 type LoginInput = {
   email: string;

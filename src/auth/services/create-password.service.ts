@@ -1,7 +1,7 @@
 import sql from "@/lib/postgresql";
 import argon2 from "argon2";
-import { IdentifierType } from "@/enums/auth/identifier-type.enum";
-import { AuthGuard } from "@/guards/auth.guard";
+import { IdentifierType } from "@/auth/enum/identifier-type.enum";
+import { AuthGuard } from "@/common/guards/auth.guard";
 
 export class CreatePasswordService {
     async createPassword(params: {
@@ -23,21 +23,21 @@ export class CreatePasswordService {
         }
 
         const hashPassword = await argon2.hash(password);
-
-        try {
+        console.log(hashPassword)
+        try{
             await sql`
-                INSERT INTO identifiers (type, value, isverified, isactive, authid)
-                VALUES (
-                    ${IdentifierType.PASSWORD},
-                    ${hashPassword},
-                    true,
-                    true,
-                    ${sub}
-                )
-            `;
+            INSERT INTO identifiers (type, value, isverified, isactive, authid)
+            VALUES (
+                ${IdentifierType.PASSWORD},
+                ${hashPassword},
+                true,
+                true,
+                ${sub}
+            )
+        `;
         } catch (err: any) {
             if (err.code === "23505") {
-                throw new Error("PASSWORD ĐÃ TỒN TẠI");
+                throw new Error("KHÔNG THỂ TẠO MẬT KHẨU VÌ NGƯỜI DÙNG ĐÃ TỒN TẠI");
             }
             throw err;
         }

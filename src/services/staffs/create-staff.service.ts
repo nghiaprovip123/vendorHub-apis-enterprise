@@ -1,6 +1,6 @@
 // resolvers/staff.resolver.ts
 import { prisma } from "@/lib/prisma";
-import { uploadToCloudinary } from "@/utils/upload-helper";
+import { uploadToCloudinary } from "@/common/utils/upload-helper";
 import * as z from "zod";
 import { createStaffSchema } from "@/dto/staffs/staffs.validation"
 

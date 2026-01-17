@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma"
-import { replaceImageOnCloudinary } from "@/utils/replace-img-helper"
+import { replaceImageOnCloudinary } from "@/common/utils/replace-img-helper"
 import { FileUpload, GraphQLUpload } from "graphql-upload-minimal";
 import * as z from "zod"
 import { updateStaffSchema } from "@/dto/staffs/staffs.validation"

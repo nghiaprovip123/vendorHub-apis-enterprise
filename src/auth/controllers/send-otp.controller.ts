@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express"
-import { SendOTPService } from "@/services/auth/send-otp.service"
+import { SendOTPService } from "@/auth/services/send-otp.service"
 type SendOTPControllerType = {
     phone: string,
     type: string

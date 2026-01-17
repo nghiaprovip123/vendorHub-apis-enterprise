@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import ApiError from '@/utils/ApiError';
-import { authService } from '@/services/auth/login.service';
-import { optionsCookie } from '@/lib/cookie';
+import ApiError from '@/common/utils/ApiError';
+import { authService } from '@/auth/services/login.service';
+import { optionsCookie } from '@/common/utils/cookie';
 
 export const LoginController = async (
   req: Request,

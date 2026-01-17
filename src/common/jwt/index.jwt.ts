@@ -1,4 +1,4 @@
-import { JwtService } from "@/lib/jwt/jwt.service";
+import { JwtService } from "@/common/jwt/jwt.service";
 
 export const jwtService = new JwtService({
     privateKey: process.env.JWT_PRIVATE_KEY!.replace(/\\n/g, "\n"),
