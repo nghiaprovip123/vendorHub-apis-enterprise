@@ -1,13 +1,13 @@
 import express from "express"
-import { LoginController } from "@/auth/controllers/login.controller"
-import { SendOTPController } from "@/auth/controllers/send-otp.controller"
-import { VerifyOTPController } from "@/auth/controllers/verify-otp.controller"
-import { CreatePasswordController } from "@/auth/controllers/create-password.controller"
+import { loginController } from "@/auth/controllers/login.controller"
+import { sendOTPController } from "@/auth/controllers/send-otp.controller"
+import { verifyOTPController } from "@/auth/controllers/verify-otp.controller"
+import { createPasswordController } from "@/auth/controllers/create-password.controller"
 const AuthRouter = express.Router()
 
-AuthRouter.post('/login', LoginController)
-AuthRouter.post('/sendOTP', SendOTPController)
-AuthRouter.post('/verifyOTP', VerifyOTPController)
-AuthRouter.post('/createPassword', CreatePasswordController)
+AuthRouter.post('/login', loginController.LoginController)
+AuthRouter.post('/sendOTP', sendOTPController.SendOTPController)
+AuthRouter.post('/verifyOTP', verifyOTPController.VerifyOTPController)
+AuthRouter.post('/createPassword', createPasswordController.CreatePassword)
 
 export default AuthRouter
