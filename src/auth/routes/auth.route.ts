@@ -6,8 +6,11 @@ import { createPasswordController } from "@/auth/controllers/create-password.con
 const AuthRouter = express.Router()
 
 AuthRouter.post('/login', loginController.LoginController)
-AuthRouter.post('/sendOTP', sendOTPController.SendOTPController)
-AuthRouter.post('/verifyOTP', verifyOTPController.VerifyOTPController)
-AuthRouter.post('/createPassword', createPasswordController.CreatePassword)
+AuthRouter.post('/sendOTPRegisteration', sendOTPController.SendOTPByRegisterationFlow)
+AuthRouter.post('/sendOTPForgotPassword', sendOTPController.SendOTPByForgotFlow)
+AuthRouter.post('/verifyOTPRegisteration', verifyOTPController.verifyOTPByRegisterationFlow)
+AuthRouter.post('/verifyOTPForgotPassword', verifyOTPController.verifyOTPByForgotFlow)
+AuthRouter.post('/createPasswordRegisteration', createPasswordController.createNewPasswordByRegisterationFlow)
+// AuthRouter.post('/')
 
 export default AuthRouter

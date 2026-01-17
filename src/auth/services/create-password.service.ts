@@ -4,7 +4,7 @@ import { IdentifierType } from "@/auth/enum/identifier-type.enum";
 import { AuthGuard } from "@/common/guards/auth.guard";
 
 export class CreatePasswordService {
-    async createPassword(params: {
+    async createPasswordByRegisterationFlow(params: {
         token: string;
         password: string;
     }) {
@@ -44,4 +44,8 @@ export class CreatePasswordService {
 
         return user;
     }
+
+    // async createPasswordByForgotFlow () {
+
+    // }
 }

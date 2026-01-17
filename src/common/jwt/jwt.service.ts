@@ -1,4 +1,4 @@
-import jwt, { SignOptions, Algorithm } from 'jsonwebtoken';
+import jwt, { SignOptions, Algorithm, JwtPayload } from 'jsonwebtoken';
 import crypto from 'crypto';
 
 type JwtServiceOptions = {
@@ -41,6 +41,18 @@ export class JwtService {
     }
 
     verifyRefreshToken(token: string): any {
+        return jwt.verify(token, this.publicKey, { algorithms: [this.algorithm] })
+    }
+
+    generateResetToken(payload: Record <string, any>, expiresInSecond: number): string {
+        const options: SignOptions = {
+            algorithm: this.algorithm,
+            expiresIn: expiresInSecond || 150,
+        }
+        return jwt.sign(payload, this.privateKey, options)
+    }
+
+    verifyResetToken (token: string): any {
         return jwt.verify(token, this.publicKey, { algorithms: [this.algorithm] })
     }
 

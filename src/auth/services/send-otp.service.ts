@@ -4,6 +4,7 @@ import crypto from "crypto"
 import { sendOtpEmailRegisteration } from "@/common/utils/send-otp-helper"
 import { SendOTPSchema } from "@/auth/dto/auth/auth.validation"
 import * as z from "zod"
+import { VerifyOTPType } from "@/auth/enum/veirfy-otp-type.enum"
 type SendOTPServiceType = z.infer< typeof SendOTPSchema >
 type SendOTPServiceResult = {
     otp: any,
@@ -11,7 +12,7 @@ type SendOTPServiceResult = {
     remainingAttempts: number
 }
 export class SendOTPService {
-    async sendOTP ( {phone, type, email}: SendOTPServiceType): Promise<SendOTPServiceResult> {
+    async sendOTPByRegisterationFlow ( {phone, email}: SendOTPServiceType): Promise<SendOTPServiceResult> {
         if(!email || !phone) {
             throw new ApiError(400, 'Email is required')
         }
@@ -19,7 +20,7 @@ export class SendOTPService {
         const [{count}] = await sql`
             SELECT COUNT(*)::int AS count 
             FROM otps
-            WHERE type = ${type}
+            WHERE type = ${VerifyOTPType.VERIFY_OTP_REGISTERATION}
                 AND email = ${email}
                 AND createdat > NOW() - INTERVAL '15 minutes'
         `
@@ -31,7 +32,7 @@ export class SendOTPService {
             UPDATE otps
             SET isverified = true
                 AND isactive = false
-            WHERE type = ${type}
+            WHERE type = ${VerifyOTPType.VERIFY_OTP_REGISTERATION}
                 AND email = ${email}
                 AND phone = ${phone}
                 AND isverified = false
@@ -48,7 +49,68 @@ export class SendOTPService {
                 expiresat,
                 phone
             ) VALUES (
-                ${type},
+                ${VerifyOTPType.VERIFY_OTP_REGISTERATION},
+                ${email},
+                ${generateOTP},
+                NOW() + INTERVAL '15 Minutes',
+                ${phone}
+            )
+            RETURNING expiresAt, id
+        `
+
+        const [sendOTP] = await sql`
+            SELECT *
+            FROM otps
+            WHERE id= ${id}
+        `
+
+
+        await sendOtpEmailRegisteration(email, generateOTP);
+        return {
+            otp: sendOTP,
+            expiresAt: expiresat,
+            remainingAttempts: 3 - count
+        }
+    }
+
+    async sendOTPByForgotFlow ( {phone, email}: SendOTPServiceType): Promise<SendOTPServiceResult> {
+        if(!email || !phone) {
+            throw new ApiError(400, 'Email is required')
+        }
+
+        const [{count}] = await sql`
+            SELECT COUNT(*)::int AS count 
+            FROM otps
+            WHERE type = ${VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD}
+                AND email = ${email}
+                AND createdat > NOW() - INTERVAL '15 minutes'
+        `
+        if (count > 3) {
+            throw new ApiError(429, "KHÔNG THỂ GỬI OTP VÌ SỐ LẦN GỬI OTP ĐÃ ĐẠT GIỚI HẠN")
+        }
+
+        await sql`
+            UPDATE otps
+            SET isverified = true
+                AND isactive = false
+            WHERE type = ${VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD}
+                AND email = ${email}
+                AND phone = ${phone}
+                AND isverified = false
+                AND isactive = true
+        `
+
+        const generateOTP = await crypto.randomInt(100000, 999999).toString()
+
+        const [{expiresat, id}] = await sql`
+            INSERT INTO otps (
+                type, 
+                email,
+                otp,
+                expiresat,
+                phone
+            ) VALUES (
+                ${VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD},
                 ${email},
                 ${generateOTP},
                 NOW() + INTERVAL '15 Minutes',

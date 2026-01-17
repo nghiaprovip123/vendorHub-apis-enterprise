@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import ApiError from '@/common/utils/ApiError';
-import { otpAuthService } from '@/auth/services/verify-otp.service';
+import { verifyOTPService } from '@/auth/services/verify-otp.service';
 
 export class VerifyOTPController {
-  async VerifyOTPController ( req: Request, res: Response, next: NextFunction ) {
+  async verifyOTPByRegisterationFlow ( req: Request, res: Response, next: NextFunction ) {
     try {
       const { otp, email, name } = req.body;
 
@@ -11,7 +11,7 @@ export class VerifyOTPController {
         throw new ApiError(400, 'OTP VÀ EMAIL LÀ BẮT BUỘC');
       }
 
-      const { accessToken } = await otpAuthService.verifyOtp({
+      const { accessToken } = await verifyOTPService.verifyOtpByRegisterationFlow({
         otp,
         email,
         name,
@@ -23,6 +23,22 @@ export class VerifyOTPController {
       });
     } catch (err) {
       next(err);
+    }
+  }
+
+  async verifyOTPByForgotFlow ( req: Request, res: Response, next: NextFunction ) {
+    try {
+      const result = await verifyOTPService.verifyOtpByForgotFlow({
+        otp: req.body.otp,
+        email: req.body.email
+      })
+
+      return res.json({
+        success: true,
+        resetToken: result.resetToken
+      })
+    } catch (err) {
+      next(err)
     }
   }
 }
