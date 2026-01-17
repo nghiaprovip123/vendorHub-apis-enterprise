@@ -20,6 +20,8 @@ export class LoginController {
         userAgent,
       });
 
+      console.log(refreshToken)
+
       res.cookie('refreshToken', refreshToken, optionsCookie);
 
       return res.status(200).json({

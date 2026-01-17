@@ -1,8 +1,8 @@
 export const optionsCookie = {
     httpOnly: true,
-    secure: process.env.NODE_ENV !== 'development',
+    secure: false,
     sameSite: 'strict',
-    path: '/auth/refresh',
+    path: '/',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   } as const;
   

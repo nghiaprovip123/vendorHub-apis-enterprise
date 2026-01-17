@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { CreatePasswordService } from "@/auth/services/create-password.service";
-
-const authPasswordService = new CreatePasswordService();
+import { createPasswordService } from "@/auth/services/create-password.service";
 
 export class CreatePasswordController {
     async createNewPasswordByRegisterationFlow (req: Request, res: Response, next: NextFunction) {
@@ -24,7 +22,7 @@ export class CreatePasswordController {
 
             const token = authHeader.split(" ")[1];
 
-            const user = await authPasswordService.createPassword({
+            const user = await createPasswordService.createPasswordByRegisterationFlow({
                 token,
                 password,
             });

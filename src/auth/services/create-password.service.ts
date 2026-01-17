@@ -49,3 +49,5 @@ export class CreatePasswordService {
 
     // }
 }
+
+export const createPasswordService = new CreatePasswordService()
