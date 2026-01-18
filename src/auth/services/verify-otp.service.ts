@@ -1,8 +1,8 @@
-import sql from '@/lib/postgresql';
 import ApiError from '@/common/utils/ApiError';
 import { jwtService } from '@/common/jwt/index.jwt';
 import { VerifyOTPType } from '@/auth/enum/veirfy-otp-type.enum'
 import { IdentifierType } from '@/auth/enum/identifier-type.enum'
+import sql from '@/lib/postgresQL';
 type VerifyOtpInput = {
   otp: string;
   email: string;

@@ -1,10 +1,10 @@
-import sql from "@/lib/postgresql"
 import ApiError from "@/common/utils/ApiError"
 import crypto from "crypto"
 import { sendOtpEmailRegisteration } from "@/common/utils/send-otp-helper"
 import { SendOTPSchema } from "@/auth/dto/auth/auth.validation"
 import * as z from "zod"
 import { VerifyOTPType } from "@/auth/enum/veirfy-otp-type.enum"
+import sql from "@/lib/postgresQL"
 type SendOTPServiceType = z.infer< typeof SendOTPSchema >
 type SendOTPServiceResult = {
     otp: any,

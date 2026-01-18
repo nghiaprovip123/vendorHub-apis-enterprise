@@ -1,8 +1,8 @@
-import sql from "@/lib/postgresql";
 import argon2 from "argon2";
 import { IdentifierType } from "@/auth/enum/identifier-type.enum";
 import { VerifyOTPType } from "@/auth/enum/veirfy-otp-type.enum"
 import { AuthGuard } from "@/common/guards/auth.guard";
+import sql from "@/lib/postgresQL";
 
 export class CreatePasswordService {
     async createPasswordByRegisterationFlow(params: {
