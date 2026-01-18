@@ -1,6 +1,7 @@
 import sql from "@/lib/postgresql";
 import argon2 from "argon2";
 import { IdentifierType } from "@/auth/enum/identifier-type.enum";
+import { VerifyOTPType } from "@/auth/enum/veirfy-otp-type.enum"
 import { AuthGuard } from "@/common/guards/auth.guard";
 
 export class CreatePasswordService {
@@ -45,9 +46,45 @@ export class CreatePasswordService {
         return user;
     }
 
-    // async createPasswordByForgotFlow () {
+    async createPasswordByForgotFlow(params: {
+        token: string;
+        password: string;
+    }) {
+        const { token, password } = params;
 
-    // }
+        const guard = new AuthGuard(token);
+        const payload = guard.extractTokenPayload();
+        const { sub, purpose } = payload;
+
+        const [user] = await sql`
+            SELECT * FROM auth_user
+            WHERE id = ${sub}
+        `;
+        if (!user && purpose !== VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD) {
+            throw new Error("KHÔNG TÌM THẤY USER HOẶC TOKEN KHÔNG CÓ HIỆU LỰC Ở API NÀY");
+        }
+
+        const hashPassword = await argon2.hash(password);
+        
+        try{
+                await sql`
+                    UPDATE identifiers
+                    SET value = ${hashPassword},
+                        isverified = true,
+                        isactive = true
+                    WHERE authid = ${sub}
+                        AND type = ${IdentifierType.PASSWORD}
+                    RETURNING authid
+                `
+        } catch (err: any) {
+            if (err.code === "23505") {
+                throw new Error("KHÔNG THỂ TẠO MẬT KHẨU VÌ NGƯỜI DÙNG ĐÃ TỒN TẠI");
+            }
+            throw err;
+        }
+
+        return user;
+    }
 }
 
 export const createPasswordService = new CreatePasswordService()

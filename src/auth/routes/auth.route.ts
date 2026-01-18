@@ -5,12 +5,19 @@ import { verifyOTPController } from "@/auth/controllers/verify-otp.controller"
 import { createPasswordController } from "@/auth/controllers/create-password.controller"
 const AuthRouter = express.Router()
 
-AuthRouter.post('/login', loginController.LoginController)
-AuthRouter.post('/sendOTPRegisteration', sendOTPController.SendOTPByRegisterationFlow)
-AuthRouter.post('/sendOTPForgotPassword', sendOTPController.SendOTPByForgotFlow)
-AuthRouter.post('/verifyOTPRegisteration', verifyOTPController.verifyOTPByRegisterationFlow)
-AuthRouter.post('/verifyOTPForgotPassword', verifyOTPController.verifyOTPByForgotFlow)
-AuthRouter.post('/createPasswordRegisteration', createPasswordController.createNewPasswordByRegisterationFlow)
-// AuthRouter.post('/')
+
+// ĐĂNG NHẬP
+AuthRouter.post('/login', loginController.login)
+
+// ĐĂNG KÝ
+AuthRouter.post('/registeration/sendOTP', sendOTPController.SendOTPByRegisterationFlow)
+AuthRouter.post('/registeration/verifyOTP', verifyOTPController.verifyOTPByRegisterationFlow)
+AuthRouter.post('/registeration/createPassword', createPasswordController.createNewPasswordByRegisterationFlow)
+
+// QUÊN MẬT KHẨU
+AuthRouter.post('/forgot-password/sendOTP', sendOTPController.SendOTPByForgotFlow)
+AuthRouter.post('forgot-password/verifyOTP', verifyOTPController.verifyOTPByForgotFlow)
+AuthRouter.post('/forgot-password/createPassword', createPasswordController.createPasswordByForgotFlow)
+
 
 export default AuthRouter

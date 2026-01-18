@@ -5,7 +5,7 @@ import { optionsCookie } from '@/common/utils/cookie';
 
 
 export class LoginController {
-  async LoginController ( req: Request, res: Response, next: NextFunction ) {
+  async login ( req: Request, res: Response, next: NextFunction ) {
     try {
       const { email, password } = req.body;
       const userAgent = req.headers['user-agent'] ?? 'unknown';
