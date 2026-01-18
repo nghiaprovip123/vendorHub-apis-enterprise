@@ -14,6 +14,16 @@ datasource db {
 }
 
 // ======================================================================
+// TYPE 
+// ======================================================================
+type BookingSlot {
+  startTime DateTime?
+  endTime DateTime?
+  day DateTime?
+  durationMinutes Int?
+}
+
+// ======================================================================
 // ENUMS
 // ======================================================================
 enum PricingType {
@@ -181,11 +191,11 @@ model Booking {
 
   staffId                         String? @db.ObjectId
   bookingStaff                    Staff? @relation(fields: [staffId], references: [id])
-
-  day                             String?
-  dayOfWeek                       String?
-  startTime                       String?
-  endTime                         String?
+  slot                            BookingSlot?
+  // day                             String?
+  // dayOfWeek                       String?
+  // startTime                       String?
+  // endTime                         String?
   customerName                    String?
   customerPhone                   String?
   customerEmail                   String?

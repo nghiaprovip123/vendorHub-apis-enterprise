@@ -2,7 +2,6 @@ input CreateBookingInput {
   serviceId: String!
   staffId: String                       
   day: String!
-  dayOfWeek: String!
   startTime: String!
   endTime: String!
   customerName: String!
@@ -16,7 +15,7 @@ type CreateBookingResponse {
   serviceId: String!
   staffId: String                        
   day: String
-  dayOfWeek: String
+  durationInMinute: Int
   startTime: String
   endTime: String
   customerName: String
@@ -28,7 +27,7 @@ type CreateBookingResponse {
   cancelReason: String
   createdAt: String
   updatedAt: String
-}
+} 
 
 input AssignStaffForBookingRequestInput {
   staffId: String!
