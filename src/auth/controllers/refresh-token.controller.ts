@@ -1,103 +1,32 @@
-import { Request, Response, NextFunction } from "express"
-import sql from "@/lib/postgresql"
-import { jwtService } from "@/common/jwt/index.jwt"
-import argon2 from "argon2"
-import { optionsCookie } from "@/common/utils/cookie"
+import { Request, Response, NextFunction } from "express";
+import { RefreshTokenService } from "@/auth/services/refresh-token.service";
+import { optionsCookie } from "@/common/utils/cookie";
+
 export const RefreshTokenController = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const refreshToken = req.cookies.refreshToken;
-  if (!refreshToken) {
-    throw new Error("THIẾU REFRESH TOKEN");
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+      throw new Error("THIẾU REFRESH TOKEN");
+    }
+
+    const userAgent = req.headers["user-agent"] ?? null;
+
+    const result = await RefreshTokenService.execute(
+      refreshToken,
+      userAgent
+    );
+
+    res.cookie("refreshToken", result.refreshToken, optionsCookie);
+
+    return res.status(200).json({
+      success: true,
+      accessToken: result.accessToken,
+    });
+  } catch (err) {
+    next(err);
   }
-
-  const userAgent = req.headers["user-agent"] ?? null;
-
-  const payload = await jwtService.verifyRefreshToken(refreshToken);
-  if (!payload) {
-    throw new Error("SAI TOKEN, VUI LÒNG THỬ LẠI");
-  }
-
-  const { sub } = payload;
-
-  const [session] = await sql`
-        SELECT refreshtokenhash, sessionid
-        FROM refresh_token_sessions
-        WHERE authid = ${sub}
-        ORDER BY createdat DESC
-        LIMIT 1
-    `
-  ;
-
-  if (!session) {
-    throw new Error("KHÔNG TÌM THẤY SESSION REFRESH TOKEN");
-  }
-
-  const isValid = await argon2.verify(
-    session.refreshtokenhash,
-    refreshToken
-  );
-
-  if (!isValid) {
-    throw new Error("REFRESH TOKEN KHÔNG HỢP LỆ");
-  }
-
-
-  await sql`
-    DELETE FROM refresh_token_sessions
-    WHERE sessionid = ${session.sessionid}
-  `;
-
-  const [{ email }] = await sql`
-        SELECT value AS email
-        FROM identifiers
-        WHERE type = 'email'
-        AND authid = ${sub}
-    ` ;
-
-  const accessToken = jwtService.generateAccessToken(
-    {
-      sub,
-      email,
-      jti: jwtService.generateJit(),
-    },
-    300
-  );
-
-  const newRefreshToken = await jwtService.generateRefreshToken(
-    {
-      sub,
-      email,
-      jti: jwtService.generateJit(),
-    },
-    604800
-  );
-
-  const newRefreshTokenHash = await argon2.hash(newRefreshToken);
-
-  await sql`
-    INSERT INTO refresh_token_sessions (
-      authid,
-      refreshtokenhash,
-      expiresat,
-      sessionid,
-      useragent
-    )
-    VALUES (
-      ${sub},
-      ${newRefreshTokenHash},
-      NOW() + INTERVAL '7 days',
-      gen_random_uuid(),
-      ${userAgent}
-    )
-  `;
-
-  res.cookie("refreshToken", newRefreshToken, optionsCookie);
-
-  return res.status(200).json({
-    success: true,
-    accessToken,
-  });
 };
