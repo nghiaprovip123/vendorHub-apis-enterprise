@@ -17,6 +17,7 @@ import { logger, createContextLogger } from './lib/logger';
 import morgan from 'morgan';
 import AuthRouter from '@/auth/routes/auth.route'
 import { errorHandler } from '@/common/guards/error.guard'
+import cookieParser from "cookie-parser";
 dotenv.config();
 
 (async function () {
@@ -24,6 +25,7 @@ dotenv.config();
     const pubsub = new PubSub(); 
     const app = express();
     app.use(express.json())
+    app.use(cookieParser()); 
     app.use((req: any, res, next) => {
         req.id = Math.random().toString(36).substring(7);
         res.setHeader('X-Request-ID', req.id);

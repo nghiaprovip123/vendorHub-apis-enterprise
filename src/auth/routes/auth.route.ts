@@ -3,6 +3,7 @@ import { loginController } from "@/auth/controllers/login.controller"
 import { sendOTPController } from "@/auth/controllers/send-otp.controller"
 import { verifyOTPController } from "@/auth/controllers/verify-otp.controller"
 import { createPasswordController } from "@/auth/controllers/create-password.controller"
+import { RefreshTokenController } from "@/auth/controllers/refresh-token.controller"
 const AuthRouter = express.Router()
 
 
@@ -19,5 +20,7 @@ AuthRouter.post('/forgot-password/sendOTP', sendOTPController.SendOTPByForgotFlo
 AuthRouter.post('forgot-password/verifyOTP', verifyOTPController.verifyOTPByForgotFlow)
 AuthRouter.post('/forgot-password/createPassword', createPasswordController.createPasswordByForgotFlow)
 
+// REFRESH TOKEN
+AuthRouter.post('/refresh-tokens', RefreshTokenController)
 
 export default AuthRouter

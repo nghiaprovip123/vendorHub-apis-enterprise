@@ -1,19 +1,21 @@
-import sql from '@/lib/postgresql';
-import ApiError from '@/common/utils/ApiError';
-import { jwtService } from '@/common/jwt/index.jwt';
-import { VerifyOTPType } from '@/auth/enum/veirfy-otp-type.enum'
-import { IdentifierType } from '@/auth/enum/identifier-type.enum'
+import sql from "@/lib/postgresql"
+import ApiError from "@/common/utils/ApiError"
+import { jwtService } from "@/common/jwt/index.jwt"
+import { VerifyOTPType } from "@/auth/enum/veirfy-otp-type.enum"
+import { IdentifierType } from "@/auth/enum/identifier-type.enum"
+
 type VerifyOtpInput = {
-  otp: string;
-  email: string;
-  name?: string;
-};
+    otp: string
+    email: string
+    name?: string
+}
 
 type VerifyOtpByRegisterationFlowResult = {
-  accessToken: string;
-};
+    accessToken: string
+}
+
 type VerifyOtpByForgotFlowResult = {
-  resetToken: string
+    resetToken: string
 }
 
 export class VerifyOTPService {
@@ -22,113 +24,139 @@ export class VerifyOTPService {
     email,
     name,
   }: VerifyOtpInput): Promise<VerifyOtpByRegisterationFlowResult> {
-    const [otpRow] = await sql`
-      SELECT id
-      FROM otps
-      WHERE otp = ${otp}
-        AND email = ${email}
-        AND isverified = false
-        AND isactive = true
-        AND expiresat > NOW()
-    `;
+    
+    const result = await sql.begin(async (tx) => {
+      const [otpRow] = await tx`
+        SELECT id
+        FROM otps
+        WHERE otp = ${otp}
+          AND email = ${email}
+          AND type = ${VerifyOTPType.VERIFY_OTP_REGISTERATION}
+          AND isverified = false
+          AND isactive = true
+          AND expiresat > NOW()
+      `
 
-    if (!otpRow) {
-      throw new ApiError(400, 'OTP KHÔNG HỢP LỆ');
-    }
+      if (!otpRow) {
+        throw new ApiError(400, 'OTP KHÔNG HỢP LỆ HOẶC ĐÃ HẾT HẠN')
+      }
 
-    const [existing] = await sql`
-      SELECT authid
-      FROM identifiers
-      WHERE type = 'email'
-        AND value = ${email}
-        AND isactive = true
-    `;
+      const [existing] = await tx`
+        SELECT authid
+        FROM identifiers
+        WHERE type = ${IdentifierType.EMAIL}
+          AND value = ${email}
+          AND isactive = true
+      `
 
-    let authUserId: string;
+      let authUserId: string
 
-    if (existing?.authid) {
-      authUserId = existing.authid;
-    } else {
-      const [{ id }] = await sql`
-        INSERT INTO auth_user (name, isactive)
-        VALUES (${name ?? null}, true)
-        RETURNING id
-      `;
+      if (existing?.authid) {
+        authUserId = existing.authid
+      } else {
+        const [{ id }] = await tx`
+          INSERT INTO auth_user (name, isactive)
+          VALUES (${name ?? null}, true)
+          RETURNING id
+        `
+        authUserId = id
 
-      authUserId = id;
+        await tx`
+          INSERT INTO identifiers (
+            authid,
+            type,
+            value,
+            isverified,
+            isactive
+          )
+          VALUES (
+            ${authUserId},
+            ${IdentifierType.EMAIL},
+            ${email},
+            true,
+            true
+          )
+        `
+      }
 
-      await sql`
-        INSERT INTO identifiers (
-          authid,
-          type,
-          value,
-          isverified,
-          isactive
-        )
-        VALUES (
-          ${authUserId},
-          'email',
-          ${email},
-          true,
-          true
-        )
-      `;
-    }
-
-    await sql`
-      UPDATE otps
-      SET isverified = true,
-          isactive = false,
-          verifiedat = NOW()
-      WHERE id = ${otpRow.id}
-    `;
+      await tx`
+        UPDATE otps
+        SET isverified = true,
+            isactive = false,
+            verifiedat = NOW()
+        WHERE id = ${otpRow.id}
+      `
+      return {
+        authUserId,
+        email
+      }
+    }) 
 
     const accessToken = jwtService.generateAccessToken(
       {
-        sub: authUserId,
-        email,
+        sub: result.authUserId,
+        email: result.email,
         jti: jwtService.generateJit(),
       },
-      300 
-    );
+      300
+    )
 
-    return { accessToken };
+    return { accessToken }
   }
 
-  async verifyOtpByForgotFlow( input: VerifyOtpInput ): Promise<VerifyOtpByForgotFlowResult> {
+  async verifyOtpByForgotFlow(input: VerifyOtpInput): Promise<VerifyOtpByForgotFlowResult> {
     const { otp, email } = input
 
     if (!otp || !email) {
       throw new ApiError(400, 'OTP VÀ EMAIL LÀ BẮT BUỘC')
     }
 
-    const [findOTP] = await sql`
-      SELECT otp FROM otps
-        WHERE otps.email = ${email}
-          AND otps.otp = ${otp}
-          AND otps.type = ${VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD}
-          AND otps.isverified = false
-          AND otps.isactive = true
-    `
+    const result = await sql.begin(async (tx) => {
+      const [otpRow] = await tx`
+        SELECT id
+        FROM otps
+        WHERE email = ${email}
+          AND otp = ${otp}
+          AND type = ${VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD}
+          AND isverified = false
+          AND isactive = true
+          AND expiresat > NOW()
+      `
 
-    if (!findOTP) {
-      throw new ApiError(401, 'OTP KHÔNG HỢP LỆ')
-    }
+      if (!otpRow) {
+        throw new ApiError(401, 'OTP KHÔNG HỢP LỆ HOẶC ĐÃ HẾT HẠN')
+      }
 
-    const [findUser] = await sql`
-      SELECT authid FROM identifiers
-        WHERE identifiers.type = ${IdentifierType.EMAIL}
-          AND identifiers.value = ${email}
-    `
+      const [findUser] = await tx`
+        SELECT authid
+        FROM identifiers
+        WHERE type = ${IdentifierType.EMAIL}
+          AND value = ${email}
+          AND isactive = true
+      `
 
-    if (!findUser) {
-      throw new ApiError(404, 'USER NOT FOUND')
-    }
+      if (!findUser) {
+        throw new ApiError(404, 'NGƯỜI DÙNG KHÔNG TỒN TẠI')
+      }
 
-    const resetToken = await jwtService.generateResetToken(
+      await tx`
+        UPDATE otps
+        SET isverified = true,
+            isactive = false,
+            verifiedat = NOW()
+        WHERE id = ${otpRow.id}
+      `
+
+      return {
+        authUserId: findUser.authid
+      }
+    })
+
+    const resetToken = jwtService.generateResetToken(
       {
-        sub: findUser.authid,
-        purpose: VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD
+        sub: result.authUserId,
+        purpose: VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD,
+        jti: jwtService.generateJit()
       },
       150
     )
@@ -137,4 +165,4 @@ export class VerifyOTPService {
   }
 }
 
-export const verifyOTPService = new VerifyOTPService();
+export const verifyOTPService = new VerifyOTPService()
