@@ -1,4 +1,4 @@
-import sql from "@/lib/postgresql"
+import sql from "@/lib/postgresQL"
 import ApiError from "@/common/utils/ApiError.utils"
 import { jwtService } from "@/common/jwt/index.jwt"
 import { VerifyOTPType } from "@/auth/enum/veirfy-otp-type.enum"
