@@ -1,4 +1,4 @@
-import sql from "@/lib/postgresQL";
+import sql from "@/lib/postgresql";
 import argon2 from "argon2";
 import { jwtService } from "@/common/jwt/index.jwt";
 
