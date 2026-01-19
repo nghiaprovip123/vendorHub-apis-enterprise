@@ -1,5 +1,5 @@
 import sql from "@/lib/postgresql"
-import ApiError from "@/common/utils/ApiError"
+import ApiError from "@/common/utils/ApiError.utils"
 import crypto from "crypto"
 import { sendOtpEmailRegisteration } from "@/common/utils/send-otp-helper.utils"
 import { SendOTPSchema } from "@/auth/dto/auth/auth.validation"

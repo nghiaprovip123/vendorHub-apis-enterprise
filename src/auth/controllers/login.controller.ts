@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import ApiError from '@/common/utils/ApiError';
+import ApiError from '@/common/utils/ApiError.utils';
 import { authService } from '@/auth/services/login.service';
 import { optionsCookie } from '@/common/utils/cookie.utils';
 

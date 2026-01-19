@@ -22,4 +22,20 @@ export class AuthGuard {
         }
         return payload;
     }
+
+    verifyRefreshToken() {
+        const decoded = jwtService.verifyRefreshToken(this.token);
+        if (!decoded) {
+            throw new Error('SAI TOKEN, VUI LÒNG THỬ LẠI');
+        }
+        return decoded;    
+    }
+
+    extractAccessTokenPayload() {
+        const payload = this.verifyRefreshToken();
+        if (!payload) {
+            throw new Error("KHÔNG TỒN TẠI TOKEN PAYLOAD");
+        }
+        return payload;
+    }
 }

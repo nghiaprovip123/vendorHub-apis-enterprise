@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import ApiError from '@/common/utils/ApiError';
+import ApiError from '@/common/utils/ApiError.utils';
 import { verifyOTPService } from '@/auth/services/verify-otp.service';
 
 export class VerifyOTPController {

@@ -4,11 +4,15 @@ import { sendOTPController } from "@/auth/controllers/send-otp.controller"
 import { verifyOTPController } from "@/auth/controllers/verify-otp.controller"
 import { createPasswordController } from "@/auth/controllers/create-password.controller"
 import { RefreshTokenController } from "@/auth/controllers/refresh-token.controller"
+import { SignOutController } from "@/auth/controllers/sign-out.controller"
 const AuthRouter = express.Router()
 
 
 // ĐĂNG NHẬP
 AuthRouter.post('/login', loginController.login)
+
+// ĐĂNG XUẤT
+AuthRouter.get('/logout', SignOutController)
 
 // ĐĂNG KÝ
 AuthRouter.post('/registeration/sendOTP', sendOTPController.SendOTPByRegisterationFlow)
