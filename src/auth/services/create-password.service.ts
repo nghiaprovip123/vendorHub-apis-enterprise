@@ -1,9 +1,9 @@
-import sql from "@/lib/postgresql";
+import sql from "@/lib/postgresQL";
 import argon2 from "argon2";
 import { IdentifierType } from "@/auth/enum/identifier-type.enum";
 import { VerifyOTPType } from "@/auth/enum/veirfy-otp-type.enum"
 import { AuthGuard } from "@/common/guards/auth.guard";
-
+import { passwordUtilities } from "@/common/utils/password.utils"
 export class CreatePasswordService {
     async createPasswordByRegisterationFlow(params: {
         token: string;
@@ -23,8 +23,7 @@ export class CreatePasswordService {
             throw new Error("KHÔNG TÌM THẤY USER");
         }
 
-        const hashPassword = await argon2.hash(password);
-        console.log(hashPassword)
+        const hashPassword = passwordUtilities.hashPassword({password})
         try{
             await sql`
             INSERT INTO identifiers (type, value, isverified, isactive, authid)
@@ -64,7 +63,7 @@ export class CreatePasswordService {
             throw new Error("KHÔNG TÌM THẤY USER HOẶC TOKEN KHÔNG CÓ HIỆU LỰC Ở API NÀY");
         }
 
-        const hashPassword = await argon2.hash(password);
+        const hashPassword = passwordUtilities.hashPassword({password})
         
         try{
                 await sql`

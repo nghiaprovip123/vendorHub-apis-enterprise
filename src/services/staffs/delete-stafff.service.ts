@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma"
-import { deleteAssetFromCloudinary } from "@/common/utils/delete-image-helper"
+import { deleteAssetFromCloudinary } from "@/common/utils/delete-image-helper.utils"
 import * as z from "zod"
 import { deleteStaffSchema } from "@/dto/staffs/staffs.validation"
 

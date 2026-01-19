@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { RefreshTokenService } from "@/auth/services/refresh-token.service";
-import { optionsCookie } from "@/common/utils/cookie";
+import { optionsCookie } from "@/common/utils/cookie.utils";
 
 export const RefreshTokenController = async (
   req: Request,

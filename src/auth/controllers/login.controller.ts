@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import ApiError from '@/common/utils/ApiError';
 import { authService } from '@/auth/services/login.service';
-import { optionsCookie } from '@/common/utils/cookie';
+import { optionsCookie } from '@/common/utils/cookie.utils';
 
 
 export class LoginController {

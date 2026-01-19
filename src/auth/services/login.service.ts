@@ -3,7 +3,7 @@ import sql from '@/lib/postgresql';
 import ApiError from '@/common/utils/ApiError';
 import { IdentifierType } from '@/auth/enum/identifier-type.enum';
 import { jwtService } from '@/common/jwt/index.jwt';
-
+import { PasswordUtilities } from '@/common/utils/password.utils'
 type LoginInput = {
   email: string;
   password: string;
@@ -30,21 +30,24 @@ export class LoginService {
     const authid = identifier.authid;
 
     const [passwordRow] = await sql`
-      SELECT value
-      FROM identifiers
-      WHERE authid = ${authid}
-        AND type = ${IdentifierType.PASSWORD}
-    `;
-
-    if (!passwordRow?.value) {
-      throw new ApiError(500, 'PASSWORD IDENTIFIER NOT FOUND');
-    }
-
-    const isValid = await argon2.verify(passwordRow.value, password);
-
-    if (!isValid) {
-      throw new ApiError(401, 'KHÔNG ĐÚNG THÔNG TIN ĐĂNG NHẬP');
-    }
+    SELECT value AS "hashPassword"
+    FROM identifiers
+    WHERE authid = ${authid}
+      AND type = ${IdentifierType.PASSWORD}
+  `;
+  
+  if (!passwordRow?.hashPassword) {
+    throw new ApiError(500, 'PASSWORD IDENTIFIER NOT FOUND');
+  }
+  
+  const isValid = await PasswordUtilities.comparePassword(
+    passwordRow.hashPassword,
+    password
+  );
+  
+  if (!isValid) {
+    throw new ApiError(401, 'KHÔNG ĐÚNG THÔNG TIN ĐĂNG NHẬP');
+  }
 
     const refreshToken = await jwtService.generateRefreshToken(
       {
