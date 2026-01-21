@@ -5,7 +5,7 @@ import { sendOtpEmailRegisteration } from "@/common/utils/send-otp-helper.utils"
 import { SendOTPSchema } from "@/auth/dto/auth/auth.validation"
 import * as z from "zod"
 import { VerifyOTPType } from "@/auth/enum/veirfy-otp-type.enum"
-
+import { OTPRepository } from "@/auth/repositories/otp.repository"
 type SendOTPServiceType = z.infer<typeof SendOTPSchema>
 type SendOTPServiceResult = {
     otp: any,
@@ -26,47 +26,30 @@ export class SendOTPService {
         let result
 
         try {
-            result = await sql.begin(async (sql) => {
-                const [{ count }] = await sql`
-                    SELECT COUNT(*)::int AS count 
-                    FROM otps
-                    WHERE type = ${type}
-                        AND email = ${email}
-                        AND createdat > NOW() - INTERVAL '15 minutes'
-                `
+            result = await sql.begin(async (trx) => {
+                const otpRepo = new OTPRepository(trx)
+
+                ////////////////////////////////////////////////////////////////////////////////////
+                // Layerize Repositories for OTP Entity: Count the OTP by email within 15 minutes //
+                const count = await otpRepo.countOTPWithin15Minutes(email, type)
 
                 if (count >= 3) {
                     throw new ApiError(429, "KHÔNG THỂ GỬI OTP VÌ SỐ LẦN GỬI OTP ĐÃ ĐẠT GIỚI HẠN")
                 }
 
-                // Deactivate old OTPs
-                await sql`
-                    UPDATE otps
-                    SET isverified = true,
-                        isactive = false
-                    WHERE type = ${type}
-                        AND email = ${email}
-                        AND phone = ${phone}
-                        AND isverified = false
-                        AND isactive = true
-                `
-
+                ////////////////////////////////////////////////////////////////////////////////////
+                // Layerize Repositories for OTP Entity: De-Active all the old OTPs for the new process //
+                await otpRepo.deactiveOldOTPs(email, phone, type)
                 const generateOTP = crypto.randomInt(100000, 999999).toString()
 
-                const [{ expiresat, id }] = await sql`
-                    INSERT INTO otps (
-                        type, email, otp, expiresat, phone
-                    ) VALUES (
-                        ${type}, ${email}, ${generateOTP},
-                        NOW() + INTERVAL '15 Minutes', ${phone}
-                    )
-                    RETURNING expiresat, id
-                `
+                ////////////////////////////////////////////////////////////////////////
+                // Layerize Repositories for OTP Entity: Create the new OTP by email //
+                const createNewOTP = await otpRepo.createNewOTP(email, phone, type, generateOTP)
 
-                const [sendOTP] = await sql`
-                    SELECT * FROM otps WHERE id = ${id}
-                `
-
+                /////////////////////////////////////////////////////////////////////////////////////
+                // Layerize Repositories for OTP Entity: Select the OTP that is just sent by Email //
+                const sendOTP = await otpRepo.findSentOTP(createNewOTP.id)
+                const expiresat = await createNewOTP.expiresat
                 return {
                     sendOTP,
                     expiresat,
