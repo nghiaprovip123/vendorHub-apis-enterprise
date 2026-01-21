@@ -9,7 +9,7 @@ import { OTPRepository } from "@/auth/repositories/otp.repository"
 type SendOTPServiceType = z.infer<typeof SendOTPSchema>
 type SendOTPServiceResult = {
     otp: any,
-    expiresAt: string,
+    expiresAt: Date,
     remainingAttempts: number
 }
 

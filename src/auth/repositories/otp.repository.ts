@@ -83,4 +83,29 @@ export class OTPRepository {
 
         return otp
     }
+
+    async findOTPForVerification(otp: string, email: string, type: string) {
+        const [otpRow] = await this.sql`
+            SELECT id
+                FROM otps
+                    WHERE otp = ${otp}
+                        AND email = ${email}
+                        AND type = ${type}
+                        AND isverified = false
+                        AND isactive = true
+                        AND expiresat > NOW()
+        `
+        return otpRow
+    }
+
+    async setOTPAsVerified (id: string) {
+        await this.sql`
+            UPDATE otps
+                SET isverified = true,
+                    isactive = false,
+                    verifiedat = NOW()
+            WHERE id = ${id}
+        `
+    }
+
 }

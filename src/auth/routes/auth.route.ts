@@ -28,7 +28,7 @@ AuthRouter.post('/registeration/createPassword', createPasswordController.create
 
 // QUÊN MẬT KHẨU
 AuthRouter.post('/forgot-password/sendOTP', sendOTPController.SendOTPByForgotFlow)
-AuthRouter.post('forgot-password/verifyOTP', verifyOTPController.verifyOTPByForgotFlow)
+AuthRouter.post('/forgot-password/verifyOTP', verifyOTPController.verifyOTPByForgotFlow)
 AuthRouter.post('/forgot-password/createPassword', createPasswordController.createPasswordByForgotFlow)
 
 // REFRESH TOKEN

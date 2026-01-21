@@ -3,105 +3,77 @@ import ApiError from "@/common/utils/ApiError.utils"
 import { jwtService } from "@/common/jwt/index.jwt"
 import { VerifyOTPType } from "@/auth/enum/veirfy-otp-type.enum"
 import { IdentifierType } from "@/auth/enum/identifier-type.enum"
-
+import { OTPRepository } from '@/auth/repositories/otp.repository'
+import { IdentifiersRepository } from '@/auth/repositories/identifiers.repository'
+import { AuthenticationUserRepository } from '@/auth/repositories/auth-user.repository'
 type VerifyOtpInput = {
-    otp: string
-    email: string
-    name?: string
+  otp: string
+  email: string
+  name?: string
 }
-
 type VerifyOtpByRegisterationFlowResult = {
-    accessToken: string
+  accessToken: string
 }
 
 type VerifyOtpByForgotFlowResult = {
-    resetToken: string
+  resetToken: string
 }
 
 export class VerifyOTPService {
   async verifyOtpByRegisterationFlow({
-    otp,
-    email,
-    name,
+      otp,
+      email,
+      name,
   }: VerifyOtpInput): Promise<VerifyOtpByRegisterationFlowResult> {
-    
-    const result = await sql.begin(async (tx) => {
-      const [otpRow] = await tx`
-        SELECT id
-        FROM otps
-        WHERE otp = ${otp}
-          AND email = ${email}
-          AND type = ${VerifyOTPType.VERIFY_OTP_REGISTERATION}
-          AND isverified = false
-          AND isactive = true
-          AND expiresat > NOW()
-      `
+      
+      const result = await sql.begin(async (tx) => {
+          const otpRepo = new OTPRepository(tx)
+          const identifiersRepo = new IdentifiersRepository(tx)
+          const authenticationUserRepository = new AuthenticationUserRepository(tx)
+          
+          const otpRow = await otpRepo.findOTPForVerification(otp, email, VerifyOTPType.VERIFY_OTP_REGISTERATION)
+          
+          if (!otpRow) {
+              throw new ApiError(400, 'OTP KHÔNG HỢP LỆ HOẶC ĐÃ HẾT HẠN')
+          }
 
-      if (!otpRow) {
-        throw new ApiError(400, 'OTP KHÔNG HỢP LỆ HOẶC ĐÃ HẾT HẠN')
-      }
-
-      const [existing] = await tx`
-        SELECT authid
-        FROM identifiers
-        WHERE type = ${IdentifierType.EMAIL}
-          AND value = ${email}
-          AND isactive = true
-      `
-
-      let authUserId: string
-
-      if (existing?.authid) {
-        authUserId = existing.authid
-      } else {
-        const [{ id }] = await tx`
-          INSERT INTO auth_user (name, isactive)
-          VALUES (${name ?? null}, true)
-          RETURNING id
-        `
-        authUserId = id
-
-        await tx`
-          INSERT INTO identifiers (
-            authid,
-            type,
-            value,
-            isverified,
-            isactive
+          const existing = await identifiersRepo.checkExistenceOfIdentifier(
+              IdentifierType.EMAIL, 
+              email
           )
-          VALUES (
-            ${authUserId},
-            ${IdentifierType.EMAIL},
-            ${email},
-            true,
-            true
-          )
-        `
-      }
 
-      await tx`
-        UPDATE otps
-        SET isverified = true,
-            isactive = false,
-            verifiedat = NOW()
-        WHERE id = ${otpRow.id}
-      `
-      return {
-        authUserId,
-        email
-      }
-    }) 
+          let authUserId: string
 
-    const accessToken = jwtService.generateAccessToken(
-      {
-        sub: result.authUserId,
-        email: result.email,
-        jti: jwtService.generateJit(),
-      },
-      300
-    )
+          if (existing?.authid) {
+              authUserId = existing.authid
+          } else {
+              const createAuthUser = await authenticationUserRepository.createNewAuthenticationUser(name)
+              authUserId = createAuthUser.id
+              await identifiersRepo.insertIdentifiers(
+                  authUserId, 
+                  IdentifierType.EMAIL, 
+                  email
+              )
+          }
 
-    return { accessToken }
+          await otpRepo.setOTPAsVerified(otpRow.id)
+          
+          return {
+              authUserId,
+              email
+          }
+      })
+
+      const accessToken = jwtService.generateAccessToken(
+          {
+              sub: result.authUserId,
+              email: result.email,
+              jti: jwtService.generateJit(),
+          },
+          300
+      )
+
+      return { accessToken }
   }
 
   async verifyOtpByForgotFlow(input: VerifyOtpInput): Promise<VerifyOtpByForgotFlowResult> {
@@ -112,40 +84,24 @@ export class VerifyOTPService {
     }
 
     const result = await sql.begin(async (tx) => {
-      const [otpRow] = await tx`
-        SELECT id
-        FROM otps
-        WHERE email = ${email}
-          AND otp = ${otp}
-          AND type = ${VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD}
-          AND isverified = false
-          AND isactive = true
-          AND expiresat > NOW()
-      `
+      const otpRepo = new OTPRepository(tx)
+      const identifiersRepo = new IdentifiersRepository(tx)
+      const otpRow = await otpRepo.findOTPForVerification(otp, email, VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD)
 
       if (!otpRow) {
         throw new ApiError(401, 'OTP KHÔNG HỢP LỆ HOẶC ĐÃ HẾT HẠN')
       }
 
-      const [findUser] = await tx`
-        SELECT authid
-        FROM identifiers
-        WHERE type = ${IdentifierType.EMAIL}
-          AND value = ${email}
-          AND isactive = true
-      `
+      const findUser = await identifiersRepo.checkExistenceOfIdentifier(
+        IdentifierType.EMAIL, 
+        email
+    )
 
       if (!findUser) {
         throw new ApiError(404, 'NGƯỜI DÙNG KHÔNG TỒN TẠI')
       }
 
-      await tx`
-        UPDATE otps
-        SET isverified = true,
-            isactive = false,
-            verifiedat = NOW()
-        WHERE id = ${otpRow.id}
-      `
+      await otpRepo.setOTPAsVerified(otpRow.id)
 
       return {
         authUserId: findUser.authid
