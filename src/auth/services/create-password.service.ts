@@ -41,7 +41,7 @@ export class CreatePasswordService {
         password: string;
     }) {
         const { token, password } = params;
-
+        const identifiersRepo = new IdentifiersRepository(sql)
         const guard = new AuthGuard(token);
         const payload = guard.extractTokenPayload();
         const { sub, purpose } = payload;
@@ -56,16 +56,8 @@ export class CreatePasswordService {
 
         const hashPassword = await PasswordUtilities.hashPassword(password)
         
-        try{
-                await sql`
-                    UPDATE identifiers
-                    SET value = ${hashPassword},
-                        isverified = true,
-                        isactive = true
-                    WHERE authid = ${sub}
-                        AND type = ${IdentifierType.PASSWORD}
-                    RETURNING authid
-                `
+        try {
+            await identifiersRepo.updatePasswordIdentifier(IdentifierType.PASSWORD, sub, hashPassword)
         } catch (err: any) {
             if (err.code === "23505") {
                 throw new Error("KHÔNG THỂ TẠO MẬT KHẨU VÌ NGƯỜI DÙNG ĐÃ TỒN TẠI");

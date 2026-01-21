@@ -46,4 +46,15 @@ export class IdentifiersRepository {
         `
     }
 
+    async updatePasswordIdentifier (type: string, authid: string, value: string) {
+        await this.sql`
+            UPDATE identifiers 
+                SET value = ${value},
+                    isverified = true,
+                    isactive = true
+                WHERE authid = ${authid}
+                    AND type = ${type}
+        `
+    }
+
 }
