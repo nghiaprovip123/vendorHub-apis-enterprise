@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma"
-import { getStaffListService } from "@/services/staffs/view-staff-list.service"
+import { getStaffListService } from "@/staff/services/view-staff-list.service"
 const PAGE_SIZE = 10
 
 const getStaffList = async (

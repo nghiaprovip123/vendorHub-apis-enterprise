@@ -1,5 +1,5 @@
 import { deleteAssetFromCloudinary } from "@/common/utils/delete-image-helper.utils"
-import { deleteStaffService } from "@/services/staffs/delete-stafff.service"
+import { deleteStaffService } from "@/staff/services/delete-stafff.service"
 
 const deleteStaff = async (
   _: unknown,

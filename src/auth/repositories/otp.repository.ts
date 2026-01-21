@@ -24,9 +24,6 @@ export type CreateOtpInput = {
 }
 
 export class OtpRepository {
-    /**
-     * Count OTPs sent within time window
-     */
     async countRecentOtps(email: string, type: VerifyOTPType, minutesAgo: number): Promise<number> {
         const [{ count }] = await sql`
             SELECT COUNT(*)::int AS count
@@ -38,9 +35,6 @@ export class OtpRepository {
         return count
     }
 
-    /**
-     * Deactivate existing active OTPs
-     */
     async deactivateOtps(tx: any, params: { email: string; phone: string; type: VerifyOTPType }): Promise<void> {
         const { email, phone, type } = params
         await tx`
@@ -55,9 +49,6 @@ export class OtpRepository {
         `
     }
 
-    /**
-     * Create new OTP
-     */
     async create(tx: any, input: CreateOtpInput): Promise<OtpEntity> {
         const { email, phone, otp, type, expiresAt } = input
         
@@ -72,9 +63,6 @@ export class OtpRepository {
         return created
     }
 
-    /**
-     * Find OTP by ID
-     */
     async findById(tx: any, id: string): Promise<OtpEntity | null> {
         const [otp] = await tx`
             SELECT * FROM otps WHERE id = ${id}
@@ -82,9 +70,6 @@ export class OtpRepository {
         return otp || null
     }
 
-    /**
-     * Find active valid OTP
-     */
     async findActiveOtp(tx: any, params: {
         otp: string
         email: string
@@ -105,9 +90,6 @@ export class OtpRepository {
         return otpRow || null
     }
 
-    /**
-     * Mark OTP as verified
-     */
     async markAsVerified(tx: any, otpId: string): Promise<void> {
         await tx`
             UPDATE otps
@@ -118,9 +100,6 @@ export class OtpRepository {
         `
     }
 
-    /**
-     * Increment attempt count
-     */
     async incrementAttempt(tx: any, otpId: string): Promise<void> {
         await tx`
             UPDATE otps

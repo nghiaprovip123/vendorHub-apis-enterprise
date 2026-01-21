@@ -1,4 +1,4 @@
-import { getAvailableStaffbyBookingTimeService } from "@/services/staffs/get-available-staff.service"
+import { getAvailableStaffbyBookingTimeService } from "@/staff/services/get-available-staff.service"
 
 const getAvailableStaffByBookingTime = async (
   _: unknown,

@@ -1,5 +1,5 @@
 import { GraphQLUpload } from "graphql-upload-minimal";
-import { updateStaffService } from "@/services/staffs/update-staff.service"
+import { updateStaffService } from "@/staff/services/update-staff.service"
 const updateStaff = async (
     _: unknown,
     args: { input: any },

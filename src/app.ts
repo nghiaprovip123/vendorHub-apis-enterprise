@@ -97,7 +97,7 @@ dotenv.config();
     app.use(
         graphqlUploadExpress({
           maxFileSize: 5_000_000,
-          maxFiles: 1,
+          maxFiles: 5,
         })
       )
     app.use('/auth', AuthRouter)

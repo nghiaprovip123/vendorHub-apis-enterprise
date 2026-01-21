@@ -5,7 +5,7 @@ import { join } from "path";
 // __dirname sẽ là:
 // - src/typeDefs khi dev
 // - dist/typeDefs khi build
-const typeDefsDir = __dirname;
+const typeDefsDir = join(__dirname, "..");
 
 function getGraphqlFiles(dir: string): string[] {
   let results: string[] = [];

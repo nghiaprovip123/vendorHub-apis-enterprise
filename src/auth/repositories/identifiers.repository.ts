@@ -22,9 +22,6 @@ export type CreateIdentifierInput = {
 }
 
 export class IdentifierRepository {
-    /**
-     * Find identifier by email
-     */
     async findByEmail(email: string): Promise<IdentifierEntity | null> {
         const [identifier] = await sql`
             SELECT *
