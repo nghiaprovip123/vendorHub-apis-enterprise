@@ -33,4 +33,17 @@ export class IdentifiersRepository {
         `
     }
 
+    async createPasswordIdentifier (type: string, value: string, authid: string) {
+        await this.sql`
+            INSERT INTO identifiers (type, value, isverified, isactive, authid)
+            VALUES (
+                ${type},
+                ${value},
+                true,
+                true,
+                ${authid}
+            )
+        `
+    }
+
 }

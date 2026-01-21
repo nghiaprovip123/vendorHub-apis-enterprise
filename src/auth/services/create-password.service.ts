@@ -3,13 +3,14 @@ import { IdentifierType } from "@/auth/enum/identifier-type.enum";
 import { VerifyOTPType } from "@/auth/enum/veirfy-otp-type.enum"
 import { AuthGuard } from "@/common/guards/auth.guard";
 import { PasswordUtilities } from "@/common/utils/password.utils"
+import { IdentifiersRepository } from "@/auth/repositories/identifiers.repository"
 export class CreatePasswordService {
     async createPasswordByRegisterationFlow(params: {
         token: string;
         password: string;
     }) {
         const { token, password } = params;
-
+        const identifiersRepo = new IdentifiersRepository(sql)
         const guard = new AuthGuard(token);
         const payload = guard.extractTokenPayload();
         const { sub } = payload;
@@ -24,16 +25,7 @@ export class CreatePasswordService {
 
         const hashPassword = await PasswordUtilities.hashPassword(password)
         try{
-            await sql`
-            INSERT INTO identifiers (type, value, isverified, isactive, authid)
-            VALUES (
-                ${IdentifierType.PASSWORD},
-                ${hashPassword},
-                true,
-                true,
-                ${sub}
-            )
-        `;
+            await identifiersRepo.createPasswordIdentifier(IdentifierType.PASSWORD, hashPassword, sub)
         } catch (err: any) {
             if (err.code === "23505") {
                 throw new Error("KHÔNG THỂ TẠO MẬT KHẨU VÌ NGƯỜI DÙNG ĐÃ TỒN TẠI");
