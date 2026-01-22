@@ -70,7 +70,7 @@ export class IdentifiersRepository {
     }
 
     async findPasswordIdentifier (authid: string, type: string) {
-        const [passwordRow] = await sql`
+        const [passwordRow] = await this.sql`
             SELECT value AS "hashPassword"
                 FROM identifiers
                     WHERE authid = ${authid}
@@ -78,6 +78,17 @@ export class IdentifiersRepository {
         `
 
         return passwordRow
+    }
+
+    async findEmailIdentifier (authid: string, type: string) {
+        const [{email}] = await this.sql`
+            SELECT value AS email
+                FROM identifiers
+                    WHERE type = ${type}
+                        AND authid = ${authid}
+        `
+
+        return email;
     }
 
 }

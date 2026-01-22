@@ -20,4 +20,26 @@ export class RefreshTokenSessionRepository {
             )
         `
     }
+
+    async findSession(authid: string) {
+        const [session] = await this.sql`
+            SELECT refreshtokenhash, sessionid
+                FROM refresh_token_sessions 
+                    WHERE authid = ${authid}
+                        AND expiresat > NOW()
+                    ORDER BY createdat DESC 
+                    LIMIT 1
+        `
+
+        return session
+    }
+
+    async deleteOldSession(sessionid: string) {
+        await sql`
+            DELETE FROM refresh_token_sessions 
+                WHERE sessionid = ${sessionid}
+        `
+    }
+
+    async 
 }

@@ -55,7 +55,6 @@ export class LoginService {
     const refreshTokenHash = await argon2.hash(refreshToken);
 
     await refreshTokenSessionRepo.createRefreshTokenSession(authid, refreshTokenHash, userAgent)
-    
 
     return { refreshToken };
   }

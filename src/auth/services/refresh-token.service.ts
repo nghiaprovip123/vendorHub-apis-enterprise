@@ -1,7 +1,9 @@
 import sql from "@/lib/postgresql";
 import argon2 from "argon2";
 import { jwtService } from "@/common/jwt/index.jwt";
-
+import { RefreshTokenSessionRepository } from '@/auth/repositories/refresh-token-sessions.repository'
+import { IdentifiersRepository } from '@/auth/repositories/identifiers.repository'
+import { IdentifierType } from "@/auth/enum/identifier-type.enum"
 type RefreshTokenResult = {
   accessToken: string;
   refreshToken: string;
@@ -10,7 +12,7 @@ type RefreshTokenResult = {
 export class RefreshTokenService {
   static async execute(
     refreshToken: string,
-    userAgent: string | null
+    userAgent: string
   ): Promise<RefreshTokenResult> {
 
     const payload = await jwtService.verifyRefreshToken(refreshToken);
@@ -21,14 +23,9 @@ export class RefreshTokenService {
     const { sub } = payload;
 
     return await sql.begin(async (tx) => {
-      const [session] = await tx`
-        SELECT refreshtokenhash, sessionid
-        FROM refresh_token_sessions
-        WHERE authid = ${sub}
-          AND expiresat > NOW()
-        ORDER BY createdat DESC
-        LIMIT 1
-      `;
+      const refreshTokenSessionRepo = new RefreshTokenSessionRepository(tx)
+      const identifiersRepo = new IdentifiersRepository(tx)
+      const session = await refreshTokenSessionRepo.findSession(sub)
 
       if (!session) {
         throw new Error("KHÔNG TÌM THẤY SESSION REFRESH TOKEN");
@@ -44,17 +41,9 @@ export class RefreshTokenService {
       }
 
       // Rotate: xoá session cũ
-      await tx`
-        DELETE FROM refresh_token_sessions
-        WHERE sessionid = ${session.sessionid}
-      `;
+      await refreshTokenSessionRepo.deleteOldSession(session.sessionid)
 
-      const [{ email }] = await tx`
-        SELECT value AS email
-        FROM identifiers
-        WHERE type = 'email'
-          AND authid = ${sub}
-      `;
+      const email = await identifiersRepo.findEmailIdentifier(sub, IdentifierType.EMAIL)
 
       const accessToken = jwtService.generateAccessToken(
         {
@@ -76,22 +65,7 @@ export class RefreshTokenService {
 
       const newRefreshTokenHash = await argon2.hash(newRefreshToken);
 
-      await tx`
-        INSERT INTO refresh_token_sessions (
-          authid,
-          refreshtokenhash,
-          expiresat,
-          sessionid,
-          useragent
-        )
-        VALUES (
-          ${sub},
-          ${newRefreshTokenHash},
-          NOW() + INTERVAL '7 days',
-          gen_random_uuid(),
-          ${userAgent}
-        )
-      `;
+      await refreshTokenSessionRepo.createRefreshTokenSession(sub, newRefreshTokenHash, userAgent)
 
       return {
         accessToken,
