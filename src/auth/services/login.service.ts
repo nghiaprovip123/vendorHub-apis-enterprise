@@ -4,6 +4,8 @@ import ApiError from '@/common/utils/ApiError.utils';
 import { IdentifierType } from '@/auth/enum/identifier-type.enum';
 import { jwtService } from '@/common/jwt/index.jwt';
 import { PasswordUtilities } from '@/common/utils/password.utils'
+import { IdentifiersRepository } from '@/auth/repositories/identifiers.repository'
+import { RefreshTokenSessionRepository } from '@/auth/repositories/refresh-token-sessions.repository'
 type LoginInput = {
   email: string;
   password: string;
@@ -14,30 +16,22 @@ type LoginResult = {
   refreshToken: string;
 };
 
+const identifiersRepo = new IdentifiersRepository(sql)
+const refreshTokenSessionRepo = new RefreshTokenSessionRepository(sql)
 export class LoginService {
   async login({ email, password, userAgent }: LoginInput): Promise<LoginResult> {
-    const [identifier] = await sql`
-      SELECT authid
-      FROM identifiers
-      WHERE type = ${IdentifierType.EMAIL}
-        AND value = ${email}
-    `;
+    const identifier = await identifiersRepo.findIdentifier(IdentifierType.EMAIL, email)
 
     if (!identifier?.authid) {
-      throw new ApiError(403, 'TÀI KHOẢN KHÔNG TỒN TẠI');
+      throw new ApiError(403, 'TÀI KHOẢN KHÔNG TỒN TẠI HOẶC ĐÃ BỊ TẠM KHOÁ');
     }
 
     const authid = identifier.authid;
 
-    const [passwordRow] = await sql`
-    SELECT value AS "hashPassword"
-    FROM identifiers
-    WHERE authid = ${authid}
-      AND type = ${IdentifierType.PASSWORD}
-  `;
+    const passwordRow = await identifiersRepo.findPasswordIdentifier(authid, IdentifierType.PASSWORD)
   
   if (!passwordRow?.hashPassword) {
-    throw new ApiError(500, 'PASSWORD IDENTIFIER NOT FOUND');
+    throw new ApiError(500, 'PASSWORD KHÔNG CHÍNH XÁC');
   }
   
   const isValid = await PasswordUtilities.comparePassword(
@@ -60,22 +54,8 @@ export class LoginService {
 
     const refreshTokenHash = await argon2.hash(refreshToken);
 
-    await sql`
-      INSERT INTO refresh_token_sessions (
-        authid,
-        refreshtokenhash,
-        expiresat,
-        sessionid,
-        useragent
-      )
-      VALUES (
-        ${authid},
-        ${refreshTokenHash},
-        NOW() + INTERVAL '7d',
-        gen_random_uuid(),
-        ${userAgent}
-      )
-    `;
+    await refreshTokenSessionRepo.createRefreshTokenSession(authid, refreshTokenHash, userAgent)
+    
 
     return { refreshToken };
   }

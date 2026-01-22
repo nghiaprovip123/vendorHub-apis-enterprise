@@ -1,4 +1,5 @@
 import sql from "@/lib/postgresql"
+import { IdentifierType } from "../enum/identifier-type.enum"
 
 export class IdentifiersRepository {
     constructor (private readonly sql: any) {}
@@ -13,6 +14,17 @@ export class IdentifiersRepository {
 
         `
         return existing
+    }
+
+    async findIdentifier(type: string, value: string) {
+        const [identifier] = await sql`
+            SELECT authid
+                FROM identifiers
+                    WHERE type = ${type}
+                        AND value = ${value}
+        `
+
+        return identifier
     }
 
     async insertIdentifiers (authid: string, type: string, value: string) {
@@ -55,6 +67,17 @@ export class IdentifiersRepository {
                 WHERE authid = ${authid}
                     AND type = ${type}
         `
+    }
+
+    async findPasswordIdentifier (authid: string, type: string) {
+        const [passwordRow] = await sql`
+            SELECT value AS "hashPassword"
+                FROM identifiers
+                    WHERE authid = ${authid}
+                        AND type = ${IdentifierType.PASSWORD}
+        `
+
+        return passwordRow
     }
 
 }
