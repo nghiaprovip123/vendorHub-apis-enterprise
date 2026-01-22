@@ -2,13 +2,17 @@ import sql from "@/lib/postgresql";
 import argon2 from "argon2";
 import { jwtService } from "@/common/jwt/index.jwt";
 import { GoogleOpenAuthorizationService } from "@/auth/services/google-oauth.service";
-
+import { RefreshTokenSessionRepository } from '@/auth/repositories/refresh-token-sessions.repository'
+import { IdentifiersRepository } from "@/auth/repositories/identifiers.repository";
+import { IdentifierType } from '@/auth/enum/identifier-type.enum'
 export class GoogleCallbackAuthService {
     static async execute(params: {
     code: string;
-    userAgent?: string | null;
+    userAgent: string | null
   }): Promise<{ accessToken: string; refreshToken: string }> {
     const { code, userAgent } = params;
+    
+    const refreshTokenSessionRepo = new RefreshTokenSessionRepository(sql)
 
     const tokenData =
       await GoogleOpenAuthorizationService.exchangeGoogleTokens({ code });
@@ -39,22 +43,7 @@ export class GoogleCallbackAuthService {
 
     const refreshTokenHash = await argon2.hash(refreshToken);
 
-    await sql`
-      INSERT INTO refresh_token_sessions (
-        authid,
-        refreshtokenhash,
-        expiresat,
-        sessionid,
-        userAgent
-      )
-      VALUES (
-        ${authId},
-        ${refreshTokenHash},
-        NOW() + INTERVAL '7 days',
-        gen_random_uuid(),
-        ${userAgent ?? null}
-      )
-    `;
+    await refreshTokenSessionRepo.createRefreshTokenSession(authId, refreshTokenHash, userAgent)
 
     const accessToken = await jwtService.generateAccessToken(
       {
@@ -72,14 +61,8 @@ export class GoogleCallbackAuthService {
     email: string,
     userAgent?: string | null
   ): Promise<string> {
-    const [existing] = await sql`
-      SELECT authid
-      FROM identifiers
-      WHERE type = 'email'
-        AND value = ${email}
-        AND isactive = true
-      LIMIT 1
-    `;
+    const identifiersRepo = new IdentifiersRepository(sql)
+    const existing = await identifiersRepo.checkExistenceOfIdentifier(IdentifierType.EMAIL, email)
 
     if (existing) {
       return existing.authid;
@@ -89,7 +72,7 @@ export class GoogleCallbackAuthService {
       INSERT INTO auth_user DEFAULT VALUES
       RETURNING id
     `;
-
+    
     await sql`
       INSERT INTO identifiers (
         type,

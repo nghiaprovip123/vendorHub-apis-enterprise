@@ -3,7 +3,7 @@ import sql from '@/lib/postgresql'
 export class RefreshTokenSessionRepository {
     constructor(private readonly sql: any){}
 
-    async createRefreshTokenSession(authid: string, refreshtokenhash: string, useragent: string) {
+    async createRefreshTokenSession(authid: string, refreshtokenhash: string, useragent: string | null) {
         await this.sql`
             INSERT INTO refresh_token_sessions (
                 authid,

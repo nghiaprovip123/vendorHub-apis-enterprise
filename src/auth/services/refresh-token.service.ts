@@ -12,7 +12,7 @@ type RefreshTokenResult = {
 export class RefreshTokenService {
   static async execute(
     refreshToken: string,
-    userAgent: string
+    userAgent: string | null
   ): Promise<RefreshTokenResult> {
 
     const payload = await jwtService.verifyRefreshToken(refreshToken);
