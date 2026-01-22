@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBookingListInBackOfficeService = void 0;
-const prisma_1 = require("../../lib/prisma");
+const prisma_1 = require("@/lib/prisma");
 const getMonthRange = async (date) => {
     const d = new Date(date);
     const day = d.getDate();

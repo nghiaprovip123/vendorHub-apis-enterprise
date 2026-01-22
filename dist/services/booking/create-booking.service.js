@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createBookingByCustomerService = void 0;
-const prisma_1 = require("../../lib/prisma");
+const prisma_1 = require("@/lib/prisma");
 const createBookingByCustomerService = async (input) => {
     const { serviceId, staffId, day, dayOfWeek, startTime, endTime, customerName, customerPhone, customerEmail, notes, } = input;
     if (!serviceId) {

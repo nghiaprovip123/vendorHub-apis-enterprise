@@ -20,23 +20,21 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const graphql_upload_minimal_1 = require("graphql-upload-minimal");
 const logger_1 = require("./lib/logger");
 const morgan_1 = __importDefault(require("morgan"));
-const auth_route_1 = __importDefault(require("./routes/auth.route"));
-const error_middleware_1 = require("./middlewares/error.middleware");
-// Asnychronous Anonymous Function
-// Inside of server.ts -> await keyword
+const auth_route_1 = __importDefault(require("@/auth/routes/auth.route"));
+const error_guard_1 = require("@/common/guards/error.guard");
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 dotenv_1.default.config();
 (async function () {
     const PORT = Number(process.env.PORT) || 3000;
-    // Server code in here!
-    const pubsub = new graphql_subscriptions_1.PubSub(); // Publish and Subscribe, Publish -> everyone gets to hear it
+    const pubsub = new graphql_subscriptions_1.PubSub();
     const app = (0, express_1.default)();
     app.use(express_1.default.json());
+    app.use((0, cookie_parser_1.default)());
     app.use((req, res, next) => {
         req.id = Math.random().toString(36).substring(7);
         res.setHeader('X-Request-ID', req.id);
         next();
     });
-    // HTTP request logging
     morgan_1.default.token('request-id', (req) => req.id);
     app.use((0, morgan_1.default)((tokens, req, res) => {
         return JSON.stringify({
@@ -57,7 +55,6 @@ dotenv_1.default.config();
             },
         },
     }));
-    // Request ID middleware
     const httpServer = (0, http_1.createServer)(app);
     app.use((0, cors_1.default)({
         origin: true, // hoặc '*'
@@ -86,14 +83,12 @@ dotenv_1.default.config();
             }
         ]
     });
-    // start our server
     await server.start();
     app.use((0, graphql_upload_minimal_1.graphqlUploadExpress)({
         maxFileSize: 5000000,
-        maxFiles: 1,
+        maxFiles: 5,
     }));
     app.use('/auth', auth_route_1.default);
-    // apply middlewares (cors, expressmiddlewares)
     app.use('/graphql', (0, cors_1.default)(), body_parser_1.default.json(), (0, express4_1.expressMiddleware)(server, {
         context: async ({ req, res }) => {
             const contextLogger = (0, logger_1.createContextLogger)({
@@ -108,9 +103,7 @@ dotenv_1.default.config();
             };
         }
     }));
-    app.use(error_middleware_1.errorHandler);
-    // http server start
-    // http server start
+    app.use(error_guard_1.errorHandler);
     httpServer.listen(PORT, "0.0.0.0", () => {
         logger_1.logger.info('Server started', {
             port: PORT,

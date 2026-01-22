@@ -3,28 +3,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvers = void 0;
 // resolvers/index.ts
 // import { productResolver } from "./products.resolvers";
-const create_staff_resolver_1 = require("./staffs/create-staff.resolver");
-const update_staff_resolver_1 = require("./staffs/update-staff.resolver");
-const delete_staff_resolver_1 = require("./staffs/delete-staff.resolver");
-const view_staff_list_resolver_1 = require("./staffs/view-staff-list.resolver");
-const get_available_staff_resolver_1 = require("./staffs/get-available-staff.resolver");
-const create_booking_resolver_1 = require("./booking/create-booking.resolver");
-const assign_staff_resolver_1 = require("./booking/assign-staff.resolver");
-const cancel_booking_resolver_1 = require("./booking/cancel-booking.resolver");
-const view_booking_detail_resolver_1 = require("./booking/view-booking-detail.resolver");
-const get_booking_list_by_week_resolver_1 = require("./booking/get-booking-list-by-week.resolver");
-const get_booking_list_by_month_resolver_1 = require("./booking/get-booking-list-by-month.resolver");
+const create_staff_resolver_1 = require("@/staff/resolvers/create-staff.resolver");
+// import { UpdateStaff } from "../staff/resolvers/update-staff.resolver"
+// import { DeleteStaff } from "../staff/resolvers/delete-staff.resolver"
+// import { ViewStaffList } from "../staff/resolvers/view-staff-list.resolver"
+// import { GetAvailableStaff } from "../staff/resolvers/get-available-staff.resolver"
+// import { CreateBookingByCustomer } from "./booking/create-booking.resolver"
+// import { AssignStaffByBookingRequest } from "./booking/assign-staff.resolver"
+// import { CancelBooking } from "./booking/cancel-booking.resolver"
+// import { ViewBookingDetailInBackOffce } from "./booking/view-booking-detail.resolver"
+// import { GetBookingListInBackOfficeByWeek } from "./booking/get-booking-list-by-week.resolver"
+// import { GetBookingListInBackOfficeByMonth } from "./booking/get-booking-list-by-month.resolver"
 exports.resolvers = [
     // productResolver,
     create_staff_resolver_1.CreateStaff,
-    update_staff_resolver_1.UpdateStaff,
-    delete_staff_resolver_1.DeleteStaff,
-    view_staff_list_resolver_1.ViewStaffList,
-    get_available_staff_resolver_1.GetAvailableStaff,
-    create_booking_resolver_1.CreateBookingByCustomer,
-    assign_staff_resolver_1.AssignStaffByBookingRequest,
-    cancel_booking_resolver_1.CancelBooking,
-    view_booking_detail_resolver_1.ViewBookingDetailInBackOffce,
-    get_booking_list_by_week_resolver_1.GetBookingListInBackOfficeByWeek,
-    get_booking_list_by_month_resolver_1.GetBookingListInBackOfficeByMonth
+    // UpdateStaff,
+    // DeleteStaff,
+    // ViewStaffList,
+    // GetAvailableStaff,
+    // CreateBookingByCustomer,
+    // AssignStaffByBookingRequest,
+    // CancelBooking,
+    // ViewBookingDetailInBackOffce,
+    // GetBookingListInBackOfficeByWeek,
+    // GetBookingListInBackOfficeByMonth
 ];

@@ -40,6 +40,4 @@ export class RefreshTokenSessionRepository {
                 WHERE sessionid = ${sessionid}
         `
     }
-
-    async 
 }

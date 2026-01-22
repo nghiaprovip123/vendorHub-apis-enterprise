@@ -72,23 +72,21 @@ export class GoogleCallbackAuthService {
       INSERT INTO auth_user DEFAULT VALUES
       RETURNING id
     `;
-    
+
     await sql`
       INSERT INTO identifiers (
         type,
         value,
         isverified,
         isactive,
-        authid,
-        userAgent
+        authid
       )
       VALUES (
         'email',
         ${email},
         true,
         true,
-        ${created.id},
-        ${userAgent ?? null}
+        ${created.id}
       )
     `;
 

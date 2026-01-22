@@ -7,7 +7,7 @@ const path_1 = require("path");
 // __dirname sẽ là:
 // - src/typeDefs khi dev
 // - dist/typeDefs khi build
-const typeDefsDir = __dirname;
+const typeDefsDir = (0, path_1.join)(__dirname, "..");
 function getGraphqlFiles(dir) {
     let results = [];
     const list = (0, fs_1.readdirSync)(dir, { withFileTypes: true });

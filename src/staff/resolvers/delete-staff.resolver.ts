@@ -1,25 +1,25 @@
-import { deleteAssetFromCloudinary } from "@/common/utils/delete-image-helper.utils"
-import { deleteStaffService } from "@/staff/services/delete-stafff.service"
+// import { deleteAssetFromCloudinary } from "@/common/utils/delete-image-helper.utils"
+// import { deleteStaffService } from "@/staff/services/delete-stafff.service"
 
-const deleteStaff = async (
-  _: unknown,
-  args: { input: any },
-  ctx: any
-) => {
-  try {
-    const result = await deleteStaffService(args.input)
-    return {
-      success: true,
-      message: "Successfullt delete a Product!"
-    }
-  }
-    catch(error: any) {
-      throw error
-    }
-  }
+// const deleteStaff = async (
+//   _: unknown,
+//   args: { input: any },
+//   ctx: any
+// ) => {
+//   try {
+//     const result = await deleteStaffService(args.input)
+//     return {
+//       success: true,
+//       message: "Successfullt delete a Product!"
+//     }
+//   }
+//     catch(error: any) {
+//       throw error
+//     }
+//   }
 
-export const DeleteStaff = {
-  Mutation: {
-    deleteStaff,
-  },
-}
+// export const DeleteStaff = {
+//   Mutation: {
+//     deleteStaff,
+//   },
+// }
