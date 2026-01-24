@@ -1,6 +1,6 @@
 // resolvers/staff.resolver.ts
 import { prisma } from "@/lib/prisma";
-import { uploadToCloudinary } from "@/common/utils/upload-helper.utils";
+import { Cloudinary } from "@/common/utils/upload-helper.utils";
 import * as z from "zod";
 import { createStaffSchema } from "@/staff/dto/staffs.validation"
 
@@ -11,7 +11,7 @@ export const createStaffService = async(input: createStaffServiceType) => {
     if (input.avatar) {
       const file = await input.avatar;
       const stream = file.createReadStream();
-      const upload = await uploadToCloudinary(stream, "Staff Avatar Storage");
+      const upload = await Cloudinary.uploadToCloudinary(stream, "Staff Avatar Storage");
       avatar_url = upload.secure_url;
     }
 
