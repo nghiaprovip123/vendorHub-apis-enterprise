@@ -132,6 +132,7 @@ model Staff {
   id                String @id @map("_id") @default(auto()) @db.ObjectId
   fullName          String?
   avatar_url        String?
+  avatar_public_id  String?
   timezone          String?
   isActive          Boolean? @default(true)
   isDeleted         Boolean? @default(false)
