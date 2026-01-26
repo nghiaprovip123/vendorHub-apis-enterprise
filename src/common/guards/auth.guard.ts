@@ -104,4 +104,58 @@ export class AuthGuard {
         }
 
     }
+
+    static RequireResetToken ( req: Request, res: Response, next: NextFunction ) {
+        try {
+            const authHeader = req.headers.authorization
+
+            if (!authHeader) {
+                return res.status(401).json(
+                    {
+                        success: false,
+                        message: GuardError.MISSING_AUTHENTICATION_ERROR
+                    }
+                )
+            }
+    
+            const token = authHeader.split(" ")[1]
+    
+            if (!token) {
+                return res.status(401).json(
+                    {
+                        success: false,
+                        message: GuardError.MISSING_RESET_TOKEN_INFORMATION
+                    }
+                )
+            }
+    
+            const decoded = jwtService.verifyResetToken(token)
+    
+            if (!decoded) {
+                return res.status(401).json(
+                    {
+                        success: false,
+                        message: GuardError.WRONG_RESET_TOKEN_INFORMATION
+                    }
+                )
+            }
+    
+            req.user = decoded
+    
+            next()
+        }
+    catch (error: any) {
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({
+                success: false,
+                message: GuardError.WRONG_RESET_TOKEN_INFORMATION
+            });
+        }
+        
+        return res.status(401).json({
+            success: false,
+            message: 'FAIL TO AUTHENTICATE'
+        });
+    }
+}
 }
