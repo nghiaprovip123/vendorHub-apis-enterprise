@@ -6,6 +6,8 @@ import { SendOTPSchema } from "@/auth/dto/auth/auth.validation"
 import * as z from "zod"
 import { VerifyOTPType } from "@/auth/enum/veirfy-otp-type.enum"
 import { OTPRepository } from "@/auth/repositories/otp.repository"
+import { RateLimit } from "@/common/utils/rate-limit.utils"
+
 type SendOTPServiceType = z.infer<typeof SendOTPSchema>
 type SendOTPServiceResult = {
     otp: any,
@@ -33,7 +35,7 @@ export class SendOTPService {
                 // Layerize Repositories for OTP Entity: Count the OTP by email within 15 minutes //
                 const count = await otpRepo.countOTPWithin15Minutes(email, type)
 
-                if (count >= 3) {
+                if (count >= RateLimit.SEND_OTP_RATE_LIMIT) {
                     throw new ApiError(429, "KHÔNG THỂ GỬI OTP VÌ SỐ LẦN GỬI OTP ĐÃ ĐẠT GIỚI HẠN")
                 }
 
@@ -73,7 +75,7 @@ export class SendOTPService {
         return {
             otp: result.sendOTP,
             expiresAt: result.expiresat,
-            remainingAttempts: 3 - result.count
+            remainingAttempts: RateLimit.SEND_OTP_RATE_LIMIT - result.count
         }
     }
 
