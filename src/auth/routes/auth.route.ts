@@ -20,7 +20,7 @@ AuthRouter.get('/callback/google', GoogleOAuthCallbackController);
 AuthRouter.post('/login', loginController.login)
 
 // ĐĂNG XUẤT
-AuthRouter.get('/logout', AuthGuard.RequireAuth, SignOutController)
+AuthRouter.get('/logout', AuthGuard.RequireRefreshToken, SignOutController)
 
 // ĐĂNG KÝ
 AuthRouter.post('/registeration/sendOTP', sendOTPController.SendOTPByRegisterationFlow)

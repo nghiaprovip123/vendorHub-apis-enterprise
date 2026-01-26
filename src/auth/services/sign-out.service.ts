@@ -1,12 +1,8 @@
 import sql from "@/lib/postgresql"
-import { AuthGuard } from "@/common/guards/auth.guard"
 
 export class SignOutService {
-  async execute(refreshToken: string): Promise<void> {
-    const authGuard = new AuthGuard(refreshToken);
-    const payload = authGuard.extractTokenPayload();
-
-    const { sub } = payload;
+  async execute(extractedUser: any): Promise<void> {
+    const { sub } = extractedUser;
     if (!sub) {
       throw new Error("INVALID_TOKEN_PAYLOAD");
     }

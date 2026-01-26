@@ -8,15 +8,15 @@ export const SignOutController = async (
   next: NextFunction
 ) => {
   try {
-    const refreshToken = req.cookies?.refreshToken;
+    const extractedUser = req.user
 
-    if (!refreshToken) {
+    if (!extractedUser) {
       res.clearCookie("refreshToken", optionsRevokedCookie);
       return res.status(200).json({ success: true });
     }
 
     const service = new SignOutService();
-    await service.execute(refreshToken);
+    await service.execute(extractedUser);
 
     res.clearCookie("refreshToken", optionsRevokedCookie);
 
