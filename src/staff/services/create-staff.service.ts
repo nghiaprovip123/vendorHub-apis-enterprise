@@ -4,12 +4,14 @@ import { CloudinaryRest } from "@/common/utils/cloudinary-orchestration.utils"
 import * as z from "zod"
 import { createStaffSchema } from "@/staff/dto/staffs.validation"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
+import { WorkingHoursRepository } from "@/staff/repositories/working-hours.repository"
 
 type CreateStaffServiceType = z.infer<typeof createStaffSchema>
 
 export const createStaffService = async (input: CreateStaffServiceType) => {
   return prisma.$transaction(async (tx) => {
     const staffRepo = new StaffRepository(tx)
+    const workingHoursRepo = new WorkingHoursRepository(tx)
     let avatar_url: string | null = null
     let avatar_public_id: string | null = null
 
@@ -44,18 +46,16 @@ export const createStaffService = async (input: CreateStaffServiceType) => {
       })
     }
 
-    await tx.workingHour.createMany({
-      data: input.workingHours.map((wh) => ({
+    await workingHoursRepo.createManyWorkingHour(
+      input.workingHours.map((wh) => ({
         day: wh.day,
         startTime: wh.startTime,
         endTime: wh.endTime,
         staffId: staff.id,
-      })),
-    })
+      }))
+    )
 
-    const workingHours = await tx.workingHour.findMany({
-      where: { staffId: staff.id },
-    })
+    const workingHours = await workingHoursRepo.findManyWorkingHour(staff.id)
 
     return {
       ...staff,
