@@ -1,11 +1,11 @@
 import sql from '@/lib/postgresQL';
 import argon2 from 'argon2';
-import ApiError from '@/common/utils/ApiError';
 import { IdentifierType } from '@/auth/enum/identifier-type.enum';
 import { jwtService } from '@/common/jwt/index.jwt';
 import { PasswordUtilities } from '@/common/utils/password.utils'
 import { IdentifiersRepository } from '@/auth/repositories/identifiers.repository'
 import { RefreshTokenSessionRepository } from '@/auth/repositories/refresh-token-sessions.repository'
+import ApiError from '@/common/utils/ApiError.utils';
 type LoginInput = {
   email: string;
   password: string;
