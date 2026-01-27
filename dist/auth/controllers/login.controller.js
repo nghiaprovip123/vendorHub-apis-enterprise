@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loginController = exports.LoginController = void 0;
-const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
-const login_service_1 = require("@/auth/services/login.service");
-const cookie_utils_1 = require("@/common/utils/cookie.utils");
+const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
+const login_service_1 = require("../../auth/services/login.service");
+const cookie_utils_1 = require("../../common/utils/cookie.utils");
 class LoginController {
     async login(req, res, next) {
         try {

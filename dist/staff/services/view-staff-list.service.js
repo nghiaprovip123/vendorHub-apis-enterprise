@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStaffListService = void 0;
-const prisma_1 = require("@/lib/prisma");
+const prisma_1 = require("../../lib/prisma");
 const PAGE_SIZE = 10;
 const getStaffListService = async (page) => {
     try {

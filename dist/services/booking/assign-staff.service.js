@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.assignStaffByBookingRequestService = void 0;
-const prisma_1 = require("@/lib/prisma");
+const prisma_1 = require("../../lib/prisma");
 const assignStaffByBookingRequestService = async (input) => {
     if (!input.bookingId) {
         throw new Error("Missing Booking ID!");

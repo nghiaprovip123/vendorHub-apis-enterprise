@@ -4,12 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendOTPService = exports.SendOTPService = void 0;
-const postgresql_1 = __importDefault(require("@/lib/postgresql"));
-const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
+const postgresql_1 = __importDefault(require("../../lib/postgresql"));
+const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
 const crypto_1 = __importDefault(require("crypto"));
-const send_otp_helper_utils_1 = require("@/common/utils/send-otp-helper.utils");
-const veirfy_otp_type_enum_1 = require("@/auth/enum/veirfy-otp-type.enum");
-const otp_repository_1 = require("@/auth/repositories/otp.repository");
+const send_otp_helper_utils_1 = require("../../common/utils/send-otp-helper.utils");
+const veirfy_otp_type_enum_1 = require("../../auth/enum/veirfy-otp-type.enum");
+const otp_repository_1 = require("../../auth/repositories/otp.repository");
+const rate_limit_utils_1 = require("../../common/utils/rate-limit.utils");
 class SendOTPService {
     async sendOTP(email, phone, type) {
         if (!email || !phone) {
@@ -22,7 +23,7 @@ class SendOTPService {
                 ////////////////////////////////////////////////////////////////////////////////////
                 // Layerize Repositories for OTP Entity: Count the OTP by email within 15 minutes //
                 const count = await otpRepo.countOTPWithin15Minutes(email, type);
-                if (count >= 3) {
+                if (count >= rate_limit_utils_1.RateLimit.SEND_OTP_RATE_LIMIT) {
                     throw new ApiError_utils_1.default(429, "KHÔNG THỂ GỬI OTP VÌ SỐ LẦN GỬI OTP ĐÃ ĐẠT GIỚI HẠN");
                 }
                 ////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +60,7 @@ class SendOTPService {
         return {
             otp: result.sendOTP,
             expiresAt: result.expiresat,
-            remainingAttempts: 3 - result.count
+            remainingAttempts: rate_limit_utils_1.RateLimit.SEND_OTP_RATE_LIMIT - result.count
         };
     }
     async sendOTPByRegisterationFlow({ phone, email }) {

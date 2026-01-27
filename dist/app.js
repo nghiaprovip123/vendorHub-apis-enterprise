@@ -20,8 +20,8 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const graphql_upload_minimal_1 = require("graphql-upload-minimal");
 const logger_1 = require("./lib/logger");
 const morgan_1 = __importDefault(require("morgan"));
-const auth_route_1 = __importDefault(require("@/auth/routes/auth.route"));
-const error_guard_1 = require("@/common/guards/error.guard");
+const auth_route_1 = __importDefault(require("./auth/routes/auth.route"));
+const error_guard_1 = require("./common/guards/error.guard");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 dotenv_1.default.config();
 (async function () {

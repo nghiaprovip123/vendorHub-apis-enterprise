@@ -1,40 +1,54 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createStaffService = void 0;
-// resolvers/staff.resolver.ts
-const prisma_1 = require("@/lib/prisma");
-const upload_helper_utils_1 = require("@/common/utils/upload-helper.utils");
+// create-staff.service.ts
+const prisma_1 = require("../../lib/prisma");
+const cloudinary_orchestration_utils_1 = require("../../common/utils/cloudinary-orchestration.utils");
+const staff_repository_1 = require("../../staff/repositories/staff.repository");
+const working_hours_repository_1 = require("../../staff/repositories/working-hours.repository");
 const createStaffService = async (input) => {
-    let avatar_url;
-    if (input.avatar) {
-        const file = await input.avatar;
-        const stream = file.createReadStream();
-        const upload = await (0, upload_helper_utils_1.uploadToCloudinary)(stream, "Staff Avatar Storage");
-        avatar_url = upload.secure_url;
-    }
-    const result = await prisma_1.prisma.$transaction(async (tx) => {
-        const staff = await tx.staff.create({
-            data: {
-                fullName: input.fullName,
-                avatar_url: avatar_url,
-                timezone: input.timezone,
-                isActive: input.isActive ?? true,
-                isDeleted: input.isDeleted ?? false,
-            }
+    return prisma_1.prisma.$transaction(async (tx) => {
+        const staffRepo = new staff_repository_1.StaffRepository(tx);
+        const workingHoursRepo = new working_hours_repository_1.WorkingHoursRepository(tx);
+        let avatar_url = null;
+        let avatar_public_id = null;
+        const staff = await staffRepo.create({
+            fullName: input.fullName,
+            timezone: input.timezone,
+            isActive: input.isActive ?? true,
+            isDeleted: false,
         });
-        const createworkingHours = await Promise.all(input.workingHours.map((wh) => tx.workingHour.create({
-            data: {
-                day: wh.day,
-                startTime: wh.startTime,
-                endTime: wh.endTime,
-                staffId: staff.id
-            }
+        if (input.avatar) {
+            const file = await input.avatar;
+            const stream = file.createReadStream();
+            const env = process.env.NODE_ENV === "production" ? "prod" : "dev";
+            const folder = `${env}/staffs`;
+            const public_id = `${staff.id}/avatar`;
+            const upload = await cloudinary_orchestration_utils_1.CloudinaryRest.UploadImageToCloudinary(stream, {
+                folder,
+                public_id,
+                resource_type: "image",
+            });
+            avatar_url = upload.secure_url;
+            avatar_public_id = upload.public_id;
+            await staffRepo.updateById(staff.id, {
+                avatar_url: upload.secure_url,
+                avatar_public_id: upload.public_id,
+            });
+        }
+        await workingHoursRepo.createManyWorkingHour(input.workingHours.map((wh) => ({
+            day: wh.day,
+            startTime: wh.startTime,
+            endTime: wh.endTime,
+            staffId: staff.id,
         })));
+        const workingHours = await workingHoursRepo.findManyWorkingHour(staff.id);
         return {
             ...staff,
-            workingHours: createworkingHours,
+            avatar_url,
+            avatar_public_id,
+            workingHours,
         };
     });
-    return result;
 };
 exports.createStaffService = createStaffService;

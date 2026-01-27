@@ -4,13 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SignOutService = void 0;
-const postgresql_1 = __importDefault(require("@/lib/postgresql"));
-const auth_guard_1 = require("@/common/guards/auth.guard");
+const postgresql_1 = __importDefault(require("../../lib/postgresql"));
 class SignOutService {
-    async execute(refreshToken) {
-        const authGuard = new auth_guard_1.AuthGuard(refreshToken);
-        const payload = authGuard.extractTokenPayload();
-        const { sub } = payload;
+    async execute(extractedUser) {
+        const { sub } = extractedUser;
         if (!sub) {
             throw new Error("INVALID_TOKEN_PAYLOAD");
         }

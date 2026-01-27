@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvers = void 0;
 // resolvers/index.ts
 // import { productResolver } from "./products.resolvers";
-const create_staff_resolver_1 = require("@/staff/resolvers/create-staff.resolver");
+const create_staff_resolver_1 = require("../staff/resolvers/create-staff.resolver");
 // import { UpdateStaff } from "../staff/resolvers/update-staff.resolver"
 // import { DeleteStaff } from "../staff/resolvers/delete-staff.resolver"
 // import { ViewStaffList } from "../staff/resolvers/view-staff-list.resolver"

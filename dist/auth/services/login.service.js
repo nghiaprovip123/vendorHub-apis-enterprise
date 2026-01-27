@@ -5,13 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authService = exports.LoginService = void 0;
 const argon2_1 = __importDefault(require("argon2"));
-const postgresql_1 = __importDefault(require("@/lib/postgresql"));
-const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
-const identifier_type_enum_1 = require("@/auth/enum/identifier-type.enum");
-const index_jwt_1 = require("@/common/jwt/index.jwt");
-const password_utils_1 = require("@/common/utils/password.utils");
-const identifiers_repository_1 = require("@/auth/repositories/identifiers.repository");
-const refresh_token_sessions_repository_1 = require("@/auth/repositories/refresh-token-sessions.repository");
+const postgresql_1 = __importDefault(require("../../lib/postgresql"));
+const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
+const identifier_type_enum_1 = require("../../auth/enum/identifier-type.enum");
+const index_jwt_1 = require("../../common/jwt/index.jwt");
+const password_utils_1 = require("../../common/utils/password.utils");
+const identifiers_repository_1 = require("../../auth/repositories/identifiers.repository");
+const refresh_token_sessions_repository_1 = require("../../auth/repositories/refresh-token-sessions.repository");
 const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(postgresql_1.default);
 const refreshTokenSessionRepo = new refresh_token_sessions_repository_1.RefreshTokenSessionRepository(postgresql_1.default);
 class LoginService {

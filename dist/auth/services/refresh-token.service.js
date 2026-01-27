@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RefreshTokenService = void 0;
-const postgresql_1 = __importDefault(require("@/lib/postgresql"));
+const postgresql_1 = __importDefault(require("../../lib/postgresql"));
 const argon2_1 = __importDefault(require("argon2"));
-const index_jwt_1 = require("@/common/jwt/index.jwt");
-const refresh_token_sessions_repository_1 = require("@/auth/repositories/refresh-token-sessions.repository");
-const identifiers_repository_1 = require("@/auth/repositories/identifiers.repository");
-const identifier_type_enum_1 = require("@/auth/enum/identifier-type.enum");
+const index_jwt_1 = require("../../common/jwt/index.jwt");
+const refresh_token_sessions_repository_1 = require("../../auth/repositories/refresh-token-sessions.repository");
+const identifiers_repository_1 = require("../../auth/repositories/identifiers.repository");
+const identifier_type_enum_1 = require("../../auth/enum/identifier-type.enum");
 class RefreshTokenService {
     static async execute(refreshToken, userAgent) {
         const payload = await index_jwt_1.jwtService.verifyRefreshToken(refreshToken);
