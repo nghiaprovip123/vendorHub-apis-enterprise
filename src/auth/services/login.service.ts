@@ -1,6 +1,6 @@
+import sql from '@/lib/postgresQL';
 import argon2 from 'argon2';
-import sql from '@/lib/postgresql';
-import ApiError from '@/common/utils/ApiError.utils';
+import ApiError from '@/common/utils/ApiError';
 import { IdentifierType } from '@/auth/enum/identifier-type.enum';
 import { jwtService } from '@/common/jwt/index.jwt';
 import { PasswordUtilities } from '@/common/utils/password.utils'
