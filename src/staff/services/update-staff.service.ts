@@ -1,10 +1,10 @@
-// staff/services/update-staff.service.ts
 import { prisma } from "@/lib/prisma"
 import { CloudinaryRest } from "@/common/utils/cloudinary-orchestration.utils"
 import * as z from "zod"
 import { updateStaffSchema } from "@/staff/dto/staffs.validation"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
 import { WorkingHoursRepository } from "@/staff/repositories/working-hours.repository"
+import { StaffError } from "@/common/utils/error/staff.error"
 type UpdateStaffType = z.infer<typeof updateStaffSchema>
 
 export const updateStaffService = async (input: UpdateStaffType) => {
@@ -13,7 +13,7 @@ export const updateStaffService = async (input: UpdateStaffType) => {
     });
 
     if (!existingStaff) {
-        throw new Error('KHÔNG TÌM THẤY NHÂN VIÊN');
+        throw new Error(StaffError.NOT_FOUND_STAFF_ERROR);
     }
 
     let avatar_url: string | undefined = existingStaff.avatar_url || undefined;

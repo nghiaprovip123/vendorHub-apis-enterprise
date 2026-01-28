@@ -1,4 +1,3 @@
-// staff/dto/staffs.validation.ts
 import { z } from 'zod';
 
 export const createWorkingHourSchema = z.object({
