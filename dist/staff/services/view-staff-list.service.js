@@ -2,16 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStaffListService = void 0;
 const prisma_1 = require("../../lib/prisma");
+const staff_repository_1 = require("../../staff/repositories/staff.repository");
 const PAGE_SIZE = 10;
 const getStaffListService = async (page) => {
     try {
+        const staffRepos = new staff_repository_1.StaffRepository(prisma_1.prisma);
         const getPage = page ?? 1;
         const skip = (getPage - 1) * PAGE_SIZE;
-        const staffs = await prisma_1.prisma.staff.findMany({
-            skip,
-            take: PAGE_SIZE,
-        });
-        const total = await prisma_1.prisma.staff.count();
+        const staffs = await staffRepos.getPagnition(skip, PAGE_SIZE);
+        const total = staffRepos.count();
         return {
             items: staffs,
             total

@@ -10,6 +10,11 @@ class WorkingHoursRepository {
             data,
         });
     }
+    async deleteManyWorkingHour(staffId) {
+        return this.prisma.workingHour.deleteMany({
+            where: { staffId }
+        });
+    }
     async findManyWorkingHour(staffId) {
         return this.prisma.workingHour.findMany({
             where: { staffId },

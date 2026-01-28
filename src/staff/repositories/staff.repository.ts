@@ -33,4 +33,17 @@ export class StaffRepository {
       }
     )
   }
+
+  getPagnition(skip: number, take: number) {
+    return this.prisma.staff.findMany(
+      {
+        skip,
+        take
+      }
+    )
+  }
+
+  count() {
+    return this.prisma.staff.count()
+  }
 }

@@ -6,7 +6,7 @@ exports.resolvers = void 0;
 const create_staff_resolver_1 = require("../staff/resolvers/create-staff.resolver");
 const update_staff_resolver_1 = require("../staff/resolvers/update-staff.resolver");
 const delete_staff_resolver_1 = require("../staff/resolvers/delete-staff.resolver");
-// import { ViewStaffList } from "../staff/resolvers/view-staff-list.resolver"
+const view_staff_list_resolver_1 = require("../staff/resolvers/view-staff-list.resolver");
 // import { GetAvailableStaff } from "../staff/resolvers/get-available-staff.resolver"
 // import { CreateBookingByCustomer } from "./booking/create-booking.resolver"
 // import { AssignStaffByBookingRequest } from "./booking/assign-staff.resolver"
@@ -19,7 +19,7 @@ exports.resolvers = [
     create_staff_resolver_1.CreateStaff,
     update_staff_resolver_1.UpdateStaff,
     delete_staff_resolver_1.DeleteStaff,
-    // ViewStaffList,
+    view_staff_list_resolver_1.ViewStaffList,
     // GetAvailableStaff,
     // CreateBookingByCustomer,
     // AssignStaffByBookingRequest,

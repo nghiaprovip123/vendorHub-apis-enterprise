@@ -7,7 +7,7 @@ const deleteStaff = async (_, args, ctx) => {
         const result = await (0, delete_stafff_service_1.deleteStaffService)(args.input);
         return {
             success: true,
-            message: "Successfullt delete a Product!"
+            message: "Successfullt delete a Staff!"
         };
     }
     catch (error) {
