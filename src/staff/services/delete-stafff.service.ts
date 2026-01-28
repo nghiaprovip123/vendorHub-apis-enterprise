@@ -1,40 +1,37 @@
-// import { prisma } from "@/lib/prisma"
-// import { deleteAssetFromCloudinary } from "@/common/utils/delete-image-helper.utils"
-// import * as z from "zod"
-// import { deleteStaffSchema } from "@/dto/staffs/staffs.validation"
+import { prisma } from "@/lib/prisma"
+import { CloudinaryRest } from "@/common/utils/cloudinary-orchestration.utils"
+import * as z from "zod"
+import { deleteStaffSchema } from "@/staff/dto/staffs.validation"
+import { StaffRepository } from "@/staff/repositories/staff.repository"
+import { WorkingHoursRepository } from "@/staff/repositories/working-hours.repository"
 
-// type DeleteStaffInput = z.infer<typeof deleteStaffSchema>
+type DeleteStaffInput = z.infer<typeof deleteStaffSchema>
 
-// export const deleteStaffService = async (input: DeleteStaffInput) => {
-//   if (!input.id) {
-//     throw new Error("Missing Deleted Staff ID")
-//   }
+export const deleteStaffService = async (input: DeleteStaffInput) => {
+  if (!input.id) {
+    throw new Error("Missing Deleted Staff ID")
+  }
 
-//   const staff = await prisma.$transaction(async (tx) => {
-//     const existing = await tx.staff.findUnique({
-//       where: { id: input.id },
-//     })
+    const staff = await prisma.$transaction(async (tx) => {
+    const staffsRepo = new StaffRepository(tx);
+    const workingHourRepos = new WorkingHoursRepository(tx)
+    const existing = await staffsRepo.findById(input.id)
 
-//     if (!existing) {
-//       throw new Error("Staff not found")
-//     }
+    if (!existing) {
+      throw new Error("Staff not found")
+    }
 
-//     await tx.workingHour.deleteMany({
-//       where: { staffId: input.id },
-//     })
+    await workingHourRepos.deleteManyWorkingHour(input.id)
 
-//     return tx.staff.delete({
-//       where: { id: input.id },
-//     })
-//   })
+    return staffsRepo.delete(input.id)
+  })
 
-//   if (input.public_id) {
-//     try {
-//       await deleteAssetFromCloudinary(input.public_id)
-//     } catch (err) {
-//       console.error("Cloudinary delete failed:", err)
-//     }
-//   }
-
-//   return staff
-// }
+  if (input.public_id) {
+    try {
+      await CloudinaryRest.DestroyImageInCloudinary(input.public_id, 'image')  
+    } catch (err) {
+      console.error("Cloudinary delete failed:", err)
+    }
+  }
+  return staff
+}

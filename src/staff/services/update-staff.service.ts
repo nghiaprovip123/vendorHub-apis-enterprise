@@ -1,61 +1,102 @@
-// import { prisma } from "@/lib/prisma"
-// import { replaceImageOnCloudinary } from "@/common/utils/replace-img-helper.utils"
-// import { FileUpload, GraphQLUpload } from "graphql-upload-minimal";
-// import * as z from "zod"
-// // import { updateStaffSchema } from "@/dto/staffs/staffs.validation"
-// // import { createWorkingHourSchema } from "@/dto/staffs/staffs.validation"
+// staff/services/update-staff.service.ts
+import { prisma } from "@/lib/prisma"
+import { CloudinaryRest } from "@/common/utils/cloudinary-orchestration.utils"
+import * as z from "zod"
+import { updateStaffSchema } from "@/staff/dto/staffs.validation"
+import { StaffRepository } from "@/staff/repositories/staff.repository"
+import { WorkingHoursRepository } from "@/staff/repositories/working-hours.repository"
+type UpdateStaffType = z.infer<typeof updateStaffSchema>
 
-// type UpdateStaffType = z.infer< typeof updateStaffSchema >
+export const updateStaffService = async (input: UpdateStaffType) => {
+    const existingStaff = await prisma.staff.findUnique({
+        where: { id: input.id }
+    });
 
-// export const updateStaffService = async (input: UpdateStaffType) => {
-//         let avatar_url: string | undefined
+    if (!existingStaff) {
+        throw new Error('KHÔNG TÌM THẤY NHÂN VIÊN');
+    }
 
-//         if (input.avatar) {
-//             const file = await input.avatar;
-//             const stream = file.createReadStream()
-//             const replaceImage = await replaceImageOnCloudinary(stream, "Staff Avatar Storage", "rqvosutgecru7tutqcdu", true)
-//             avatar_url = replaceImage.secure_url
-//         }
-    
-//         const result = await prisma.$transaction( async(tx) => {
-//             const staff = await tx.staff.update(
-//                 {
-//                     where: {
-//                         id: input.id
-//                     },
-//                     data: {
-//                         fullName: input.fullName,
-//                         avatar_url: avatar_url,
-//                         timezone: input.timezone,
-//                         isActive: input.isActive,
-//                         isDeleted: input.isDeleted,
-//                     }
-//                 }
-//             )
-        
-//             if (input.workingHours?.length) {
-//                 await tx.workingHour.deleteMany({
-//                   where: { staffId: staff.id },
-//                 });
-              
-//                 const workingHours = await Promise.all(
-//                   input.workingHours.map((wh) =>
-//                     tx.workingHour.create({
-//                       data: {
-//                         staffId: staff.id,
-//                         day: wh.day,
-//                         startTime: wh.startTime,
-//                         endTime: wh.endTime,
-//                       },
-//                     })
-//                   )
-//                 );
-//             return {
-//                 ...staff,
-//                 workingHours: workingHours
-//             }
-//         } 
-//         }
-//     )
-//     return result
-// }
+    let avatar_url: string | undefined = existingStaff.avatar_url || undefined;
+    let avatar_public_id: string | undefined = existingStaff.avatar_public_id || undefined;
+
+    if (input.avatar) {
+        const file = await input.avatar;
+        const stream = file.createReadStream();
+
+        const env = process.env.NODE_ENV === "production" ? "prod" : "dev";
+        const folder = `${env}/staffs`;
+        const public_id = `${input.id}/avatar`;
+
+        if (existingStaff.avatar_public_id) {
+            const upload = await CloudinaryRest.OverwriteImageInCloudinary(
+                stream,
+                {
+                    folder,
+                    public_id,
+                    resource_type: "image",
+                    contentType: file.mimetype || 'image/png',
+                    filename: file.filename || 'avatar.png',
+                    overwrite: true,
+                }
+            );
+            avatar_url = upload.secure_url;
+            avatar_public_id = upload.public_id;
+        } else {
+            const upload = await CloudinaryRest.UploadImageToCloudinary(
+                stream,
+                {
+                    folder,
+                    public_id,
+                    resource_type: "image",
+                    contentType: file.mimetype || 'image/png',
+                    filename: file.filename || 'avatar.png',
+                }
+            );
+            avatar_url = upload.secure_url;
+            avatar_public_id = upload.public_id;
+        }
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+        const staffRepos = new StaffRepository(tx)
+        const workingHourRepos = new WorkingHoursRepository(tx)
+        const updateData: any = {};
+        if (input.fullName !== undefined) updateData.fullName = input.fullName;
+        if (input.timezone !== undefined) updateData.timezone = input.timezone;
+        if (input.isActive !== undefined) updateData.isActive = input.isActive;
+        if (input.isDeleted !== undefined) updateData.isDeleted = input.isDeleted;
+        if (avatar_url !== undefined) updateData.avatar_url = avatar_url;
+        if (avatar_public_id !== undefined) updateData.avatar_public_id = avatar_public_id;
+
+        const staff = await staffRepos.updateById(input.id, updateData)
+
+        let workingHours = [];
+        if (input.workingHours && input.workingHours.length > 0) {
+            await tx.workingHour.deleteMany({
+                where: { staffId: staff.id },
+            });
+            workingHours = await Promise.all(
+                input.workingHours.map((wh) =>
+                    tx.workingHour.create({
+                        data: {
+                            staffId: staff.id,
+                            day: wh.day,
+                            startTime: wh.startTime,
+                            endTime: wh.endTime,
+                        },
+                    })
+                )
+            );
+        } else {
+            workingHours = await workingHourRepos.findManyWorkingHour(staff.id)
+        }
+
+        const finalResult = {
+            ...staff,
+            workingHours,
+        };
+        return finalResult;
+    });
+
+    return result;
+};

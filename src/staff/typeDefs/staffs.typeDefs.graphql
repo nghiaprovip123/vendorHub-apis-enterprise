@@ -13,6 +13,7 @@ type Staff {
   id: ID!
   fullName: String!
   avatar_url: String
+  avatar_public_id: String
   timezone: String!
   isActive: Boolean!
   isDeleted: Boolean!
@@ -26,7 +27,6 @@ input WorkingHourInput {
   startTime: String!
   endTime: String!
 }
-
 
 input CreateStaffInput {
   fullName: String!
@@ -51,6 +51,7 @@ input DeleteStaffInput {
   id: String!
   public_id: String!
 }
+
 type DeleteStaffResponse {
   success: Boolean!
   message: String!
@@ -59,6 +60,7 @@ type DeleteStaffResponse {
 input GetStaffListInput {
   page: Int!
 }
+
 type GetStaffListResponse {
   items: [Staff]!
   total: Int!
@@ -72,20 +74,11 @@ input GetAvailableStaffByBookingtimeInput {
 
 type Mutation {
   createStaff(input: CreateStaffInput!): Staff!
-}
-
-type Mutation {
   updateStaff(input: UpdateStaffInput!): Staff!
-}
-
-type Mutation {
   deleteStaff(input: DeleteStaffInput!): DeleteStaffResponse!
 }
 
 type Query {
   getStaffList(input: GetStaffListInput!): GetStaffListResponse!
-}
-
-type Query {
   getAvailableStaffByBookingTime(input: GetAvailableStaffByBookingtimeInput!): [Staff]!
 }

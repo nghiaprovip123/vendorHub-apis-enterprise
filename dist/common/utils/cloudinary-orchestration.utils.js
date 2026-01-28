@@ -44,5 +44,53 @@ class CloudinaryRest {
         });
         return res.data;
     }
+    static async OverwriteImageInCloudinary(file, options) {
+        const apiKey = process.env.CLOUDINARY_API_KEY;
+        const apiSecret = process.env.CLOUDINARY_API_SECRET;
+        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+        const timestamp = Math.floor(Date.now() / 1000);
+        const { filename = 'file', public_id, resource_type = 'image', folder, contentType = 'application/octet-stream', } = options;
+        const form = new form_data_1.default();
+        form.append('file', file, { contentType, filename });
+        const paramsToSign = {
+            folder,
+            overwrite: 'true',
+            public_id,
+            timestamp,
+        };
+        const signature = CloudinaryRest.sign(paramsToSign, apiSecret);
+        form.append('api_key', apiKey);
+        form.append('timestamp', timestamp.toString());
+        form.append('signature', signature);
+        form.append('folder', folder);
+        form.append('public_id', public_id);
+        form.append('overwrite', 'true');
+        const res = await axios_1.default.post(`https://api.cloudinary.com/v1_1/${cloudName}/${resource_type}/upload`, form, { headers: form.getHeaders() });
+        return res.data;
+    }
+    static async DestroyImageInCloudinary(public_id, resource_type) {
+        const api_key = process.env.CLOUDINARY_API_KEY;
+        const apiSecret = process.env.CLOUDINARY_API_SECRET;
+        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+        const timestampNumber = Math.floor(Date.now() / 1000);
+        const timestamp = timestampNumber.toString();
+        const paramsTosign = {
+            public_id,
+            timestamp
+        };
+        const signature = await CloudinaryRest.sign(paramsTosign, apiSecret);
+        const body = new URLSearchParams({
+            public_id,
+            timestamp,
+            api_key,
+            signature
+        });
+        const res = await axios_1.default.post(`https://api.cloudinary.com/v1_1/${cloudName}/${resource_type}/destroy`, body, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+        return res.data;
+    }
 }
 exports.CloudinaryRest = CloudinaryRest;

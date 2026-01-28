@@ -19,5 +19,19 @@ class StaffRepository {
             where: { id },
         });
     }
+    delete(id) {
+        return this.prisma.staff.delete({
+            where: { id }
+        });
+    }
+    getPagnition(skip, take) {
+        return this.prisma.staff.findMany({
+            skip,
+            take
+        });
+    }
+    count() {
+        return this.prisma.staff.count();
+    }
 }
 exports.StaffRepository = StaffRepository;

@@ -25,4 +25,25 @@ export class StaffRepository {
       where: { id },
     })
   }
+
+  delete(id: string) {
+    return this.prisma.staff.delete(
+      {
+        where: { id }
+      }
+    )
+  }
+
+  getPagnition(skip: number, take: number) {
+    return this.prisma.staff.findMany(
+      {
+        skip,
+        take
+      }
+    )
+  }
+
+  count() {
+    return this.prisma.staff.count()
+  }
 }
