@@ -4,8 +4,8 @@ exports.resolvers = void 0;
 // resolvers/index.ts
 // import { productResolver } from "./products.resolvers";
 const create_staff_resolver_1 = require("../staff/resolvers/create-staff.resolver");
-// import { UpdateStaff } from "../staff/resolvers/update-staff.resolver"
-// import { DeleteStaff } from "../staff/resolvers/delete-staff.resolver"
+const update_staff_resolver_1 = require("../staff/resolvers/update-staff.resolver");
+const delete_staff_resolver_1 = require("../staff/resolvers/delete-staff.resolver");
 // import { ViewStaffList } from "../staff/resolvers/view-staff-list.resolver"
 // import { GetAvailableStaff } from "../staff/resolvers/get-available-staff.resolver"
 // import { CreateBookingByCustomer } from "./booking/create-booking.resolver"
@@ -17,8 +17,8 @@ const create_staff_resolver_1 = require("../staff/resolvers/create-staff.resolve
 exports.resolvers = [
     // productResolver,
     create_staff_resolver_1.CreateStaff,
-    // UpdateStaff,
-    // DeleteStaff,
+    update_staff_resolver_1.UpdateStaff,
+    delete_staff_resolver_1.DeleteStaff,
     // ViewStaffList,
     // GetAvailableStaff,
     // CreateBookingByCustomer,

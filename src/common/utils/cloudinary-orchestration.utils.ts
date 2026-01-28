@@ -11,6 +11,10 @@ type UploadResult = {
   height?: number
 }
 
+type DestroyImageInCloudinaryResult = {
+  result: string
+}
+
 export class CloudinaryRest {
   private static sign(
     params: any,
@@ -26,6 +30,7 @@ export class CloudinaryRest {
       .update(toSign + secret)
       .digest('hex')
   }
+
   static async UploadImageToCloudinary (
     file: Readable,
     options: {
@@ -77,6 +82,7 @@ export class CloudinaryRest {
 
       return res.data as UploadResult
   }
+
   static async OverwriteImageInCloudinary(
     file: Readable,
     options: {
@@ -129,4 +135,41 @@ export class CloudinaryRest {
   
     return res.data as UploadResult
   }  
+
+  static async DestroyImageInCloudinary(
+      public_id: string,
+      resource_type: string
+  ): Promise<DestroyImageInCloudinaryResult> {
+    const api_key = process.env.CLOUDINARY_API_KEY!;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET!;
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME!;
+    const timestampNumber = Math.floor( Date.now() / 1000 )
+    const timestamp = timestampNumber.toString()
+    
+    const paramsTosign = {
+      public_id,
+      timestamp
+    }
+
+    const signature = await CloudinaryRest.sign(paramsTosign, apiSecret)
+
+    const body = new URLSearchParams(
+      {
+        public_id,   
+        timestamp,     
+        api_key,
+        signature
+      }
+    )
+
+    const res = await axios.post(`https://api.cloudinary.com/v1_1/${cloudName}/${resource_type}/destroy`,
+      body, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+    )
+
+    return res.data as DestroyImageInCloudinaryResult
+  }
 }

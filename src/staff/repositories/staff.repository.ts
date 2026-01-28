@@ -25,4 +25,12 @@ export class StaffRepository {
       where: { id },
     })
   }
+
+  delete(id: string) {
+    return this.prisma.staff.delete(
+      {
+        where: { id }
+      }
+    )
+  }
 }

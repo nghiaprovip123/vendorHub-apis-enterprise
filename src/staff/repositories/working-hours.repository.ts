@@ -14,6 +14,14 @@ export class WorkingHoursRepository {
         })
     }
 
+    async deleteManyWorkingHour(staffId: string) {
+      return this.prisma.workingHour.deleteMany(
+        {
+          where: {staffId}
+        }
+      )
+    }
+
     async findManyWorkingHour(staffId: string) {
         return this.prisma.workingHour.findMany({
           where: { staffId },
