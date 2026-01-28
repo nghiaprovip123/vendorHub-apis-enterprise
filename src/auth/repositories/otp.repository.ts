@@ -1,5 +1,3 @@
-import sql from '@/lib/postgresql'
-
 export class OTPRepository {
     constructor(private readonly sql: any) {}
 
@@ -23,16 +21,21 @@ export class OTPRepository {
     // Deactivate old OTPs
     async deactiveOldOTPs(
         email: string,
-        phone: string,
+        phone: string | null | undefined,
         type: string
     ): Promise<void> {
+        const phoneValue = phone || null
+
         await this.sql`
             UPDATE otps
             SET isverified = true,
                 isactive = false
             WHERE type = ${type}
               AND email = ${email}
-              AND phone = ${phone}
+              AND (
+                ${type} = 'forgot password'
+                OR phone IS NOT DISTINCT FROM ${phoneValue}
+              )
               AND isverified = false
               AND isactive = true
         `
@@ -41,10 +44,12 @@ export class OTPRepository {
     // Create new OTP
     async createNewOTP(
         email: string,
-        phone: string,
+        phone: string | null | undefined,
         type: string,
         otp: string
     ): Promise<{ id: string; expiresat: Date }> {
+        const phoneValue = phone || null
+
         const [{ id, expiresat }] = await this.sql`
             INSERT INTO otps (
                 type,
@@ -60,7 +65,7 @@ export class OTPRepository {
                 ${email},
                 ${otp},
                 NOW() + INTERVAL '15 minutes',
-                ${phone},
+                ${phoneValue},
                 false,
                 true
             )

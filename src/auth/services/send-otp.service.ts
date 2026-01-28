@@ -21,8 +21,15 @@ export class SendOTPService {
         phone: string,
         type: VerifyOTPType
     ): Promise<SendOTPServiceResult> {
-        if (!email || !phone) {
-            throw new ApiError(400, 'Email and phone are required')
+        switch (type) {
+            case VerifyOTPType.VERIFY_OTP_REGISTERATION:
+                if (!email || !phone) throw new ApiError(400, 'Email and phone are required')
+                break
+            case VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD:
+                if (!email) throw new ApiError(400, 'Email is required')
+                break
+            default:
+                throw new ApiError(400, 'Invalid OTP type')
         }
 
         let result
@@ -51,7 +58,7 @@ export class SendOTPService {
                 /////////////////////////////////////////////////////////////////////////////////////
                 // Layerize Repositories for OTP Entity: Select the OTP that is just sent by Email //
                 const sendOTP = await otpRepo.findSentOTP(createNewOTP.id)
-                const expiresat = await createNewOTP.expiresat
+                const expiresat = createNewOTP.expiresat
                 return {
                     sendOTP,
                     expiresat,
