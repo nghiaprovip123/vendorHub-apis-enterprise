@@ -1,0 +1,3 @@
+export const StaffError = {
+    COMMON_UPDATE_STAFF_ERROR: 'FAIL TO UPDATE STAFF INFORMATION'
+}

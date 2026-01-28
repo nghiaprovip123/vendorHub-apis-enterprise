@@ -1,7 +1,7 @@
 // staff/resolvers/update-staff.resolver.ts
 import { GraphQLUpload } from "graphql-upload-minimal";
 import { updateStaffService } from "@/staff/services/update-staff.service";
-
+import { StaffError } from "@/common/utils/error/staff.error"
 const updateStaff = async (
     _: unknown,
     args: { input: any },
@@ -11,12 +11,11 @@ const updateStaff = async (
         const result = await updateStaffService(args.input);
         
         if (!result) {
-            throw new Error('CẬP NHẬT NHÂN VIÊN THẤT BẠI');
+            throw new Error(StaffError.COMMON_UPDATE_STAFF_ERROR);
         }
         console.log(result)
         return result;
     } catch (error: any) {
-        console.error('Update staff error:', error);
         throw error;
     }
 }
@@ -24,6 +23,6 @@ const updateStaff = async (
 export const UpdateStaff = {
     Upload: GraphQLUpload,
     Mutation: {
-        updateStaff, // ← Sử dụng function đã định nghĩa ở trên
+        updateStaff, 
     },
 };
