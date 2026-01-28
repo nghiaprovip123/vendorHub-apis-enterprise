@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
+import { StaffError } from "@/common/utils/error/staff.error"
 
 const PAGE_SIZE = 10
 
@@ -18,6 +19,6 @@ export const getStaffListService = async ( page: number) => {
       total
     }
   } catch (error) {
-    throw new Error("Fail to fetch list of staffs")
+    throw new Error(StaffError.FETCH_STAFF_LIST_ERROR)
   }
 }

@@ -26,6 +26,17 @@ export class StaffRepository {
     })
   }
 
+  findManyActiveByIds(ids: string[]) {
+    return this.prisma.staff.findMany({
+      where: {
+        id: { in: ids },
+        isDeleted: false,
+      },
+    })
+  }
+  
+
+
   delete(id: string) {
     return this.prisma.staff.delete(
       {

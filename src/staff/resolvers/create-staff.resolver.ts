@@ -10,7 +10,6 @@ const createStaff = async(
     const createStaff = await createStaffService(args.input)
     return createStaff;
   } catch (error: any) {
-    console.error("Error creating staff:", error);
     throw error
   }
 }
