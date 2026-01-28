@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma"
 import { CloudinaryRest } from "@/common/utils/cloudinary-orchestration.utils"
 import * as z from "zod"
 import { updateStaffSchema } from "@/staff/dto/staffs.validation"
-
+import { StaffRepository } from "@/staff/repositories/staff.repository"
+import { WorkingHoursRepository } from "@/staff/repositories/working-hours.repository"
 type UpdateStaffType = z.infer<typeof updateStaffSchema>
 
 export const updateStaffService = async (input: UpdateStaffType) => {
@@ -57,6 +58,8 @@ export const updateStaffService = async (input: UpdateStaffType) => {
     }
 
     const result = await prisma.$transaction(async (tx) => {
+        const staffRepos = new StaffRepository(tx)
+        const workingHourRepos = new WorkingHoursRepository(tx)
         const updateData: any = {};
         if (input.fullName !== undefined) updateData.fullName = input.fullName;
         if (input.timezone !== undefined) updateData.timezone = input.timezone;
@@ -65,18 +68,13 @@ export const updateStaffService = async (input: UpdateStaffType) => {
         if (avatar_url !== undefined) updateData.avatar_url = avatar_url;
         if (avatar_public_id !== undefined) updateData.avatar_public_id = avatar_public_id;
 
-        // ALREADY HAVE REPOS IN STAFF REPOSITORY
-        const staff = await tx.staff.update({
-            where: { id: input.id },
-            data: updateData,
-        });
+        const staff = await staffRepos.updateById(input.id, updateData)
 
         let workingHours = [];
         if (input.workingHours && input.workingHours.length > 0) {
             await tx.workingHour.deleteMany({
                 where: { staffId: staff.id },
             });
-            // ALREADY HAVE REPOS IN WORKING-HOURS REPOSITORY
             workingHours = await Promise.all(
                 input.workingHours.map((wh) =>
                     tx.workingHour.create({
@@ -90,10 +88,7 @@ export const updateStaffService = async (input: UpdateStaffType) => {
                 )
             );
         } else {
-            // ALREADY HAVE REPOS IN WORKING-HOURS REPOSITORY
-            workingHours = await tx.workingHour.findMany({
-                where: { staffId: staff.id },
-            });
+            workingHours = await workingHourRepos.findManyWorkingHour(staff.id)
         }
 
         const finalResult = {
