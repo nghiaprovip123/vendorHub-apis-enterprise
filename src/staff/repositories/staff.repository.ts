@@ -34,8 +34,6 @@ export class StaffRepository {
       },
     })
   }
-  
-
 
   delete(id: string) {
     return this.prisma.staff.delete(

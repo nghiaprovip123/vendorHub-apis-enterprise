@@ -1,5 +1,4 @@
 import { Prisma, PrismaClient } from '@prisma/client'
-import { prisma } from '@/lib/prisma'
 
 type PrismaProvider = PrismaClient | Prisma.TransactionClient
 
