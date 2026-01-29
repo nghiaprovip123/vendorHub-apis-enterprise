@@ -34,6 +34,14 @@ enum MediaType {
   VIDEO
 }
 
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
 // ======================================================================
 // TENANT (MULTI-TENANT ROOT)
 // ======================================================================
@@ -182,7 +190,7 @@ model Booking {
   customerPhone                   String?
   customerEmail                   String?
   notes                           String?
-  status                          String?
+  status                          BookingStatus?
   
   cancelledAt                     DateTime? @default(now())
   cancelledBy                     String?   
