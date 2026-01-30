@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createStaffService = void 0;
 // create-staff.service.ts
-const prisma_1 = require("../../lib/prisma");
-const cloudinary_orchestration_utils_1 = require("../../common/utils/cloudinary-orchestration.utils");
-const staff_repository_1 = require("../../staff/repositories/staff.repository");
-const working_hours_repository_1 = require("../../staff/repositories/working-hours.repository");
+const prisma_1 = require("@/lib/prisma");
+const cloudinary_orchestration_utils_1 = require("@/common/utils/cloudinary-orchestration.utils");
+const staff_repository_1 = require("@/staff/repositories/staff.repository");
+const working_hours_repository_1 = require("@/staff/repositories/working-hours.repository");
 const createStaffService = async (input) => {
     return prisma_1.prisma.$transaction(async (tx) => {
         const staffRepo = new staff_repository_1.StaffRepository(tx);

@@ -19,6 +19,14 @@ class StaffRepository {
             where: { id },
         });
     }
+    findManyActiveByIds(ids) {
+        return this.prisma.staff.findMany({
+            where: {
+                id: { in: ids },
+                isDeleted: false,
+            },
+        });
+    }
     delete(id) {
         return this.prisma.staff.delete({
             where: { id }

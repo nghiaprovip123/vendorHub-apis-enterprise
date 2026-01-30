@@ -4,13 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendOTPService = exports.SendOTPService = void 0;
-const postgresql_1 = __importDefault(require("../../lib/postgresql"));
-const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
+const postgresql_1 = __importDefault(require("@/lib/postgresql"));
+const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
 const crypto_1 = __importDefault(require("crypto"));
-const send_otp_helper_utils_1 = require("../../common/utils/send-otp-helper.utils");
-const veirfy_otp_type_enum_1 = require("../../auth/enum/veirfy-otp-type.enum");
-const otp_repository_1 = require("../../auth/repositories/otp.repository");
-const rate_limit_utils_1 = require("../../common/utils/rate-limit.utils");
+const send_otp_helper_utils_1 = require("@/common/utils/send-otp-helper.utils");
+const veirfy_otp_type_enum_1 = require("@/auth/enum/veirfy-otp-type.enum");
+const otp_repository_1 = require("@/auth/repositories/otp.repository");
+const rate_limit_utils_1 = require("@/common/utils/rate-limit.utils");
 class SendOTPService {
     async sendOTP(email, phone, type) {
         if (!email || !phone) {

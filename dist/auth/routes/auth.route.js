@@ -4,15 +4,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const login_controller_1 = require("../../auth/controllers/login.controller");
-const send_otp_controller_1 = require("../../auth/controllers/send-otp.controller");
-const verify_otp_controller_1 = require("../../auth/controllers/verify-otp.controller");
-const create_password_controller_1 = require("../../auth/controllers/create-password.controller");
-const refresh_token_controller_1 = require("../../auth/controllers/refresh-token.controller");
-const sign_out_controller_1 = require("../../auth/controllers/sign-out.controller");
-const google_redirect_controller_1 = require("../../auth/controllers/google-redirect.controller");
-const google_auth_controller_1 = require("../../auth/controllers/google-auth.controller");
-const auth_guard_1 = require("../../common/guards/auth.guard");
+const login_controller_1 = require("@/auth/controllers/login.controller");
+const send_otp_controller_1 = require("@/auth/controllers/send-otp.controller");
+const verify_otp_controller_1 = require("@/auth/controllers/verify-otp.controller");
+const create_password_controller_1 = require("@/auth/controllers/create-password.controller");
+const refresh_token_controller_1 = require("@/auth/controllers/refresh-token.controller");
+const sign_out_controller_1 = require("@/auth/controllers/sign-out.controller");
+const google_redirect_controller_1 = require("@/auth/controllers/google-redirect.controller");
+const google_auth_controller_1 = require("@/auth/controllers/google-auth.controller");
+const auth_guard_1 = require("@/common/guards/auth.guard");
 const AuthRouter = express_1.default.Router();
 // REDIRECT USER QUA GOOGLE
 AuthRouter.get('/google', google_redirect_controller_1.GoogleRedirectController);

@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthGuard = void 0;
-const index_jwt_1 = require("../../common/jwt/index.jwt");
-const guard_error_1 = require("../../common/utils/error/guard.error");
+const index_jwt_1 = require("@/common/jwt/index.jwt");
+const guard_error_1 = require("@/common/utils/error/guard.error");
 class AuthGuard {
     static RequireAuth(req, res, next) {
         try {

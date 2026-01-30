@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteStaffSchema = exports.updateStaffSchema = exports.createStaffSchema = exports.createWorkingHourSchema = void 0;
-// staff/dto/staffs.validation.ts
 const zod_1 = require("zod");
 exports.createWorkingHourSchema = zod_1.z.object({
     day: zod_1.z.string(),

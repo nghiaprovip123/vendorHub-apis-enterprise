@@ -4,13 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GoogleCallbackAuthService = void 0;
-const postgresql_1 = __importDefault(require("../../lib/postgresql"));
+const postgresql_1 = __importDefault(require("@/lib/postgresql"));
 const argon2_1 = __importDefault(require("argon2"));
-const index_jwt_1 = require("../../common/jwt/index.jwt");
-const google_oauth_service_1 = require("../../auth/services/google-oauth.service");
-const refresh_token_sessions_repository_1 = require("../../auth/repositories/refresh-token-sessions.repository");
-const identifiers_repository_1 = require("../../auth/repositories/identifiers.repository");
-const identifier_type_enum_1 = require("../../auth/enum/identifier-type.enum");
+const index_jwt_1 = require("@/common/jwt/index.jwt");
+const google_oauth_service_1 = require("@/auth/services/google-oauth.service");
+const refresh_token_sessions_repository_1 = require("@/auth/repositories/refresh-token-sessions.repository");
+const identifiers_repository_1 = require("@/auth/repositories/identifiers.repository");
+const identifier_type_enum_1 = require("@/auth/enum/identifier-type.enum");
 class GoogleCallbackAuthService {
     static async execute(params) {
         const { code, userAgent } = params;

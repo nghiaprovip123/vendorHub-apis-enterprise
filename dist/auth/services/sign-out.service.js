@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SignOutService = void 0;
-const postgresql_1 = __importDefault(require("../../lib/postgresql"));
+const postgresql_1 = __importDefault(require("@/lib/postgresql"));
 class SignOutService {
     async execute(extractedUser) {
         const { sub } = extractedUser;

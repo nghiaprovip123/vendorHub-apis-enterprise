@@ -4,14 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyOTPService = exports.VerifyOTPService = void 0;
-const postgresql_1 = __importDefault(require("../../lib/postgresql"));
-const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
-const index_jwt_1 = require("../../common/jwt/index.jwt");
-const veirfy_otp_type_enum_1 = require("../../auth/enum/veirfy-otp-type.enum");
-const identifier_type_enum_1 = require("../../auth/enum/identifier-type.enum");
-const otp_repository_1 = require("../../auth/repositories/otp.repository");
-const identifiers_repository_1 = require("../../auth/repositories/identifiers.repository");
-const auth_user_repository_1 = require("../../auth/repositories/auth-user.repository");
+const postgresql_1 = __importDefault(require("@/lib/postgresql"));
+const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
+const index_jwt_1 = require("@/common/jwt/index.jwt");
+const veirfy_otp_type_enum_1 = require("@/auth/enum/veirfy-otp-type.enum");
+const identifier_type_enum_1 = require("@/auth/enum/identifier-type.enum");
+const otp_repository_1 = require("@/auth/repositories/otp.repository");
+const identifiers_repository_1 = require("@/auth/repositories/identifiers.repository");
+const auth_user_repository_1 = require("@/auth/repositories/auth-user.repository");
 class VerifyOTPService {
     async verifyOtpByRegisterationFlow({ otp, email, name, }) {
         const result = await postgresql_1.default.begin(async (tx) => {

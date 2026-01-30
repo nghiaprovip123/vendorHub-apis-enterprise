@@ -1,48 +1,24 @@
 "use strict";
-// import { prisma } from "../../lib/prisma"
-// import * as z from "zod"
-// import { createWorkingHourSchema } from "@/dto/staffs/staffs.validation"
-// type getAvailableStaffbyBookingTimeType = z.infer< typeof createWorkingHourSchema > 
-// export const getAvailableStaffbyBookingTimeService = async(input: getAvailableStaffbyBookingTimeType) => {
-//     try {
-//         console.log(input);
-//         const {
-//             day,
-//             startTime,
-//             endTime
-//         } = input
-//         const getAcceptableWorkingHourbyBookingTime = await prisma.workingHour.findMany(
-//             {
-//                 where: {
-//                     day: day,
-//                     startTime: { lte: startTime },
-//                     endTime: { gte: endTime }
-//                 },
-//                 select: {
-//                     staffId: true
-//                 }
-//             }
-//         )
-//         const createStaffIdsArray = getAcceptableWorkingHourbyBookingTime.map((w) => w.staffId)
-//         if(createStaffIdsArray.length === 0) {
-//             return []
-//         }
-//         const staff = await Promise.all(
-//             createStaffIdsArray.map((staffs) => {
-//                 const findStaff = prisma.staff.findFirst(
-//                     {
-//                         where: {
-//                             id: staffs, 
-//                             isDeleted: false,
-//                         }
-//                     }
-//                 )
-//                 return findStaff
-//             })
-//         )
-//         return staff
-//     }
-//     catch(error) {
-//         throw new Error("Fail to Get Available Staff")
-//     }
-// }
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getAvailableStaffbyBookingTimeService = void 0;
+const prisma_1 = require("@/lib/prisma");
+const working_hours_repository_1 = require("@/staff/repositories/working-hours.repository");
+const staff_repository_1 = require("@/staff/repositories/staff.repository");
+const staff_error_1 = require("@/common/utils/error/staff.error");
+const getAvailableStaffbyBookingTimeService = async (input) => {
+    try {
+        const workingHourRepo = new working_hours_repository_1.WorkingHoursRepository(prisma_1.prisma);
+        const staffRepo = new staff_repository_1.StaffRepository(prisma_1.prisma);
+        const { day, startTime, endTime } = input;
+        const workingHours = await workingHourRepo.getAcceptableWorkingHourbyBookingTime(day, startTime, endTime);
+        const staffIds = workingHours.map(w => w.staffId);
+        if (staffIds.length === 0) {
+            return [];
+        }
+        return staffRepo.findManyActiveByIds(staffIds);
+    }
+    catch (error) {
+        throw new Error(staff_error_1.StaffError.FETCH_AVAILABLE_STAFF_ERROR);
+    }
+};
+exports.getAvailableStaffbyBookingTimeService = getAvailableStaffbyBookingTimeService;
