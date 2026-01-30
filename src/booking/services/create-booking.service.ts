@@ -1,6 +1,6 @@
 // import { prisma } from "@/lib/prisma"
 // import * as z from "zod"
-// import { CreateBookingByCustomerSchema } from "@/dto/booking/booking.validation"
+// import { CreateBookingByCustomerSchema } from "@/booking/dto/booking.validation"
 
 // type createBookingByCustomerServiceType = z.infer< typeof CreateBookingByCustomerSchema >
 // export const createBookingByCustomerService = async( input: createBookingByCustomerServiceType ) => {
