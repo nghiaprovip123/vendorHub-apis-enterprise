@@ -253,8 +253,8 @@ export class CreateBooking {
                             customerName : customerName,
                             slot : {
                                 day : bookingDate,
-                                startTime : startTime,
-                                endTime : endTime,
+                                startTime : bookingStartDate,
+                                endTime : bookingEndDate,
                                 durationInMinutes : duration
                             }
                         }
