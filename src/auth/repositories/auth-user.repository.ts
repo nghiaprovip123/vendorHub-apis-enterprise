@@ -1,4 +1,4 @@
-import sql from "@/lib/postgresql"
+import sql from "@/lib/postgresQL"
 
 export class AuthenticationUserRepository {
     constructor(private readonly sql: any) {}

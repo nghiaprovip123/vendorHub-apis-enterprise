@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RefreshTokenSessionRepository = void 0;
-const postgresql_1 = __importDefault(require("../../lib/postgresql"));
+const postgresQL_1 = __importDefault(require("../../lib/postgresQL"));
 class RefreshTokenSessionRepository {
     constructor(sql) {
         this.sql = sql;
@@ -38,7 +38,7 @@ class RefreshTokenSessionRepository {
         return session;
     }
     async deleteOldSession(sessionid) {
-        await (0, postgresql_1.default) `
+        await (0, postgresQL_1.default) `
             DELETE FROM refresh_token_sessions 
                 WHERE sessionid = ${sessionid}
         `;

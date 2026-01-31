@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyOTPService = exports.VerifyOTPService = void 0;
-const postgresql_1 = __importDefault(require("../../lib/postgresql"));
+const postgresQL_1 = __importDefault(require("../../lib/postgresQL"));
 const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
 const index_jwt_1 = require("../../common/jwt/index.jwt");
 const veirfy_otp_type_enum_1 = require("../../auth/enum/veirfy-otp-type.enum");
@@ -14,7 +14,7 @@ const identifiers_repository_1 = require("../../auth/repositories/identifiers.re
 const auth_user_repository_1 = require("../../auth/repositories/auth-user.repository");
 class VerifyOTPService {
     async verifyOtpByRegisterationFlow({ otp, email, name, }) {
-        const result = await postgresql_1.default.begin(async (tx) => {
+        const result = await postgresQL_1.default.begin(async (tx) => {
             const otpRepo = new otp_repository_1.OTPRepository(tx);
             const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(tx);
             const authenticationUserRepository = new auth_user_repository_1.AuthenticationUserRepository(tx);
@@ -50,7 +50,7 @@ class VerifyOTPService {
         if (!otp || !email) {
             throw new ApiError_utils_1.default(400, 'OTP VÀ EMAIL LÀ BẮT BUỘC');
         }
-        const result = await postgresql_1.default.begin(async (tx) => {
+        const result = await postgresQL_1.default.begin(async (tx) => {
             const otpRepo = new otp_repository_1.OTPRepository(tx);
             const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(tx);
             const otpRow = await otpRepo.findOTPForVerification(otp, email, veirfy_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD);

@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendOTPService = exports.SendOTPService = void 0;
-const postgresql_1 = __importDefault(require("../../lib/postgresql"));
+const postgresQL_1 = __importDefault(require("../../lib/postgresQL"));
 const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
 const crypto_1 = __importDefault(require("crypto"));
 const send_otp_helper_utils_1 = require("../../common/utils/send-otp-helper.utils");
@@ -13,12 +13,21 @@ const otp_repository_1 = require("../../auth/repositories/otp.repository");
 const rate_limit_utils_1 = require("../../common/utils/rate-limit.utils");
 class SendOTPService {
     async sendOTP(email, phone, type) {
-        if (!email || !phone) {
-            throw new ApiError_utils_1.default(400, 'Email and phone are required');
+        switch (type) {
+            case veirfy_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_REGISTERATION:
+                if (!email || !phone)
+                    throw new ApiError_utils_1.default(400, 'Email and phone are required');
+                break;
+            case veirfy_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD:
+                if (!email)
+                    throw new ApiError_utils_1.default(400, 'Email is required');
+                break;
+            default:
+                throw new ApiError_utils_1.default(400, 'Invalid OTP type');
         }
         let result;
         try {
-            result = await postgresql_1.default.begin(async (trx) => {
+            result = await postgresQL_1.default.begin(async (trx) => {
                 const otpRepo = new otp_repository_1.OTPRepository(trx);
                 ////////////////////////////////////////////////////////////////////////////////////
                 // Layerize Repositories for OTP Entity: Count the OTP by email within 15 minutes //
@@ -36,7 +45,7 @@ class SendOTPService {
                 /////////////////////////////////////////////////////////////////////////////////////
                 // Layerize Repositories for OTP Entity: Select the OTP that is just sent by Email //
                 const sendOTP = await otpRepo.findSentOTP(createNewOTP.id);
-                const expiresat = await createNewOTP.expiresat;
+                const expiresat = createNewOTP.expiresat;
                 return {
                     sendOTP,
                     expiresat,

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStaffListService = void 0;
 const prisma_1 = require("../../lib/prisma");
 const staff_repository_1 = require("../../staff/repositories/staff.repository");
+const staff_error_1 = require("../../common/utils/error/staff.error");
 const PAGE_SIZE = 10;
 const getStaffListService = async (page) => {
     try {
@@ -17,7 +18,7 @@ const getStaffListService = async (page) => {
         };
     }
     catch (error) {
-        throw new Error("Fail to fetch list of staffs");
+        throw new Error(staff_error_1.StaffError.FETCH_STAFF_LIST_ERROR);
     }
 };
 exports.getStaffListService = getStaffListService;

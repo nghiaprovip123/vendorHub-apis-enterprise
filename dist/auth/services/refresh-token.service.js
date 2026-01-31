@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RefreshTokenService = void 0;
-const postgresql_1 = __importDefault(require("../../lib/postgresql"));
+const postgresQL_1 = __importDefault(require("../../lib/postgresQL"));
 const argon2_1 = __importDefault(require("argon2"));
 const index_jwt_1 = require("../../common/jwt/index.jwt");
 const refresh_token_sessions_repository_1 = require("../../auth/repositories/refresh-token-sessions.repository");
@@ -17,7 +17,7 @@ class RefreshTokenService {
             throw new Error("SAI TOKEN, VUI LÒNG THỬ LẠI");
         }
         const { sub } = payload;
-        return await postgresql_1.default.begin(async (tx) => {
+        return await postgresQL_1.default.begin(async (tx) => {
             const refreshTokenSessionRepo = new refresh_token_sessions_repository_1.RefreshTokenSessionRepository(tx);
             const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(tx);
             const session = await refreshTokenSessionRepo.findSession(sub);

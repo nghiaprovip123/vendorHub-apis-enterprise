@@ -9,7 +9,6 @@ const createStaff = async (_, args, ctx) => {
         return createStaff;
     }
     catch (error) {
-        console.error("Error creating staff:", error);
         throw error;
     }
 };

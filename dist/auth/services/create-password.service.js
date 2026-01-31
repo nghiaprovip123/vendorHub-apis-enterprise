@@ -4,16 +4,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createPasswordService = exports.CreatePasswordService = void 0;
-const postgresql_1 = __importDefault(require("../../lib/postgresql"));
 const identifier_type_enum_1 = require("../../auth/enum/identifier-type.enum");
 const veirfy_otp_type_enum_1 = require("../../auth/enum/veirfy-otp-type.enum");
+const postgresQL_1 = __importDefault(require("../../lib/postgresQL"));
 const password_utils_1 = require("../../common/utils/password.utils");
 const identifiers_repository_1 = require("../../auth/repositories/identifiers.repository");
 class CreatePasswordService {
     async createPasswordByRegisterationFlow(params) {
         const { userId, password } = params;
-        const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(postgresql_1.default);
-        const [user] = await (0, postgresql_1.default) `
+        const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(postgresQL_1.default);
+        const [user] = await (0, postgresQL_1.default) `
             SELECT * FROM auth_user
             WHERE id = ${userId}
         `;
@@ -34,9 +34,9 @@ class CreatePasswordService {
     }
     async createPasswordByForgotFlow(params) {
         const { extractedUser, password } = params;
-        const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(postgresql_1.default);
+        const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(postgresQL_1.default);
         const { sub, purpose } = extractedUser;
-        const [user] = await (0, postgresql_1.default) `
+        const [user] = await (0, postgresQL_1.default) `
             SELECT * FROM auth_user
             WHERE id = ${sub}
         `;

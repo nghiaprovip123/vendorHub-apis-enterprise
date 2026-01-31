@@ -19,19 +19,24 @@ class OTPRepository {
     }
     // Deactivate old OTPs
     async deactiveOldOTPs(email, phone, type) {
+        const phoneValue = phone || null;
         await this.sql `
             UPDATE otps
             SET isverified = true,
                 isactive = false
             WHERE type = ${type}
               AND email = ${email}
-              AND phone = ${phone}
+              AND (
+                ${type} = 'forgot password'
+                OR phone IS NOT DISTINCT FROM ${phoneValue}
+              )
               AND isverified = false
               AND isactive = true
         `;
     }
     // Create new OTP
     async createNewOTP(email, phone, type, otp) {
+        const phoneValue = phone || null;
         const [{ id, expiresat }] = await this.sql `
             INSERT INTO otps (
                 type,
@@ -47,7 +52,7 @@ class OTPRepository {
                 ${email},
                 ${otp},
                 NOW() + INTERVAL '15 minutes',
-                ${phone},
+                ${phoneValue},
                 false,
                 true
             )

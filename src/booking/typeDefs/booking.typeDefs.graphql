@@ -2,7 +2,6 @@ input CreateBookingInput {
   serviceId: String!
   staffId: String                       
   day: String!
-  dayOfWeek: String!
   startTime: String!
   endTime: String!
   customerName: String!
@@ -12,13 +11,9 @@ input CreateBookingInput {
 }
 
 type CreateBookingResponse {
-  id: ID
+  id: ID!
   serviceId: String!
-  staffId: String                        
-  day: String
-  dayOfWeek: String
-  startTime: String
-  endTime: String
+  staffId: String
   customerName: String
   customerPhone: String
   customerEmail: String
@@ -28,7 +23,17 @@ type CreateBookingResponse {
   cancelReason: String
   createdAt: String
   updatedAt: String
+  # Update để match đúng field từ slot (có thể trả nested)
+  slot: Slot
 }
+
+type Slot {
+  day: String
+  startTime: String
+  endTime: String
+  durationInMinutes: Int
+}
+
 
 input AssignStaffForBookingRequestInput {
   staffId: String!

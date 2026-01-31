@@ -20,5 +20,17 @@ class WorkingHoursRepository {
             where: { staffId },
         });
     }
+    async getAcceptableWorkingHourbyBookingTime(day, startTime, endTime) {
+        return this.prisma.workingHour.findMany({
+            where: {
+                day,
+                startTime: { lte: startTime },
+                endTime: { gte: endTime }
+            },
+            select: {
+                staffId: true
+            }
+        });
+    }
 }
 exports.WorkingHoursRepository = WorkingHoursRepository;

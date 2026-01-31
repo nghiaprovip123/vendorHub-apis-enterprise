@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GoogleCallbackAuthService = void 0;
-const postgresql_1 = __importDefault(require("../../lib/postgresql"));
+const postgresQL_1 = __importDefault(require("../../lib/postgresQL"));
 const argon2_1 = __importDefault(require("argon2"));
 const index_jwt_1 = require("../../common/jwt/index.jwt");
 const google_oauth_service_1 = require("../../auth/services/google-oauth.service");
@@ -14,7 +14,7 @@ const identifier_type_enum_1 = require("../../auth/enum/identifier-type.enum");
 class GoogleCallbackAuthService {
     static async execute(params) {
         const { code, userAgent } = params;
-        const refreshTokenSessionRepo = new refresh_token_sessions_repository_1.RefreshTokenSessionRepository(postgresql_1.default);
+        const refreshTokenSessionRepo = new refresh_token_sessions_repository_1.RefreshTokenSessionRepository(postgresQL_1.default);
         const tokenData = await google_oauth_service_1.GoogleOpenAuthorizationService.exchangeGoogleTokens({ code });
         const googleAccessToken = tokenData.access_token;
         const googleUser = await google_oauth_service_1.GoogleOpenAuthorizationService.fetchUserInfo({
@@ -40,16 +40,16 @@ class GoogleCallbackAuthService {
         return { accessToken, refreshToken };
     }
     static async resolveAuthUser(email, userAgent) {
-        const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(postgresql_1.default);
+        const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(postgresQL_1.default);
         const existing = await identifiersRepo.checkExistenceOfIdentifier(identifier_type_enum_1.IdentifierType.EMAIL, email);
         if (existing) {
             return existing.authid;
         }
-        const [created] = await (0, postgresql_1.default) `
+        const [created] = await (0, postgresQL_1.default) `
       INSERT INTO auth_user DEFAULT VALUES
       RETURNING id
     `;
-        await (0, postgresql_1.default) `
+        await (0, postgresQL_1.default) `
       INSERT INTO identifiers (
         type,
         value,

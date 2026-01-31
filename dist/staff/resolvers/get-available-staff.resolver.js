@@ -1,20 +1,18 @@
 "use strict";
-// import { getAvailableStaffbyBookingTimeService } from "../../staff/services/get-available-staff.service"
-// const getAvailableStaffByBookingTime = async (
-//   _: unknown,
-//   args: { input: any },
-//   ctx: any
-// ) => {
-//   try { 
-//      const result = await getAvailableStaffbyBookingTimeService(args.input);
-//      return result
-//    }
-//    catch (error: any) {
-//     throw error
-//    }
-// }
-// export const GetAvailableStaff = {
-//   Query: {
-//     getAvailableStaffByBookingTime,
-//   },
-// };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GetAvailableStaff = void 0;
+const get_available_staff_service_1 = require("../../staff/services/get-available-staff.service");
+const getAvailableStaffByBookingTime = async (_, args, ctx) => {
+    try {
+        const result = await (0, get_available_staff_service_1.getAvailableStaffbyBookingTimeService)(args.input);
+        return result;
+    }
+    catch (error) {
+        throw error;
+    }
+};
+exports.GetAvailableStaff = {
+    Query: {
+        getAvailableStaffByBookingTime,
+    },
+};

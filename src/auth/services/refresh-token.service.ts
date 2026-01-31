@@ -1,4 +1,4 @@
-import sql from "@/lib/postgresql";
+import sql from "@/lib/postgresQL";
 import argon2 from "argon2";
 import { jwtService } from "@/common/jwt/index.jwt";
 import { RefreshTokenSessionRepository } from '@/auth/repositories/refresh-token-sessions.repository'

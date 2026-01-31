@@ -1,17 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateStaffService = void 0;
-// staff/services/update-staff.service.ts
 const prisma_1 = require("../../lib/prisma");
 const cloudinary_orchestration_utils_1 = require("../../common/utils/cloudinary-orchestration.utils");
 const staff_repository_1 = require("../../staff/repositories/staff.repository");
 const working_hours_repository_1 = require("../../staff/repositories/working-hours.repository");
+const staff_error_1 = require("../../common/utils/error/staff.error");
 const updateStaffService = async (input) => {
     const existingStaff = await prisma_1.prisma.staff.findUnique({
         where: { id: input.id }
     });
     if (!existingStaff) {
-        throw new Error('KHÔNG TÌM THẤY NHÂN VIÊN');
+        throw new Error(staff_error_1.StaffError.NOT_FOUND_STAFF_ERROR);
     }
     let avatar_url = existingStaff.avatar_url || undefined;
     let avatar_public_id = existingStaff.avatar_public_id || undefined;

@@ -1,4 +1,4 @@
-import sql from "@/lib/postgresql"
+import sql from "@/lib/postgresQL"
 import { IdentifierType } from "../enum/identifier-type.enum"
 
 export class IdentifiersRepository {

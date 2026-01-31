@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IdentifiersRepository = void 0;
-const postgresql_1 = __importDefault(require("../../lib/postgresql"));
+const postgresQL_1 = __importDefault(require("../../lib/postgresQL"));
 const identifier_type_enum_1 = require("../enum/identifier-type.enum");
 class IdentifiersRepository {
     constructor(sql) {
@@ -22,7 +22,7 @@ class IdentifiersRepository {
         return existing;
     }
     async findIdentifier(type, value) {
-        const [identifier] = await (0, postgresql_1.default) `
+        const [identifier] = await (0, postgresQL_1.default) `
             SELECT authid
                 FROM identifiers
                     WHERE type = ${type}
