@@ -104,4 +104,11 @@ export class BookingRepository {
             },
           })
     }
+
+    async findBookingById(id: string) {
+        return this.prisma.booking.findFirst({
+          where: { id }
+        })
+      }
+      
 }

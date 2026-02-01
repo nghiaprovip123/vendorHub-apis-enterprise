@@ -8,7 +8,7 @@ import { GetAvailableStaff } from "../staff/resolvers/get-available-staff.resolv
 import { CreateBookingResolver } from "@/booking/resolvers/create-booking.resolver"
 // import { AssignStaffByBookingRequest } from "./booking/assign-staff.resolver"
 // import { CancelBooking } from "./booking/cancel-booking.resolver"
-// import { ViewBookingDetailInBackOffce } from "./booking/view-booking-detail.resolver"
+import { ViewBookingDetailInBackOffce } from "@/booking/resolvers/view-booking-detail.resolver"
 // import { GetBookingListInBackOfficeByWeek } from "./booking/get-booking-list-by-week.resolver"
 // import { GetBookingListInBackOfficeByMonth } from "./booking/get-booking-list-by-month.resolver"
 export const resolvers = [
@@ -21,7 +21,7 @@ export const resolvers = [
   CreateBookingResolver,
   // AssignStaffByBookingRequest,
   // CancelBooking,
-  // ViewBookingDetailInBackOffce,
+  ViewBookingDetailInBackOffce,
   // GetBookingListInBackOfficeByWeek,
   // GetBookingListInBackOfficeByMonth
 ];
