@@ -7,6 +7,8 @@ import * as z from "zod"
 import { VerifyOTPType } from "@/auth/enum/veirfy-otp-type.enum"
 import { OTPRepository } from "@/auth/repositories/otp.repository"
 import { RateLimit } from "@/common/utils/rate-limit.utils"
+import { IdentifiersRepository } from "@/auth/repositories/identifiers.repository"
+import { IdentifierType } from "@/auth/enum/identifier-type.enum"
 
 type SendOTPServiceType = z.infer<typeof SendOTPSchema>
 type SendOTPServiceResult = {
@@ -21,16 +23,41 @@ export class SendOTPService {
         phone: string,
         type: VerifyOTPType
     ): Promise<SendOTPServiceResult> {
+        const identifiersRepo = new IdentifiersRepository(sql)
+
         switch (type) {
-            case VerifyOTPType.VERIFY_OTP_REGISTERATION:
-                if (!email || !phone) throw new ApiError(400, 'Email and phone are required')
-                break
-            case VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD:
-                if (!email) throw new ApiError(400, 'Email is required')
-                break
-            default:
-                throw new ApiError(400, 'Invalid OTP type')
+          case VerifyOTPType.VERIFY_OTP_REGISTERATION: {
+            if (!email && !phone) {
+              throw new ApiError(400, 'Email or phone is required')
+            }
+        
+            if (email) {
+              const exists = await identifiersRepo.checkExistenceOfIdentifier(
+                IdentifierType.EMAIL,
+                email
+              )
+              if (exists) throw new ApiError(400, 'Email has been used')
+            }
+        
+            break
+          }
+        
+          case VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD: {
+            if (!email) throw new ApiError(400, 'Email is required')
+        
+            const exists = await identifiersRepo.checkExistenceOfIdentifier(
+              IdentifierType.EMAIL,
+              email
+            )
+            if (!exists) throw new ApiError(404, 'Email not found')
+        
+            break
+          }
+        
+          default:
+            throw new ApiError(400, 'Invalid OTP type')
         }
+        
 
         let result
 
