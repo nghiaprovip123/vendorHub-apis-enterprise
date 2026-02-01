@@ -3,9 +3,12 @@ import * as z from "zod"
 import { CreateBookingDto } from "@/booking/dto/booking.validation"
 import { BookingError } from "@/common/utils/error/booking.error"
 import { parseISO, differenceInMinutes } from "date-fns"
+import { ServiceRepository } from "@/service/repositories/service.repository"
+import { BookingRepository } from "@/booking/repositories/booking.repository"
+import { BookingStatus } from "@prisma/client"
+
 
 type createBookingInput = z.infer< typeof CreateBookingDto >
-
 export class CreateBooking {
     static async createBookingByCustomer ( input: createBookingInput ) {
             const {
@@ -25,18 +28,12 @@ export class CreateBooking {
             }
             const service = await prisma.$transaction (
                 async (tx) => {
-                    const existingService = await tx.service.findUnique(
-                        {
-                            where : { 
-                                id: serviceId,
-                                isDeleted : false,
-                                isVisible: true
-                             }
-                        }
-                    )
+                    const serviceRepo = new ServiceRepository(tx)
+                    const bookingRepo = new BookingRepository(tx)
+                    const existingService = await serviceRepo.findAvailableService(serviceId)
             
                     if (!existingService) {
-                        throw new Error(BookingError.BOOKING_CREATION_MISSING_SERVICE_INFORMATION)
+                        throw new Error(BookingError.BOOKING_CREATION_SERVICE_NOT_AVAILABLE)
                     }
              
                     if (!customerName || !customerPhone || !customerEmail) {
@@ -58,45 +55,14 @@ export class CreateBooking {
     
                     const duration = differenceInMinutes(bookingEndDate, bookingStartDate)
             
-                    const overlapBookingHour = await tx.booking.findFirst(
-                        {
-                            where : {
-                                staffId : staffId,
-                                status : {
-                                    in : ['CONFIRMED', 'PENDING']
-                                },
-                                OR : [
-                                    {
-                                        slot : {
-                                            is : {
-                                                startTime : {
-                                                    lte : bookingEndDate
-                                                }
-                                            }
-                                        }
-                                    },
-                                    {
-                                        slot : {
-                                            is : {
-                                                endTime : {
-                                                    gte : bookingStartDate
-                                                }
-                                            }
-                                        }
-                                    }
-                                ],
-                                AND : [
-                                    {
-                                        slot : {
-                                            is : {
-                                                startTime: { lt: bookingEndDate },
-                                                endTime: { gt: bookingStartDate },
-                                            }
-                                        }
-                                    },
-                                ]
-                            }
-                        }
+                    const overlapBookingHour = await bookingRepo.checkOverlapWorkingHour(
+                        bookingStartDate,
+                        bookingEndDate,
+                        staffId,
+                        [
+                            BookingStatus.CONFIRMED,
+                            BookingStatus.PENDING
+                        ]
                     )
     
                     if (overlapBookingHour) {
