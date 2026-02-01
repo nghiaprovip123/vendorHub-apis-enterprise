@@ -25,6 +25,7 @@ function getGraphqlFiles(dir: string): string[] {
 }
 
 const schemaFiles = getGraphqlFiles(typeDefsDir);
+console.log('Schema files found:', schemaFiles); // Kiểm tra xem có file staff.graphql không
 
 const schemas = schemaFiles.map((filePath) =>
   readFileSync(filePath, "utf-8")

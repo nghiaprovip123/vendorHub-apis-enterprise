@@ -1,14 +1,12 @@
 import { CreateBooking } from "@/booking/services/create-booking.service"
 import { BookingError } from "@/common/utils/error/booking.error"
-import { unknown } from "zod";
 
-export class createBooking {
-  async createBookingByCustomer  (
+export class CreateBookingClass {
+  async createBookingByCustomer(
     _: unknown,
-    args: { input : any },
-    ctx : any
+    args: { input: any },
+    ctx: any
   ) {
-
     try {
       const result = await CreateBooking.createBookingByCustomer(args.input);
 
@@ -32,19 +30,16 @@ export class createBooking {
           durationInMinutes: result.slot.durationInMinutes
         } : null
       };   
-    }
-
-    catch (error : any) {
-      throw new Error(BookingError.BOOKING_CREATE_COMMON_ERROR)
+    } catch (error: any) {
+      throw error
     }
   }
 
-  async createBookingInBackOffice  (
+  async createBookingInBackOffice(
     _: unknown,
-    args: { input : any },
-    ctx : any
+    args: { input: any },
+    ctx: any
   ) {
-
     try {
       const result = await CreateBooking.createBookingInBackOffice(args.input);
 
@@ -68,22 +63,17 @@ export class createBooking {
           durationInMinutes: result.slot.durationInMinutes
         } : null
       };   
-    }
-
-    catch (error : any) {
-      throw new Error(BookingError.BOOKING_CREATE_COMMON_ERROR)
+    } catch (error: any) {
+      throw error
     }
   }
 }
 
-const resolver = new createBooking();
+const resolverInstance = new CreateBookingClass();
 
-  
-  export const CreateBookingResolver = {
-    Mutation: {
-      createBookingByCustomer: resolver.createBookingByCustomer.bind(resolver),
-      createBookingInBackOffice: resolver.createBookingInBackOffice.bind(resolver),
-    }
-  };
-  
-  
+export const CreateBookingResolver = {
+  Mutation: {
+    createBookingByCustomer: resolverInstance.createBookingByCustomer.bind(resolverInstance),
+    createBookingInBackOffice: resolverInstance.createBookingInBackOffice.bind(resolverInstance),
+  }
+};

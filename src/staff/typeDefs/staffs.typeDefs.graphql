@@ -72,7 +72,7 @@ input GetAvailableStaffByBookingtimeInput {
   endTime: String!
 }
 
-type Mutation {
+extend type Mutation {
   createStaff(input: CreateStaffInput!): Staff!
   updateStaff(input: UpdateStaffInput!): Staff!
   deleteStaff(input: DeleteStaffInput!): DeleteStaffResponse!

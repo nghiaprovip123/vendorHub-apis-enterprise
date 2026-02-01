@@ -251,6 +251,7 @@ export class CreateBooking {
                             customerEmail : customerEmail,
                             customerPhone : customerPhone,
                             customerName : customerName,
+                            status : 'PENDING',
                             slot : {
                                 day : bookingDate,
                                 startTime : bookingStartDate,

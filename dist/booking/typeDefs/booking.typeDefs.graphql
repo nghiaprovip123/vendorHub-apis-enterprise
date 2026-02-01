@@ -2,7 +2,6 @@ input CreateBookingInput {
   serviceId: String!
   staffId: String                       
   day: String!
-  dayOfWeek: String!
   startTime: String!
   endTime: String!
   customerName: String!
@@ -12,13 +11,9 @@ input CreateBookingInput {
 }
 
 type CreateBookingResponse {
-  id: ID
+  id: ID!
   serviceId: String!
-  staffId: String                        
-  day: String
-  dayOfWeek: String
-  startTime: String
-  endTime: String
+  staffId: String
   customerName: String
   customerPhone: String
   customerEmail: String
@@ -28,6 +23,14 @@ type CreateBookingResponse {
   cancelReason: String
   createdAt: String
   updatedAt: String
+  slot: Slot
+}
+
+type Slot {
+  day: String
+  startTime: String
+  endTime: String
+  durationInMinutes: Int
 }
 
 input AssignStaffForBookingRequestInput {
@@ -70,25 +73,14 @@ input getBookingMonthlyListInBackOfficeInput {
 }
 
 type Mutation {
-    createBookingByCustomer(input: CreateBookingInput): CreateBookingResponse
-}
-
-type Mutation {
+  createBookingByCustomer(input: CreateBookingInput): CreateBookingResponse
+  createBookingInBackOffice(input: CreateBookingInput): CreateBookingResponse
   assignStaffByBookingRequest(input: AssignStaffForBookingRequestInput): AssignStaffForBookingRequestResponse
-}
-
-type Mutation {
   cancelBooking(input: CancelBookingInput): CancelBookingResponse
 }
 
 type Query {
   viewBookingDetailInBackOffice(input: ViewBookingDetailInput): CreateBookingResponse
-}
-
-type Query {
   getBookingListInBackOfficeByWeek(input: getBookingWeekyListInBackOfficeInput): getBookingListInBackOfficeResponse
-}
-
-type Query {
   getBookingListInBackOfficeByMonth(input: getBookingMonthlyListInBackOfficeInput): getBookingListInBackOfficeResponse
 }

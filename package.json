@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "nodemon --watch src --ext ts,json --exec \"tsx src/app.ts\"",
-    "build": "tsc && tsc-alias && cpx \"src/typeDefs/**/*.graphql\" dist/typeDefs",
+    "build": "tsc && tsc-alias && cpx \"src/**/*.graphql\" dist",
     "start": "node dist/app.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",

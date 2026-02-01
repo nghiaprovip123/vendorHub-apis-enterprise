@@ -21,7 +21,7 @@ exports.resolvers = [
     delete_staff_resolver_1.DeleteStaff,
     view_staff_list_resolver_1.ViewStaffList,
     get_available_staff_resolver_1.GetAvailableStaff,
-    create_booking_resolver_1.CreateBookingByCustomer,
+    create_booking_resolver_1.CreateBookingResolver,
     // AssignStaffByBookingRequest,
     // CancelBooking,
     // ViewBookingDetailInBackOffce,

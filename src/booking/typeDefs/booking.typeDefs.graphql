@@ -23,7 +23,6 @@ type CreateBookingResponse {
   cancelReason: String
   createdAt: String
   updatedAt: String
-  # Update để match đúng field từ slot (có thể trả nested)
   slot: Slot
 }
 
@@ -33,7 +32,6 @@ type Slot {
   endTime: String
   durationInMinutes: Int
 }
-
 
 input AssignStaffForBookingRequestInput {
   staffId: String!
@@ -75,29 +73,14 @@ input getBookingMonthlyListInBackOfficeInput {
 }
 
 type Mutation {
-    createBookingByCustomer(input: CreateBookingInput): CreateBookingResponse
-}
-
-type Mutation {
-    createBookingInBackOffice(input: CreateBookingInput): CreateBookingResponse
-}
-
-type Mutation {
+  createBookingByCustomer(input: CreateBookingInput): CreateBookingResponse
+  createBookingInBackOffice(input: CreateBookingInput): CreateBookingResponse
   assignStaffByBookingRequest(input: AssignStaffForBookingRequestInput): AssignStaffForBookingRequestResponse
-}
-
-type Mutation {
   cancelBooking(input: CancelBookingInput): CancelBookingResponse
 }
 
 type Query {
   viewBookingDetailInBackOffice(input: ViewBookingDetailInput): CreateBookingResponse
-}
-
-type Query {
   getBookingListInBackOfficeByWeek(input: getBookingWeekyListInBackOfficeInput): getBookingListInBackOfficeResponse
-}
-
-type Query {
   getBookingListInBackOfficeByMonth(input: getBookingMonthlyListInBackOfficeInput): getBookingListInBackOfficeResponse
 }
