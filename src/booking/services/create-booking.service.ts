@@ -161,25 +161,22 @@ export class CreateBooking {
                     throw new Error(BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION)
                 }
 
-                const createBooking = await tx.booking.create(
+                const createBooking = await bookingRepo.createBooking(
                     {
-                        data : {
-                            serviceId : serviceId,
-                            staffId : staffId,
-                            customerEmail : customerEmail,
-                            customerPhone : customerPhone,
-                            customerName : customerName,
-                            status : 'PENDING',
-                            slot : {
-                                day : bookingDate,
-                                startTime : bookingStartDate,
-                                endTime : bookingEndDate,
-                                durationInMinutes : duration
-                            }
+                        serviceId : serviceId,
+                        staffId : staffId,
+                        customerEmail : customerEmail,
+                        customerPhone : customerPhone,
+                        customerName : customerName,
+                        status : 'PENDING',
+                        slot : {
+                            day : bookingDate,
+                            startTime : bookingStartDate,
+                            endTime : bookingEndDate,
+                            durationInMinutes : duration
                         }
                     }
                 )
-
                 return createBooking                
             }
         )
