@@ -1,11 +1,11 @@
-import { viewBookingDetailInBackOfficeService } from "@/booking/services/view-booking-detail.service"
-const viewBookingDetailInBackOffice = async(
+import { viewBookingDetailService } from "@/booking/services/view-booking-detail.service"
+const viewBookingDetail = async(
     _: unknown,
     args: { input: any },
     ctx: any
 ) => {
     try {
-        const result = await viewBookingDetailInBackOfficeService(args.input.bookingId)
+        const result = await viewBookingDetailService(args.input.bookingId)
         return {
             id: result.id,
             serviceId: result.serviceId,
@@ -30,8 +30,8 @@ const viewBookingDetailInBackOffice = async(
         throw error
     }            
 }
-export const ViewBookingDetailInBackOffce = {
+export const ViewBookingDetail = {
     Query: {
-        viewBookingDetailInBackOffice
+        viewBookingDetail
     }
 }

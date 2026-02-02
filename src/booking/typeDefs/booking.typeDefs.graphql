@@ -80,7 +80,7 @@ type Mutation {
 }
 
 type Query {
-  viewBookingDetailInBackOffice(input: ViewBookingDetailInput): CreateBookingResponse
+  viewBookingDetail(input: ViewBookingDetailInput): CreateBookingResponse
   getBookingListInBackOfficeByWeek(input: getBookingWeekyListInBackOfficeInput): getBookingListInBackOfficeResponse
   getBookingListInBackOfficeByMonth(input: getBookingMonthlyListInBackOfficeInput): getBookingListInBackOfficeResponse
 }
