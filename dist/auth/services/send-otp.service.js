@@ -11,17 +11,31 @@ const send_otp_helper_utils_1 = require("../../common/utils/send-otp-helper.util
 const veirfy_otp_type_enum_1 = require("../../auth/enum/veirfy-otp-type.enum");
 const otp_repository_1 = require("../../auth/repositories/otp.repository");
 const rate_limit_utils_1 = require("../../common/utils/rate-limit.utils");
+const identifiers_repository_1 = require("../../auth/repositories/identifiers.repository");
+const identifier_type_enum_1 = require("../../auth/enum/identifier-type.enum");
 class SendOTPService {
     async sendOTP(email, phone, type) {
+        const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(postgresQL_1.default);
         switch (type) {
-            case veirfy_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_REGISTERATION:
-                if (!email || !phone)
-                    throw new ApiError_utils_1.default(400, 'Email and phone are required');
+            case veirfy_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_REGISTERATION: {
+                if (!email && !phone) {
+                    throw new ApiError_utils_1.default(400, 'Email or phone is required');
+                }
+                if (email) {
+                    const exists = await identifiersRepo.checkExistenceOfIdentifier(identifier_type_enum_1.IdentifierType.EMAIL, email);
+                    if (exists)
+                        throw new ApiError_utils_1.default(400, 'Email has been used');
+                }
                 break;
-            case veirfy_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD:
+            }
+            case veirfy_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD: {
                 if (!email)
                     throw new ApiError_utils_1.default(400, 'Email is required');
+                const exists = await identifiersRepo.checkExistenceOfIdentifier(identifier_type_enum_1.IdentifierType.EMAIL, email);
+                if (!exists)
+                    throw new ApiError_utils_1.default(404, 'Email not found');
                 break;
+            }
             default:
                 throw new ApiError_utils_1.default(400, 'Invalid OTP type');
         }

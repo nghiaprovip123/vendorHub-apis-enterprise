@@ -1,24 +1,22 @@
 "use strict";
-// import { cancelBookingSerivce } from "../../booking/services/cancel-booking.service"
-// const cancelBooking = async(
-//     _: unknown,
-//     args: { input: any },
-//     ctx: any
-// ) => {
-//     try {
-//         const result = await cancelBookingSerivce(args.input)
-//         return {
-//             success: true,
-//             message: "Successfully cancel Booking",
-//             booking: result
-//         }    
-//     }
-//     catch (error:any) {
-//         throw error
-//     }
-// }
-// export const CancelBooking = {
-//     Mutation: {
-//         cancelBooking
-//     }
-// }
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CancelBooking = void 0;
+const cancel_booking_service_1 = require("../../booking/services/cancel-booking.service");
+const cancelBooking = async (_, args, ctx) => {
+    try {
+        const result = await (0, cancel_booking_service_1.cancelBookingSerivce)(args.input);
+        return {
+            success: true,
+            message: "Successfully cancel Booking",
+            booking: result
+        };
+    }
+    catch (error) {
+        throw error;
+    }
+};
+exports.CancelBooking = {
+    Mutation: {
+        cancelBooking
+    }
+};
