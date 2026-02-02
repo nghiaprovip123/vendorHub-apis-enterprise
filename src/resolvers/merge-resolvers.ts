@@ -9,7 +9,7 @@ import { CreateBookingResolver } from "../booking/resolvers/create-booking.resol
 // import { AssignStaffByBookingRequest } from "./booking/assign-staff.resolver"
 import { CancelBooking } from "../booking/resolvers/cancel-booking.resolver"
 import { ViewBookingDetail } from "../booking/resolvers/view-booking-detail.resolver"
-// import { GetBookingListInBackOfficeByWeek } from "./booking/get-booking-list-by-week.resolver"
+import { GetBookingList } from "../booking/resolvers/get-booking-list.resolver"
 // import { GetBookingListInBackOfficeByMonth } from "./booking/get-booking-list-by-month.resolver"
 export const resolvers = [
   // productResolver,
@@ -22,6 +22,6 @@ export const resolvers = [
   // AssignStaffByBookingRequest,
   CancelBooking,
   ViewBookingDetail,
-  // GetBookingListInBackOfficeByWeek,
+  GetBookingList,
   // GetBookingListInBackOfficeByMonth
 ];

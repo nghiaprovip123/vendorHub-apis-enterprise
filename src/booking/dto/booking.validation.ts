@@ -1,4 +1,5 @@
 import z from "zod"
+import { BookingError } from "@/common/utils/error/booking.error"
 
 export const CreateBookingDto = z.object(
     {
@@ -14,3 +15,11 @@ export const CreateBookingDto = z.object(
         
     }
 )
+
+export const GetBookingListDto = z.object(
+    {
+        startDate: z.string(BookingError.BOOKING_LIST_MISSING_START_DATE_INFORMATION),
+        endDate: z.string(BookingError.BOOKING_LIST_MISSISING_END_DATE_INFORMATION)
+    }
+)
+
