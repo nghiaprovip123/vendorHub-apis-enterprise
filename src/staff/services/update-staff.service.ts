@@ -5,6 +5,7 @@ import { updateStaffSchema } from "@/staff/dto/staffs.validation"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
 import { WorkingHoursRepository } from "@/staff/repositories/working-hours.repository"
 import { StaffError } from "@/common/utils/error/staff.error"
+
 type UpdateStaffType = z.infer<typeof updateStaffSchema>
 
 export const updateStaffService = async (input: UpdateStaffType) => {
@@ -20,46 +21,50 @@ export const updateStaffService = async (input: UpdateStaffType) => {
     let avatar_public_id: string | undefined = existingStaff.avatar_public_id || undefined;
 
     if (input.avatar) {
-        const file = await input.avatar;
-        const stream = file.createReadStream();
+        try {
+            const file = await input.avatar;
+            const stream = file.createReadStream();
 
-        const env = process.env.NODE_ENV === "production" ? "prod" : "dev";
-        const folder = `${env}/staffs`;
-        const public_id = `${input.id}/avatar`;
+            const env = process.env.NODE_ENV === "production" ? "prod" : "dev";
+            const folder = `${env}/staffs`;
+            const public_id = `${input.id}/avatar`;
 
-        if (existingStaff.avatar_public_id) {
-            const upload = await CloudinaryRest.OverwriteImageInCloudinary(
-                stream,
-                {
-                    folder,
-                    public_id,
-                    resource_type: "image",
-                    contentType: file.mimetype || 'image/png',
-                    filename: file.filename || 'avatar.png',
-                    overwrite: true,
-                }
-            );
-            avatar_url = upload.secure_url;
-            avatar_public_id = upload.public_id;
-        } else {
-            const upload = await CloudinaryRest.UploadImageToCloudinary(
-                stream,
-                {
-                    folder,
-                    public_id,
-                    resource_type: "image",
-                    contentType: file.mimetype || 'image/png',
-                    filename: file.filename || 'avatar.png',
-                }
-            );
-            avatar_url = upload.secure_url;
-            avatar_public_id = upload.public_id;
+            if (existingStaff.avatar_public_id) {
+                const upload = await CloudinaryRest.OverwriteImageInCloudinary(
+                    stream,
+                    {
+                        folder,
+                        public_id,
+                        resource_type: "image",
+                        contentType: file.mimetype || 'image/png',
+                        filename: file.filename || 'avatar.png',
+                        overwrite: true,
+                    }
+                );
+                avatar_url = upload.secure_url;
+                avatar_public_id = upload.public_id;
+            } else {
+                const upload = await CloudinaryRest.UploadImageToCloudinary(
+                    stream,
+                    {
+                        folder,
+                        public_id,
+                        resource_type: "image",
+                    }
+                );
+                avatar_url = upload.secure_url;
+                avatar_public_id = upload.public_id;
+            }
+        } catch (error) {
+            console.error('Avatar upload failed:', error)
+            throw new Error('Failed to upload avatar image')
         }
     }
 
     const result = await prisma.$transaction(async (tx) => {
         const staffRepos = new StaffRepository(tx)
         const workingHourRepos = new WorkingHoursRepository(tx)
+        
         const updateData: any = {};
         if (input.fullName !== undefined) updateData.fullName = input.fullName;
         if (input.timezone !== undefined) updateData.timezone = input.timezone;
@@ -70,32 +75,53 @@ export const updateStaffService = async (input: UpdateStaffType) => {
 
         const staff = await staffRepos.updateById(input.id, updateData)
 
-        let workingHours = [];
+        if (input.services !== undefined) {
+            if (input.services.length > 0) {
+                const validServices = await tx.service.findMany({
+                    where: { id: { in: input.services } },
+                    select: { id: true }
+                })
+                
+                if (validServices.length !== input.services.length) {
+                    throw new Error('Some services do not exist')
+                }
+            }
+
+            await tx.staffService.deleteMany({
+                where: { staffId: staff.id }
+            })
+
+            if (input.services.length > 0) {
+                const data = input.services.map(serviceId => ({
+                    staffId: staff.id,
+                    serviceId
+                }))
+                
+                await tx.staffService.createMany({ data })
+            }
+        }
+
         if (input.workingHours && input.workingHours.length > 0) {
             await tx.workingHour.deleteMany({
                 where: { staffId: staff.id },
             });
-            workingHours = await Promise.all(
-                input.workingHours.map((wh) =>
-                    tx.workingHour.create({
-                        data: {
-                            staffId: staff.id,
-                            day: wh.day,
-                            startTime: wh.startTime,
-                            endTime: wh.endTime,
-                        },
-                    })
-                )
-            );
-        } else {
-            workingHours = await workingHourRepos.findManyWorkingHour(staff.id)
+            
+            await tx.workingHour.createMany({
+                data: input.workingHours.map((wh) => ({
+                    staffId: staff.id,
+                    day: wh.day,
+                    startTime: wh.startTime,
+                    endTime: wh.endTime,
+                }))
+            });
         }
 
-        const finalResult = {
+        const workingHours = await workingHourRepos.findManyWorkingHour(staff.id)
+
+        return {
             ...staff,
             workingHours,
         };
-        return finalResult;
     });
 
     return result;
