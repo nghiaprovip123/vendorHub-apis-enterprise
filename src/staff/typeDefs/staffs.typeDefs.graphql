@@ -35,6 +35,7 @@ input CreateStaffInput {
   isActive: Boolean
   isDeleted: Boolean
   workingHours: [WorkingHourInput!]!
+  services: [ID!]!
 }
 
 input UpdateStaffInput {

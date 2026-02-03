@@ -125,14 +125,15 @@ model Service {
   description String?
   currency     String? @default("VND")
   displayPrice Boolean? @default(true)
-  duration     Int?
-  pricing        Float?
+  duration        Int?
+  pricing         Float?
   isDeleted      Boolean? @default(false)
   isVisible      Boolean? @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   staff     StaffService[]
   bookings  Booking[]
+  media     String?
   @@index([tenantId])
 }
 // ======================================================================
@@ -209,13 +210,10 @@ model Booking {
 }
 
 
-model Media {
-  id                              String @id @map("_id") @default(auto()) @db.ObjectId
-  url                             String?
-  public_id                       String?
-  provider                        String?
-  type                            MediaType?
-  owner_type                      String?
-  owner_id                        String?
-  created_at                      DateTime @default(now())
+model ServiceMedia {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  serviceId String   @db.ObjectId
+  url       String
+  type      String
+  order     Int
 }

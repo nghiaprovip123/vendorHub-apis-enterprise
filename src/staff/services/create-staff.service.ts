@@ -40,11 +40,36 @@ export const createStaffService = async (input: CreateStaffServiceType) => {
 
       avatar_url = upload.secure_url
       avatar_public_id = upload.public_id
+
       await staffRepo.updateById(staff.id, {
         avatar_url: upload.secure_url,
         avatar_public_id: upload.public_id,
       })
     }
+
+    if (input.services?.length) {
+      const existing = await tx.staffService.findMany({
+        where: {
+          staffId: staff.id,
+          serviceId: { in: input.services }
+        },
+        select: { serviceId: true }
+      })
+    
+      const existingIds = new Set(existing.map(e => e.serviceId))
+    
+      const data = input.services
+        .filter(serviceId => !existingIds.has(serviceId))
+        .map(serviceId => ({
+          staffId: staff.id,
+          serviceId
+        }))
+    
+      if (data.length) {
+        await tx.staffService.createMany({ data })
+      }
+    }
+    
 
     await workingHoursRepo.createManyWorkingHour(
       input.workingHours.map((wh) => ({
