@@ -3,11 +3,21 @@ import { BookingStatus } from "@prisma/client"
 import { assignStaffByBookingRequestDto } from "@/booking/dto/booking.validation"
 import * as z from "zod"
 import { BookingError } from "@/common/utils/error/booking.error"
+import { StaffRepository } from "@/staff/repositories/staff.repository"
+import { StaffError } from "@/common/utils/error/staff.error"
 
 type assignStaffByBookingRequestServiceType = z.infer< typeof assignStaffByBookingRequestDto >
 
 
 export const assignStaffByBookingRequestService = async(input: assignStaffByBookingRequestServiceType) => {
+
+    const staffRepo = new StaffRepository(prisma)
+
+    const findStaff = await staffRepo.findById(input.staffId)
+
+    if (!findStaff) {
+        throw new Error(StaffError.NOT_FOUND_STAFF_ERROR)
+    }
 
     const findBookingInformation = await prisma.booking.findFirst(
         {
