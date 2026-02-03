@@ -1,4 +1,3 @@
-// resolvers/index.ts
 import { CreateStaff } from "../staff/resolvers/create-staff.resolver"
 import { UpdateStaff } from "../staff/resolvers/update-staff.resolver"
 import { DeleteStaff } from "../staff/resolvers/delete-staff.resolver"

@@ -5,6 +5,7 @@ import * as z from "zod"
 import { BookingError } from "@/common/utils/error/booking.error"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
 import { StaffError } from "@/common/utils/error/staff.error"
+import { BookingRepository } from "@/booking/repositories/booking.repository"
 
 type assignStaffByBookingRequestServiceType = z.infer< typeof assignStaffByBookingRequestDto >
 
@@ -13,39 +14,35 @@ export const assignStaffByBookingRequestService = async(input: assignStaffByBook
 
     const staffRepo = new StaffRepository(prisma)
 
-    const findStaff = await staffRepo.findById(input.staffId)
-
-    if (!findStaff) {
-        throw new Error(StaffError.NOT_FOUND_STAFF_ERROR)
-    }
-
-    const findBookingInformation = await prisma.booking.findFirst(
-        {
-            where: { 
-                id: input.bookingId,
-                status: BookingStatus.PENDING,
-            }
-        }
-    )
+    const service = await prisma.$transaction(
+        async (tx) => {
+            const staffRepo = new StaffRepository(tx)
+            const bookingRepo = new BookingRepository(tx)
+            const findStaff = await staffRepo.findById(input.staffId)
     
-    console.log(findBookingInformation)
-
-    if (!findBookingInformation) {
-        throw new Error(BookingError.BOOKING_VIEW_DETAIL_BOOKING_NOT_EXISTS)
-    }
-
-    if (findBookingInformation.staffId) {
-        throw new Error(BookingError.BOOKING_ALREADY_ASSIGNED_STAFF)
-    }
-
-    const assignBookingInformation = await prisma.booking.update(
-        {
-            where: { id: findBookingInformation.id },
-            data: { 
-                staffId: input.staffId,
+            if (!findStaff) {
+                throw new Error(StaffError.NOT_FOUND_STAFF_ERROR)
             }
+        
+            const findBookingInformation = await bookingRepo.findBookingByIdAndStatus(
+                input.bookingId,
+                BookingStatus.PENDING
+            )
+                    
+            if (!findBookingInformation) {
+                throw new Error(BookingError.BOOKING_VIEW_DETAIL_BOOKING_NOT_EXISTS)
+            }
+        
+            if (findBookingInformation.staffId) {
+                throw new Error(BookingError.BOOKING_ALREADY_ASSIGNED_STAFF)
+            }
+        
+            const assignBookingInformation = await bookingRepo.assignStaffIntoBooking(
+                findBookingInformation.id,
+                input.staffId
+            )
+            return assignBookingInformation
+
         }
     )
-
-    return assignBookingInformation
 }

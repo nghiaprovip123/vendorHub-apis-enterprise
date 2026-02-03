@@ -18,7 +18,6 @@ type CreateBookingData = {
     }
   }
   
-
 export class BookingRepository {
     constructor (private readonly prisma : PrismaProvider) {}
 
@@ -146,6 +145,36 @@ export class BookingRepository {
                             }
                         }
                     }
+                }
+            }
+        )
+    }
+
+    async findBookingByIdAndStatus (
+        id: string,
+        status: BookingStatus
+    ) {
+        return this.prisma.booking.findFirst(
+            {
+                where : {
+                    id: id,
+                    status: status
+                }
+            }
+        )
+    }
+
+    async assignStaffIntoBooking (
+        staffId: string,
+        bookingId: string
+    ) {
+        return this.prisma.booking.update(
+            {
+                where : {
+                    id : bookingId
+                },
+                data : {
+                    staffId: staffId
                 }
             }
         )
