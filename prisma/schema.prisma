@@ -52,6 +52,11 @@ enum BookingStatus {
   NO_SHOW
 }
 
+enum ServiceMediaType {
+  VIDEO
+  IMAGE
+}
+
 // ======================================================================
 // TENANT (MULTI-TENANT ROOT)
 // ======================================================================
@@ -133,7 +138,7 @@ model Service {
   updatedAt DateTime @updatedAt
   staff     StaffService[]
   bookings  Booking[]
-  media     String?
+  media     ServiceMedia[] @relation("mediaService")
   @@index([tenantId])
 }
 // ======================================================================
@@ -209,11 +214,14 @@ model Booking {
   updatedAt                       DateTime? @updatedAt
 }
 
-
+// ======================================================================
+// MEDIA SERVICE
+// ======================================================================
 model ServiceMedia {
   id        String   @id @map("_id") @default(auto()) @db.ObjectId
-  serviceId String   @db.ObjectId
+  serviceId String   @db.ObjectId 
+  service   Service  @relation("mediaService", fields: [serviceId], references: [id])
   url       String
-  type      String
-  order     Int
+  type      ServiceMediaType?
+  order     Int?
 }
