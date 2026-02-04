@@ -14,17 +14,25 @@ export const deleteStaffService = async (input: DeleteStaffInput) => {
   }
 
     const staff = await prisma.$transaction(async (tx) => {
-    const staffsRepo = new StaffRepository(tx);
-    const workingHourRepos = new WorkingHoursRepository(tx)
-    const existing = await staffsRepo.findById(input.id)
+      const staffsRepo = new StaffRepository(tx);
+      const workingHourRepos = new WorkingHoursRepository(tx)
+      const existing = await staffsRepo.findById(input.id)
 
-    if (!existing) {
-      throw new Error(StaffError.NOT_FOUND_STAFF_ERROR)
-    }
+      if (!existing) {
+        throw new Error(StaffError.NOT_FOUND_STAFF_ERROR)
+      }
 
-    await workingHourRepos.deleteManyWorkingHour(input.id)
+      await tx.staffService.deleteMany(
+        {
+          where : {
+            staffId : existing.id
+          }
+        }
+      )
 
-    return staffsRepo.delete(input.id)
+      await workingHourRepos.deleteManyWorkingHour(input.id)
+
+      return staffsRepo.delete(input.id)
   })
 
   if (input.public_id) {

@@ -5,6 +5,9 @@ import { updateStaffSchema } from "@/staff/dto/staffs.validation"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
 import { WorkingHoursRepository } from "@/staff/repositories/working-hours.repository"
 import { StaffError } from "@/common/utils/error/staff.error"
+import { ServiceRepository } from "@/service/repositories/service.repository"
+import { ServiceError } from "@/common/utils/error/service.error"
+import { StaffServiceRepository } from "@/staff/repositories/staff-service.repository"
 
 type UpdateStaffType = z.infer<typeof updateStaffSchema>
 
@@ -56,7 +59,6 @@ export const updateStaffService = async (input: UpdateStaffType) => {
                 avatar_public_id = upload.public_id;
             }
         } catch (error) {
-            console.error('Avatar upload failed:', error)
             throw new Error('Failed to upload avatar image')
         }
     }
@@ -64,7 +66,8 @@ export const updateStaffService = async (input: UpdateStaffType) => {
     const result = await prisma.$transaction(async (tx) => {
         const staffRepos = new StaffRepository(tx)
         const workingHourRepos = new WorkingHoursRepository(tx)
-        
+        const serviceRepo = new ServiceRepository(tx)
+        const staffServiceRepo = new StaffServiceRepository(tx)
         const updateData: any = {};
         if (input.fullName !== undefined) updateData.fullName = input.fullName;
         if (input.timezone !== undefined) updateData.timezone = input.timezone;
@@ -77,19 +80,14 @@ export const updateStaffService = async (input: UpdateStaffType) => {
 
         if (input.services !== undefined) {
             if (input.services.length > 0) {
-                const validServices = await tx.service.findMany({
-                    where: { id: { in: input.services } },
-                    select: { id: true }
-                })
+                const validServices = await serviceRepo.findManyExistingService(input.services)
                 
                 if (validServices.length !== input.services.length) {
-                    throw new Error('Some services do not exist')
+                    throw new Error(ServiceError.SERVICE_IS_NOT_EXIST)
                 }
             }
 
-            await tx.staffService.deleteMany({
-                where: { staffId: staff.id }
-            })
+            await staffServiceRepo.deleteManyByStaffId(staff.id)
 
             if (input.services.length > 0) {
                 const data = input.services.map(serviceId => ({

@@ -5,6 +5,7 @@ import * as z from "zod"
 import { createStaffSchema } from "@/staff/dto/staffs.validation"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
 import { WorkingHoursRepository } from "@/staff/repositories/working-hours.repository"
+import { StaffServiceRepository } from "@/staff/repositories/staff-service.repository"
 
 type CreateStaffServiceType = z.infer<typeof createStaffSchema>
 
@@ -12,6 +13,7 @@ export const createStaffService = async (input: CreateStaffServiceType) => {
   return prisma.$transaction(async (tx) => {
     const staffRepo = new StaffRepository(tx)
     const workingHoursRepo = new WorkingHoursRepository(tx)
+    const staffServiceRepo = new StaffServiceRepository(tx)
     let avatar_url: string | null = null
     let avatar_public_id: string | null = null
 
@@ -48,25 +50,16 @@ export const createStaffService = async (input: CreateStaffServiceType) => {
     }
 
     if (input.services?.length) {
-      const existing = await tx.staffService.findMany({
-        where: {
-          staffId: staff.id,
-          serviceId: { in: input.services }
-        },
-        select: { serviceId: true }
-      })
+      const existing = await staffServiceRepo.findByStaffAndServices(staff.id, input.services)
     
       const existingIds = new Set(existing.map(e => e.serviceId))
     
       const data = input.services
         .filter(serviceId => !existingIds.has(serviceId))
-        .map(serviceId => ({
-          staffId: staff.id,
-          serviceId
-        }))
+
     
       if (data.length) {
-        await tx.staffService.createMany({ data })
+        await staffServiceRepo.attachServices(staff.id, data)
       }
     }
     

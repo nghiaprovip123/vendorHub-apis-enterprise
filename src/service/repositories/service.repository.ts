@@ -19,5 +19,19 @@ export class ServiceRepository {
             }
         )
     }
-        
+
+    async findManyExistingService (services: string[]) {
+        return this.prisma.staffService.findMany(
+            {
+                where : {
+                    id : {
+                        in : services
+                    }
+                },
+                select : {
+                    id : true
+                }
+            }
+        )
+    }       
 }
