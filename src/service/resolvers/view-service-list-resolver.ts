@@ -1,7 +1,4 @@
-import { prisma } from "@/lib/prisma"
 import { ViewServiceListService } from "@/service/services/view-service-list.service"
-
-const PAGE_SIZE = 10
 
 const viewServiceList = async(
     _: unknown,

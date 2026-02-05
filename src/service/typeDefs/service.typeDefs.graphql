@@ -60,6 +60,26 @@ input ViewServiceListInput {
   page: Int!
 }
 ################################################################################################ 
+#####################################UPDATE SERVICE INPUT SCHEMA################################
+################################################################################################
+input UpdateServiceMediaInput {
+  file: Upload
+  type: ServiceMediaType
+  order: Int
+}
+
+input UpdateServiceInput {
+  categoryId: ID
+  name: String
+  description: String
+  currency: String = "VND"
+  displayPrice: Boolean = true
+  duration: Int
+  price: Int
+  isVisible: Boolean = true
+  medias: [CreateServiceMediaInput]
+}
+################################################################################################ 
 #######################################CREATE SERVICE RESPONSE##################################
 ################################################################################################
 type ServiceResponse {
@@ -77,6 +97,8 @@ type ViewServiceListResponse {
 ################################################################################################
 extend type Mutation {
   createService(input: CreateServiceInput!): ServiceResponse!
+  updateService(input: UpdateServiceInput!): ServiceResponse!
+
 }
 
 extend type Query {
