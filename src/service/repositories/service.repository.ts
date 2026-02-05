@@ -56,4 +56,20 @@ export class ServiceRepository {
             }
         )
     }
+
+    async getServiceList (
+        skip: number,
+        take: number
+    ) {
+        return this.prisma.service.findMany(
+            {
+                skip,
+                take
+            }
+        )
+    }
+
+    async countTotal () {
+        return this.prisma.service.count()
+    }
 }
