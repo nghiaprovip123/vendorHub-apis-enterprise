@@ -34,4 +34,26 @@ export class ServiceRepository {
             }
         )
     }       
+
+    async createService (
+        categoryId: string, 
+        name: string, 
+        description: string, 
+        currency: string, 
+        duration: number, 
+        pricing: number   
+    ) {
+        return this.prisma.service.create(
+            {
+                data : {
+                    categoryId,
+                    name,
+                    description,
+                    currency,
+                    duration,
+                    pricing,
+                }
+            }
+        )
+    }
 }

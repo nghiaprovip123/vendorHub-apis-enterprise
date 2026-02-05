@@ -4,6 +4,8 @@ import { CreateServiceDto } from "@/service/dto/service.validation"
 import { ServiceError } from "@/common/utils/error/service.error"
 import * as z from "zod"
 import { ServiceMediaType } from "@prisma/client"
+import { ServiceRepository } from "@/service/repositories/service.repository"
+import { ServiceMediaRepository } from "@/service/repositories/service-media.repository"
 
 type CreateServiceInput = z.infer< typeof CreateServiceDto >
 
@@ -24,17 +26,15 @@ export const CreateServiceService = async (
 
     const service = await prisma.$transaction(
         async (tx) => {
-            const createdService = await tx.service.create(
-                {
-                    data : {
-                        categoryId,
-                        name,
-                        description,
-                        currency,
-                        duration,
-                        pricing: price,
-                    }
-                }
+            const serviceRepo = new ServiceRepository(tx)
+            const serviceMediaRepo = new ServiceMediaRepository(tx)
+            const createdService = await serviceRepo.createService(
+                categoryId,
+                name,
+                description,
+                currency,
+                duration,
+                price,
             )
 
             if (!createdService) {
@@ -70,10 +70,8 @@ export const CreateServiceService = async (
                 if (!uploadMedias) {
                     throw new Error (ServiceError.SERVICE_MEDIA_UPLOAD_ERROR)
                 }
-                await tx.serviceMedia.createMany(
-                    {
-                        data : uploadMedias
-                    }
+                await serviceMediaRepo.createMany(
+                    uploadMedias
                 )
             }
 
