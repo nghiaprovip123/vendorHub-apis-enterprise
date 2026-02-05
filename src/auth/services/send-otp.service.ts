@@ -1,7 +1,7 @@
 import sql from "@/lib/postgresQL"
 import ApiError from "@/common/utils/ApiError.utils"
 import crypto from "crypto"
-import { sendOtpEmailRegisteration } from "@/common/utils/send-otp-helper.utils"
+import { sendOtpEmailForgotPassword, sendOtpEmailRegisteration } from "@/common/utils/send-otp-helper.utils"
 import { SendOTPSchema } from "@/auth/dto/auth/auth.validation"
 import * as z from "zod"
 import { VerifyOTPType } from "@/auth/enum/veirfy-otp-type.enum"
@@ -101,7 +101,16 @@ export class SendOTPService {
         }
 
         try {
-            await sendOtpEmailRegisteration(email, result.generateOTP)
+            switch (type) {
+                case VerifyOTPType.VERIFY_OTP_REGISTERATION: {
+                    await sendOtpEmailRegisteration(email, result.generateOTP)
+                    break
+                }
+                case VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD: {
+                    await sendOtpEmailForgotPassword(email, result.generateOTP)
+                    break
+                }
+            }
         } catch (error) {
             console.error('Failed to send OTP email:', error)
         }
