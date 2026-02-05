@@ -14,5 +14,38 @@ class ServiceRepository {
             }
         });
     }
+    async findManyExistingService(services) {
+        return this.prisma.staffService.findMany({
+            where: {
+                id: {
+                    in: services
+                }
+            },
+            select: {
+                id: true
+            }
+        });
+    }
+    async createService(categoryId, name, description, currency, duration, pricing) {
+        return this.prisma.service.create({
+            data: {
+                categoryId,
+                name,
+                description,
+                currency,
+                duration,
+                pricing,
+            }
+        });
+    }
+    async getServiceList(skip, take) {
+        return this.prisma.service.findMany({
+            skip,
+            take
+        });
+    }
+    async countTotal() {
+        return this.prisma.service.count();
+    }
 }
 exports.ServiceRepository = ServiceRepository;

@@ -9,6 +9,7 @@ export class ServiceMediaRepository {
           url: string
           type: MediaType
           order: number
+          public_id: string
         }[]
     ) {
         return this.prisma.serviceMedia.createMany({

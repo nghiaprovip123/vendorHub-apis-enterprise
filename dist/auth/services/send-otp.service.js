@@ -75,7 +75,16 @@ class SendOTPService {
             throw new ApiError_utils_1.default(500, 'Failed to generate OTP');
         }
         try {
-            await (0, send_otp_helper_utils_1.sendOtpEmailRegisteration)(email, result.generateOTP);
+            switch (type) {
+                case veirfy_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_REGISTERATION: {
+                    await (0, send_otp_helper_utils_1.sendOtpEmailRegisteration)(email, result.generateOTP);
+                    break;
+                }
+                case veirfy_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD: {
+                    await (0, send_otp_helper_utils_1.sendOtpEmailForgotPassword)(email, result.generateOTP);
+                    break;
+                }
+            }
         }
         catch (error) {
             console.error('Failed to send OTP email:', error);

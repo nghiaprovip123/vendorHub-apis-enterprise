@@ -6,7 +6,7 @@ exports.optionsCookie = {
     secure: false,
     sameSite: 'strict',
     path: '/',
-    maxAge: 7 * 24 * 60 * 60,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 exports.optionsRevokedCookie = {
     httpOnly: true,

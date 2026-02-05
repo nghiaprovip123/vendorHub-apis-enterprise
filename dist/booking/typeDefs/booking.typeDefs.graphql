@@ -59,17 +59,14 @@ input ViewBookingDetailInput {
   bookingId: String!
 }
 
-type getBookingListInBackOfficeResponse {
+type getBookingListResponse {
   bookingList: [CreateBookingResponse]
   total: Int
 }
 
-input getBookingWeekyListInBackOfficeInput {
-  reference: String
-}
-
-input getBookingMonthlyListInBackOfficeInput {
-  reference: String
+input getBookingListInput {
+  startDate: String
+  endDate: String
 }
 
 type Mutation {
@@ -80,7 +77,6 @@ type Mutation {
 }
 
 type Query {
-  viewBookingDetailInBackOffice(input: ViewBookingDetailInput): CreateBookingResponse
-  getBookingListInBackOfficeByWeek(input: getBookingWeekyListInBackOfficeInput): getBookingListInBackOfficeResponse
-  getBookingListInBackOfficeByMonth(input: getBookingMonthlyListInBackOfficeInput): getBookingListInBackOfficeResponse
+  viewBookingDetail(input: ViewBookingDetailInput): CreateBookingResponse
+  getBookingList(input: getBookingListInput): getBookingListResponse
 }

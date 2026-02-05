@@ -1,5 +1,10 @@
+## ██████████████████████████████████████████████████████████████████████
+## █                           STAFF DOMAIN API CONTRACT                █
+## ██████████████████████████████████████████████████████████████████████
 scalar Upload
-
+################################################################################################ 
+#######################################CORE STAFF ENTITIY & RESPONSE############################
+################################################################################################
 type WorkingHour {
   id: ID!
   day: String!        
@@ -22,6 +27,18 @@ type Staff {
   updatedAt: String
 }
 
+type GetStaffListResponse {
+  items: [Staff]!
+  total: Int!
+}
+
+type DeleteStaffResponse {
+  success: Boolean!
+  message: String!
+}
+################################################################################################ 
+#######################################INPUT SCHEMA#############################################
+################################################################################################
 input WorkingHourInput {
   day: String!
   startTime: String!
@@ -35,6 +52,7 @@ input CreateStaffInput {
   isActive: Boolean
   isDeleted: Boolean
   workingHours: [WorkingHourInput!]!
+  services: [ID!]!
 }
 
 input UpdateStaffInput {
@@ -45,6 +63,8 @@ input UpdateStaffInput {
   isActive: Boolean
   isDeleted: Boolean
   workingHours: [WorkingHourInput]
+  services: [ID]
+
 }
 
 input DeleteStaffInput {
@@ -52,18 +72,8 @@ input DeleteStaffInput {
   public_id: String!
 }
 
-type DeleteStaffResponse {
-  success: Boolean!
-  message: String!
-}
-
 input GetStaffListInput {
   page: Int!
-}
-
-type GetStaffListResponse {
-  items: [Staff]!
-  total: Int!
 }
 
 input GetAvailableStaffByBookingtimeInput {
@@ -71,7 +81,9 @@ input GetAvailableStaffByBookingtimeInput {
   startTime: String!
   endTime: String!
 }
-
+################################################################################################ 
+#######################################RESOLVER#################################################
+################################################################################################
 extend type Mutation {
   createStaff(input: CreateStaffInput!): Staff!
   updateStaff(input: UpdateStaffInput!): Staff!

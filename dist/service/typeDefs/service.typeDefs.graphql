@@ -1,0 +1,108 @@
+## ██████████████████████████████████████████████████████████████████████
+## █                       SERVICE DOMAIN API CONTRACT                  █
+## ██████████████████████████████████████████████████████████████████████
+scalar Upload
+scalar DateTime
+################################################################################################ 
+#######################################ENUMERATED###############################################
+################################################################################################
+enum ServiceMediaType {
+  IMAGE
+  VIDEO
+}
+################################################################################################ 
+#######################################CORE SERVICE ENTITIY#####################################
+################################################################################################
+type Service {
+  id: ID!
+  categoryId: ID!
+  name: String!
+  description: String
+  currency: String!
+  displayPrice: Boolean!
+  duration: Int!
+  price: Int!
+  isVisible: Boolean!
+  medias: [ServiceMedia!]!
+  createdAt: DateTime!
+}
+
+type ServiceMedia {
+  id: ID!
+  public_id: String!
+  url: String!
+  type: ServiceMediaType
+  order: Int
+}
+################################################################################################ 
+#######################################CREATE SERVICE INPUT SCHEMA##############################
+################################################################################################
+input CreateServiceMediaInput {
+  file: Upload!
+  type: ServiceMediaType!
+  order: Int
+}
+
+input CreateServiceInput {
+  categoryId: ID!
+  name: String!
+  description: String
+  currency: String = "VND"
+  displayPrice: Boolean = true
+  duration: Int!
+  price: Int!
+  isVisible: Boolean = true
+  medias: [CreateServiceMediaInput!]
+}
+################################################################################################ 
+##################################VIEW LIST OF SERVICE INPUT SCHEMA#############################
+################################################################################################
+input ViewServiceListInput {
+  page: Int!
+}
+################################################################################################ 
+#####################################UPDATE SERVICE INPUT SCHEMA################################
+################################################################################################
+input UpdateServiceMediaInput {
+  file: Upload
+  type: ServiceMediaType
+  order: Int
+}
+
+input UpdateServiceInput {
+  id: ID!
+  categoryId: ID
+  name: String
+  description: String
+  currency: String = "VND"
+  displayPrice: Boolean = true
+  duration: Int
+  price: Int
+  isVisible: Boolean
+  medias: [CreateServiceMediaInput]
+}
+################################################################################################ 
+#######################################CREATE SERVICE RESPONSE##################################
+################################################################################################
+type ServiceResponse {
+  service: Service!
+}
+################################################################################################ 
+#####################################VIEW LIST OF SERVICE RESPONSE##############################
+################################################################################################
+type ViewServiceListResponse {
+  items: [Service]
+  total: Int
+}
+################################################################################################ 
+#######################################RESOLVER#################################################
+################################################################################################
+extend type Mutation {
+  createService(input: CreateServiceInput!): ServiceResponse!
+  updateService(input: UpdateServiceInput!): ServiceResponse!
+
+}
+
+extend type Query {
+  viewServiceList(input:ViewServiceListInput!): ViewServiceListResponse!
+}

@@ -17,6 +17,11 @@ const deleteStaffService = async (input) => {
         if (!existing) {
             throw new Error(staff_error_1.StaffError.NOT_FOUND_STAFF_ERROR);
         }
+        await tx.staffService.deleteMany({
+            where: {
+                staffId: existing.id
+            }
+        });
         await workingHourRepos.deleteManyWorkingHour(input.id);
         return staffsRepo.delete(input.id);
     });

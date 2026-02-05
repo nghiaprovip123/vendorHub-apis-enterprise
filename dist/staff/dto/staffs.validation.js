@@ -14,6 +14,7 @@ exports.createStaffSchema = zod_1.z.object({
     isActive: zod_1.z.boolean().optional().default(true),
     isDeleted: zod_1.z.boolean().optional().default(false),
     workingHours: zod_1.z.array(exports.createWorkingHourSchema).min(1),
+    services: zod_1.z.array(zod_1.z.string()).optional().default([]) // ✅ Array of strings
 });
 exports.updateStaffSchema = zod_1.z.object({
     id: zod_1.z.string(),
@@ -23,6 +24,7 @@ exports.updateStaffSchema = zod_1.z.object({
     isActive: zod_1.z.boolean().optional(),
     isDeleted: zod_1.z.boolean().optional(),
     workingHours: zod_1.z.array(exports.createWorkingHourSchema).optional(),
+    services: zod_1.z.array(zod_1.z.string()).optional(),
 });
 exports.deleteStaffSchema = zod_1.z.object({
     id: zod_1.z.string(),

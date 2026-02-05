@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ViewBookingDetailInBackOffce = void 0;
+exports.ViewBookingDetail = void 0;
 const view_booking_detail_service_1 = require("../../booking/services/view-booking-detail.service");
-const viewBookingDetailInBackOffice = async (_, args, ctx) => {
+const viewBookingDetail = async (_, args, ctx) => {
     try {
-        const result = await (0, view_booking_detail_service_1.viewBookingDetailInBackOfficeService)(args.input.bookingId);
+        const result = await (0, view_booking_detail_service_1.viewBookingDetailService)(args.input.bookingId);
         return {
             id: result.id,
             serviceId: result.serviceId,
@@ -30,8 +30,8 @@ const viewBookingDetailInBackOffice = async (_, args, ctx) => {
         throw error;
     }
 };
-exports.ViewBookingDetailInBackOffce = {
+exports.ViewBookingDetail = {
     Query: {
-        viewBookingDetailInBackOffice
+        viewBookingDetail
     }
 };

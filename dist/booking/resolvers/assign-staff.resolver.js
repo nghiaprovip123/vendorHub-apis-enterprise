@@ -1,24 +1,22 @@
 "use strict";
-// import { assignStaffByBookingRequestService } from "../../booking/services/assign-staff.service"
-// const assignStaffByBookingRequest = async (
-//     _: unknown,
-//     args: { input : any },
-//     ctx: any
-// ) => {
-//     try {
-//         const result = await assignStaffByBookingRequestService(args.input)
-//         return {
-//             success: true,
-//             message: "Assign successfully a Staff",
-//             booking: result
-//         }    
-//     }
-//     catch (error: any) {
-//         throw error
-//     }
-// }
-// export const AssignStaffByBookingRequest = {
-//     Mutation: {
-//         assignStaffByBookingRequest
-//     }
-// }
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AssignStaffByBookingRequest = void 0;
+const assign_staff_service_1 = require("../../booking/services/assign-staff.service");
+const assignStaffByBookingRequest = async (_, args, ctx) => {
+    try {
+        const result = await (0, assign_staff_service_1.assignStaffByBookingRequestService)(args.input);
+        return {
+            success: true,
+            message: "Assign successfully a Staff",
+            booking: result
+        };
+    }
+    catch (error) {
+        throw error;
+    }
+};
+exports.AssignStaffByBookingRequest = {
+    Mutation: {
+        assignStaffByBookingRequest
+    }
+};
