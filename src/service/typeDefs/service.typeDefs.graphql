@@ -1,34 +1,16 @@
-#   id          String   @id @map("_id") @default(auto()) @db.ObjectId
-#   tenantId    String?   @db.ObjectId
-#   tenant      Tenant?   @relation(fields: [tenantId], references: [id])
-#   userId      String?  @db.ObjectId
-#   user        User?    @relation("userServices", fields: [userId], references: [id])
-#   sellerId    String?  @db.ObjectId
-#   seller      Seller?  @relation("sellerServices", fields: [sellerId], references: [id])
-#   categoryId  String?   @db.ObjectId
-#   category    Category? @relation(fields: [categoryId], references: [id])
-#   name        String?
-#   description String?
-#   currency     String? @default("VND")
-#   displayPrice Boolean? @default(true)
-#   duration        Int?
-#   pricing         Float?
-#   isDeleted      Boolean? @default(false)
-#   isVisible      Boolean? @default(true)
-#   createdAt DateTime @default(now())
-#   updatedAt DateTime @updatedAt
-#   staff     StaffService[]
-#   bookings  Booking[]
-#   media     String?
-#   @@index([tenantId])
-
-# id        String   @id @map("_id") @default(auto()) @db.ObjectId
-# serviceId String   @db.ObjectId 
-# service   Service  @relation("mediaService", fields: [serviceId], references: [id])
-# url       String
-# type      ServiceMediaType?
-# order     Int?
 scalar Upload
+scalar DateTime
+
+enum ServiceMediaType {
+  IMAGE
+  VIDEO
+}
+
+input CreateServiceMediaInput {
+  file: Upload!
+  type: ServiceMediaType!
+  order: Int
+}
 
 input CreateServiceInput {
   categoryId: ID!
@@ -39,14 +21,7 @@ input CreateServiceInput {
   duration: Int!
   price: Int!
   isVisible: Boolean = true
-
   medias: [CreateServiceMediaInput!]
-}
-
-input CreateServiceMediaInput {
-  file: Upload!
-  type: ServiceMediaType!
-  order: Int
 }
 
 type ServiceMedia {
@@ -73,7 +48,6 @@ type Service {
 type ServiceResponse {
   service: Service!
 }
-
 
 extend type Mutation {
   createService(input: CreateServiceInput!): ServiceResponse!

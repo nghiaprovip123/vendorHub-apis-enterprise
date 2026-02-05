@@ -8,6 +8,7 @@ import { AssignStaffByBookingRequest } from "../booking/resolvers/assign-staff.r
 import { CancelBooking } from "../booking/resolvers/cancel-booking.resolver"
 import { ViewBookingDetail } from "../booking/resolvers/view-booking-detail.resolver"
 import { GetBookingList } from "../booking/resolvers/get-booking-list.resolver"
+import { CreateService } from "../service/resolvers/create-service.resolver"
 export const resolvers = [
   CreateStaff,
   UpdateStaff,
@@ -19,4 +20,5 @@ export const resolvers = [
   CancelBooking,
   ViewBookingDetail,
   GetBookingList,
+  CreateService
 ];

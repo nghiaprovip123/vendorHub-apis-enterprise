@@ -138,7 +138,7 @@ model Service {
   updatedAt DateTime @updatedAt
   staff     StaffService[]
   bookings  Booking[]
-  media     ServiceMedia[] @relation("mediaService")
+  medias     ServiceMedia[] @relation("mediaService")
   @@index([tenantId])
 }
 // ======================================================================
