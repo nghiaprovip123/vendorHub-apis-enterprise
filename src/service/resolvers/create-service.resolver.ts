@@ -1,7 +1,4 @@
-import { ServiceMediaType } from "@prisma/client"
 import { GraphQLUpload } from "graphql-upload-minimal"
-import { CloudinaryRest } from "@/common/utils/cloudinary-orchestration.utils"
-import { prisma } from "@/lib/prisma"
 import { CreateServiceService } from "@/service/services/create-service.service"
 
 const createService = async (

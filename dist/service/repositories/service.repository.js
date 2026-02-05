@@ -47,5 +47,20 @@ class ServiceRepository {
     async countTotal() {
         return this.prisma.service.count();
     }
+    findById(id) {
+        return this.prisma.service.findUnique({ where: { id } });
+    }
+    updateById(id, data) {
+        return this.prisma.service.update({
+            where: { id },
+            data
+        });
+    }
+    findWithMedias(id) {
+        return this.prisma.service.findUnique({
+            where: { id },
+            include: { medias: { orderBy: { order: "asc" } } }
+        });
+    }
 }
 exports.ServiceRepository = ServiceRepository;

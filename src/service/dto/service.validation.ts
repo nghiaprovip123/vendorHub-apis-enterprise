@@ -22,3 +22,17 @@ export const CreateServiceDto = z.object(
         price: z.int(ServiceError.SERVICE_DTO_PRICE)
     }
 )
+export const UpdateServiceDto = z.object(
+    {
+        id: z.string(),
+        categoryId : z.string(ServiceError.SERIVCE_DTO_CATEGORY_ID).optional(),
+        name: z.string(ServiceError.SERVICE_DTO_NAME).optional(),
+        description: z.string(ServiceError.SERVICE_DTO_DESCRIPTION).optional(),
+        currency: z.string(ServiceError.SERVICE_DTO_CURRENCY).optional(),
+        displayPrice: z.boolean().optional().optional(),
+        duration: z.int(ServiceError.SERVICE_DTO_DURATION).optional(),
+        isVisible: z.boolean().optional(),
+        medias: z.array(CreateServiceMediaDto).optional(),
+        price: z.int(ServiceError.SERVICE_DTO_PRICE).optional()
+    }
+)

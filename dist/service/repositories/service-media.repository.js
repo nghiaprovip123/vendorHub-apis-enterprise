@@ -10,5 +10,10 @@ class ServiceMediaRepository {
             data: input
         });
     }
+    deleteByServiceId(serviceId) {
+        return this.prisma.serviceMedia.deleteMany({
+            where: { serviceId }
+        });
+    }
 }
 exports.ServiceMediaRepository = ServiceMediaRepository;

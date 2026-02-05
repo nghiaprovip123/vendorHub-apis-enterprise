@@ -1,4 +1,3 @@
-import { prisma } from "@/lib/prisma"
 import { Prisma, PrismaClient } from '@prisma/client'
 
 type PrismaProvider = PrismaClient | Prisma.TransactionClient
@@ -71,5 +70,23 @@ export class ServiceRepository {
 
     async countTotal () {
         return this.prisma.service.count()
+    }
+
+    findById(id: string) {
+        return this.prisma.service.findUnique({ where: { id } })
+    }
+
+    updateById(id: string, data: Prisma.ServiceUpdateInput) {
+    return this.prisma.service.update({
+        where: { id },
+        data
+    })
+    }
+
+    findWithMedias(id: string) {
+    return this.prisma.service.findUnique({
+        where: { id },
+        include: { medias: { orderBy: { order: "asc" } } }
+    })
     }
 }
