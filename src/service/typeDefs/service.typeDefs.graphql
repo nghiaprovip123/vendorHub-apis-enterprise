@@ -1,11 +1,38 @@
 scalar Upload
 scalar DateTime
-
+################################################################################################ 
+#######################################ENUMERATED###############################################
+################################################################################################
 enum ServiceMediaType {
   IMAGE
   VIDEO
 }
+################################################################################################ 
+#######################################CORE SERVICE ENTITIY#####################################
+################################################################################################
+type Service {
+  id: ID!
+  categoryId: ID!
+  name: String!
+  description: String
+  currency: String!
+  displayPrice: Boolean!
+  duration: Int!
+  price: Int!
+  isVisible: Boolean!
+  medias: [ServiceMedia!]!
+  createdAt: DateTime!
+}
 
+type ServiceMedia {
+  id: ID!
+  url: String!
+  type: ServiceMediaType
+  order: Int
+}
+################################################################################################ 
+#######################################CREATE SERVICE INPUT SCHEMA##############################
+################################################################################################
 input CreateServiceMediaInput {
   file: Upload!
   type: ServiceMediaType!
@@ -23,32 +50,15 @@ input CreateServiceInput {
   isVisible: Boolean = true
   medias: [CreateServiceMediaInput!]
 }
-
-type ServiceMedia {
-  id: ID!
-  url: String!
-  type: ServiceMediaType
-  order: Int
-}
-
-type Service {
-  id: ID!
-  categoryId: ID!
-  name: String!
-  description: String
-  currency: String!
-  displayPrice: Boolean!
-  duration: Int!
-  price: Int!
-  isVisible: Boolean!
-  medias: [ServiceMedia!]!
-  createdAt: DateTime!
-}
-
+################################################################################################ 
+#######################################CREATE SERVICE RESPONSE##################################
+################################################################################################
 type ServiceResponse {
   service: Service!
 }
-
+################################################################################################ 
+#######################################RESOLVER#################################################
+################################################################################################
 extend type Mutation {
   createService(input: CreateServiceInput!): ServiceResponse!
 }

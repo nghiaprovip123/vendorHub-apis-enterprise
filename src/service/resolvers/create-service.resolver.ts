@@ -3,7 +3,11 @@ import { GraphQLUpload } from "graphql-upload-minimal"
 import { CloudinaryRest } from "@/common/utils/cloudinary-orchestration.utils"
 import { prisma } from "@/lib/prisma"
 
-const createService = async (_: unknown, args: { input: any }, ctx: any) => {
+const createService = async (
+    _: unknown, 
+    args: { input: any }, 
+    ctx: any
+) => {
     try {
       const {
         categoryId,
