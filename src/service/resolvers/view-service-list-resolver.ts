@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma"
-import { ServiceRepository } from "@/service/repositories/service.repository"
+import { ViewServiceListService } from "@/service/services/view-service-list.service"
 
 const PAGE_SIZE = 10
 
@@ -10,18 +10,8 @@ const viewServiceList = async(
 ) => {
     try {
         const { page } = args.input
-        const getPage = page ?? 1
-        const skip = (getPage - 1) * PAGE_SIZE
-        const serviceRepo = new ServiceRepository(prisma)
-
-
-        const serviceList = await serviceRepo.getServiceList(skip, PAGE_SIZE)
-        const total = await serviceRepo.countTotal()
-
-        return {
-            items: serviceList,
-            total
-        }
+        const result = await ViewServiceListService(page)
+        return result
     }
     catch (error: any) {
         throw error

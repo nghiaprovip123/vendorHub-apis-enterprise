@@ -70,7 +70,7 @@ export const sendOtpEmailForgotPassword = async (to: string, otp: string) => {
         </div>
 
         <div style="padding: 40px 30px; line-height: 1.6;">
-          <h2 style="color: #2C3E50; margin-top: 0; font-size: 24px;">Verify Your Account</h2>
+          <h2 style="color: #2C3E50; margin-top: 0; font-size: 24px;">Reset Your Password</h2>
           <p style="color: #4A5F7F; font-size: 16px;">
             Thank you for choosing <strong>vendorHub</strong>. Use the following One-Time Password (OTP) to complete your password update:
           </p>
