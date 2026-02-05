@@ -60,6 +60,7 @@ export const CreateServiceService = async (
                             )
                             return {
                                 serviceId: createdService.id,
+                                public_id: upload.public_id,
                                 url: upload.secure_url,
                                 type: media.type as ServiceMediaType,
                                 order: media.order ?? index                        

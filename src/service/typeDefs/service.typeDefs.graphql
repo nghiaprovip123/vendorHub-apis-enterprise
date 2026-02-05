@@ -29,6 +29,7 @@ type Service {
 
 type ServiceMedia {
   id: ID!
+  public_id: String!
   url: String!
   type: ServiceMediaType
   order: Int
@@ -69,6 +70,7 @@ input UpdateServiceMediaInput {
 }
 
 input UpdateServiceInput {
+  id: ID!
   categoryId: ID
   name: String
   description: String
@@ -76,7 +78,7 @@ input UpdateServiceInput {
   displayPrice: Boolean = true
   duration: Int
   price: Int
-  isVisible: Boolean = true
+  isVisible: Boolean
   medias: [CreateServiceMediaInput]
 }
 ################################################################################################ 

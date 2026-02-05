@@ -221,6 +221,7 @@ model ServiceMedia {
   id        String   @id @map("_id") @default(auto()) @db.ObjectId
   serviceId String   @db.ObjectId 
   service   Service  @relation("mediaService", fields: [serviceId], references: [id])
+  public_id String
   url       String
   type      ServiceMediaType?
   order     Int?
