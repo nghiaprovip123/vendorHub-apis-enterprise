@@ -104,7 +104,7 @@ export const UpdateServiceService = async (
                 if (isVisible !== undefined ) {
                     updateData.isVisible = isVisible
                 }
-            const updatedService = await prisma.service.updateMany(
+            const updatedService = await tx.service.updateMany(
                 {
                     data : updateData
                 }

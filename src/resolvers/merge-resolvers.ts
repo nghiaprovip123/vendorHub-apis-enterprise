@@ -22,7 +22,7 @@ import { GetBookingList } from "../booking/resolvers/get-booking-list.resolver"
 // █                           SERVICE DOMAIN                           █
 // ██████████████████████████████████████████████████████████████████████
 import { CreateService } from "../service/resolvers/create-service.resolver"
-import { ViewServiceList } from "../service/resolvers/view-service-list-resolver"
+import { ViewServiceList } from "../service/resolvers/view-service-list.resolver"
 import { UpdateService } from "../service/resolvers/update-service.resolver"
 
 // ══════════════════════════════════════════════════════════════════════

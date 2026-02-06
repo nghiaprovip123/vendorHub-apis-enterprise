@@ -2,17 +2,13 @@
 ## █                       SERVICE DOMAIN API CONTRACT                  █
 ## ██████████████████████████████████████████████████████████████████████
 scalar Upload
-scalar DateTime
-################################################################################################ 
+scalar DateTime 
 #######################################ENUMERATED###############################################
-################################################################################################
 enum ServiceMediaType {
   IMAGE
   VIDEO
-}
-################################################################################################ 
+} 
 #######################################CORE SERVICE ENTITIY#####################################
-################################################################################################
 type Service {
   id: ID!
   categoryId: ID!
@@ -33,10 +29,8 @@ type ServiceMedia {
   url: String!
   type: ServiceMediaType
   order: Int
-}
-################################################################################################ 
+} 
 #######################################CREATE SERVICE INPUT SCHEMA##############################
-################################################################################################
 input CreateServiceMediaInput {
   file: Upload!
   type: ServiceMediaType!
@@ -53,16 +47,12 @@ input CreateServiceInput {
   price: Int!
   isVisible: Boolean = true
   medias: [CreateServiceMediaInput!]
-}
-################################################################################################ 
+} 
 ##################################VIEW LIST OF SERVICE INPUT SCHEMA#############################
-################################################################################################
 input ViewServiceListInput {
   page: Int!
 }
-################################################################################################ 
 #####################################UPDATE SERVICE INPUT SCHEMA################################
-################################################################################################
 input UpdateServiceMediaInput {
   file: Upload
   type: ServiceMediaType
@@ -81,28 +71,27 @@ input UpdateServiceInput {
   isVisible: Boolean
   medias: [CreateServiceMediaInput]
 }
-################################################################################################ 
+###################################VIEW SERVICE DETAIL INPUT SCHEMA##############################
+input ViewServiceDetailInput {
+  id: ID!
+}
 #######################################CREATE SERVICE RESPONSE##################################
-################################################################################################
 type ServiceResponse {
   service: Service!
 }
-################################################################################################ 
 #####################################VIEW LIST OF SERVICE RESPONSE##############################
-################################################################################################
 type ViewServiceListResponse {
   items: [Service]
   total: Int
 }
-################################################################################################ 
+ 
 #######################################RESOLVER#################################################
-################################################################################################
 extend type Mutation {
   createService(input: CreateServiceInput!): ServiceResponse!
   updateService(input: UpdateServiceInput!): ServiceResponse!
-
 }
 
 extend type Query {
-  viewServiceList(input:ViewServiceListInput!): ViewServiceListResponse!
+  viewServiceList(input: ViewServiceListInput!): ViewServiceListResponse!
+  viewServiceDetail(input: ViewServiceDetailInput!): ServiceResponse!
 }
