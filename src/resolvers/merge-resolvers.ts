@@ -24,6 +24,7 @@ import { GetBookingList } from "../booking/resolvers/get-booking-list.resolver"
 import { CreateService } from "../service/resolvers/create-service.resolver"
 import { ViewServiceList } from "../service/resolvers/view-service-list.resolver"
 import { UpdateService } from "../service/resolvers/update-service.resolver"
+import { ViewServiceDetail } from "../service/resolvers/view-service-detail.resolver"
 
 // ══════════════════════════════════════════════════════════════════════
 // 🚀 GRAPHQL RESOLVER REGISTRY
@@ -46,5 +47,6 @@ export const resolvers = [
   // ──────────────────────── SERVICE ────────────────────────
   CreateService,
   ViewServiceList,
-  UpdateService
+  UpdateService,
+  ViewServiceDetail
 ]

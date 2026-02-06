@@ -63,7 +63,11 @@ export class ServiceRepository {
         return this.prisma.service.findMany(
             {
                 skip,
-                take
+                take,
+                where : {
+                    isVisible : true,
+                    isDeleted : false
+                }
             }
         )
     }
