@@ -47,7 +47,11 @@ export class StaffRepository {
     return this.prisma.staff.findMany(
       {
         skip,
-        take
+        take,
+        where : {
+          isDeleted : false,
+          isActive: true
+        }
       }
     )
   }

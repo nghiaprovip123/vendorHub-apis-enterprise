@@ -75,6 +75,10 @@ input UpdateServiceInput {
 input ViewServiceDetailInput {
   id: ID!
 }
+###################################DELETE SERVICE INPUT SCHEMA##############################
+input DeleteServiceInput {
+  id: ID!
+}
 #######################################CREATE SERVICE RESPONSE##################################
 type ServiceResponse {
   service: Service!
@@ -84,11 +88,12 @@ type ViewServiceListResponse {
   items: [Service]
   total: Int
 }
- 
+
 #######################################RESOLVER#################################################
 extend type Mutation {
   createService(input: CreateServiceInput!): ServiceResponse!
   updateService(input: UpdateServiceInput!): ServiceResponse!
+  deleteService(input: DeleteServiceInput!): ServiceResponse!
 }
 
 extend type Query {
