@@ -14,7 +14,5 @@ export const ViewServiceDetailService = async (
          
         const service = await serviceRepo.findById(id)
 
-        console.log(service)
-
         return { service }  
 }
