@@ -36,3 +36,8 @@ export const UpdateServiceDto = z.object(
         price: z.int(ServiceError.SERVICE_DTO_PRICE).optional()
     }
 )
+export const ViewServiceDetail = z.object(
+    {
+        id : z.string(ServiceError.SERVICE_IS_NOT_EXIST)
+    }
+)

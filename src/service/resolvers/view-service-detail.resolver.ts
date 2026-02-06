@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { ServiceError } from "@/common/utils/error/service.error"
+import { ViewServiceDetailService } from "@/service/services/view-service-detail.service"
 
 const viewServiceDetail = async (
     _: unknown,
@@ -7,25 +8,9 @@ const viewServiceDetail = async (
     ctx : any
 ) => {
     try {
-        const {
-            id
-        } = args.input 
-    
-        if (!id) {
-            throw new Error(ServiceError.SERVICE_IS_NOT_EXIST)
-        }
-    
-        const service = await prisma.service.findUnique(
-            {
-                where : {
-                    id : id
-                }
-            }
-        )
+        const result = await ViewServiceDetailService(args.input)
 
-        console.log(service)
-    
-        return { service } 
+        return result
     }
     catch (error : any) {
         throw error
