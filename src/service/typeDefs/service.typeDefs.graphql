@@ -88,12 +88,17 @@ type ViewServiceListResponse {
   items: [Service]
   total: Int
 }
+#####################################DELETE SERVICE RESPONSE##############################
+type ViewServiceListResponse {
+  success: Boolean!
+  message: String!
+}
 
 #######################################RESOLVER#################################################
 extend type Mutation {
   createService(input: CreateServiceInput!): ServiceResponse!
   updateService(input: UpdateServiceInput!): ServiceResponse!
-  deleteService(input: DeleteServiceInput!): ServiceResponse!
+  deleteService(input: DeleteServiceInput!): ViewServiceListResponse!
 }
 
 extend type Query {
