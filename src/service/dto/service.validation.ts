@@ -41,3 +41,8 @@ export const ViewServiceDetail = z.object(
         id : z.string(ServiceError.SERVICE_IS_NOT_EXIST)
     }
 )
+export const DeleteServiceDto = z.object(
+    {
+        id : z.string(ServiceError.SERVICE_IS_NOT_EXIST)
+    }
+)

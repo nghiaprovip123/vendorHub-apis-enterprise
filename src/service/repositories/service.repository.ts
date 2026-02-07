@@ -93,4 +93,38 @@ export class ServiceRepository {
         include: { medias: { orderBy: { order: "asc" } } }
     })
     }
+
+    async softDeleteById(id: string) {
+        return this.prisma.service.update({
+        where: { id },
+        data: {
+            isDeleted: true,
+            isVisible: false
+        }
+        })
+    }
+
+    async findMediasByServiceId(serviceId: string) {
+        return this.prisma.serviceMedia.findMany({
+        where: { serviceId },
+        select: {
+            id: true,
+            public_id: true
+        }
+        })
+    }
+    
+    async deleteMediasByServiceId(serviceId: string) {
+        return this.prisma.serviceMedia.deleteMany({
+        where: { serviceId }
+        })
+    }
+    
+    async deleteServiceById(serviceId: string) {
+        return this.prisma.service.delete({
+        where: { id: serviceId }
+        })
+    }
+  
+  
 }

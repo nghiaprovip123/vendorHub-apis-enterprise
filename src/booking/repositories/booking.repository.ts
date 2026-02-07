@@ -179,4 +179,10 @@ export class BookingRepository {
             }
         )
     }
+    
+    async countByServiceId(serviceId: string) {
+        return this.prisma.booking.count({
+        where: { serviceId }
+        })
+    }
 }
