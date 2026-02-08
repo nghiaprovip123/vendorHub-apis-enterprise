@@ -18,6 +18,7 @@ import morgan from 'morgan';
 import AuthRouter from '@/auth/routes/auth.route'
 import { errorHandler } from '@/common/guards/error.guard'
 import cookieParser from "cookie-parser";
+import { apiLimiter } from "@/common/guards/rate-limiter"
 dotenv.config();
 
 (async function () {
@@ -100,8 +101,8 @@ dotenv.config();
           maxFiles: 5,
         })
       )
-    app.use('/auth', AuthRouter)
-    app.use('/graphql', cors(), bodyParser.json(), expressMiddleware(server, {
+    app.use('/auth', apiLimiter, AuthRouter)
+    app.use('/graphql', apiLimiter,cors(), bodyParser.json(), expressMiddleware(server, {
         context: async ({ req, res }: any) => {
             const contextLogger = createContextLogger({
                 request_id: req.id,
