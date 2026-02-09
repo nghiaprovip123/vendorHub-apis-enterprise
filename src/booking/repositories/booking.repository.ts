@@ -186,7 +186,7 @@ export class BookingRepository {
         })
     }
 
-    async changeUpcommingBookingStatus (now: Date, minutes: number) {
+    async findUpcommingBookingStatus (now: Date, minutes: number) {
         const threshold = new Date(now.getTime() + minutes * 60 * 1000)
         return this.prisma.booking.findMany({
             where: {
@@ -200,6 +200,16 @@ export class BookingRepository {
                 }
               }
             },
+            select : {
+                id : true
+            }
+        })
+    }
+
+    async updateStatus(id: string, status: BookingStatus) {
+        return this.prisma.booking.update({
+          where: { id },
+          data: { status },
         })
     }
 }

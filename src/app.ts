@@ -19,11 +19,11 @@ import AuthRouter from '@/auth/routes/auth.route'
 import { errorHandler } from '@/common/guards/error.guard'
 import cookieParser from "cookie-parser";
 import { apiLimiter } from "@/common/guards/rate-limiter"
+import { pubsub } from '@/pubsub/pubsub'
 dotenv.config();
 
 (async function () {
     const PORT = Number(process.env.PORT) || 3000;
-    const pubsub = new PubSub(); 
     const app = express();
     app.use(express.json())
     app.use(cookieParser()); 
