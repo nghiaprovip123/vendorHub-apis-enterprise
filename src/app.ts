@@ -20,6 +20,7 @@ import { errorHandler } from '@/common/guards/error.guard'
 import cookieParser from "cookie-parser";
 import { apiLimiter } from "@/common/guards/rate-limiter"
 import { pubsub } from '@/pubsub/pubsub'
+import { startBookingStatusCron } from "@/booking/cron/booking.cron"
 dotenv.config();
 
 (async function () {
@@ -128,5 +129,7 @@ dotenv.config();
             loki_enabled: !!process.env.GRAFANA_LOKI_URL,
         });
     });
+    startBookingStatusCron() // ✅ BẮT BUỘC
+
 
 })();

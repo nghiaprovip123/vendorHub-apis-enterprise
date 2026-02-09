@@ -82,5 +82,5 @@ type Query {
 }
 
 type Subscription {
-  bookingStatusChanged: Booking!
+  bookingStatusChanged: CreateBookingResponse!
 }

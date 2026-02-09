@@ -1,7 +1,10 @@
-import { pubsub, EVENT } from "@/pubsub/pubsub"
+import { pubsub, EVENT } from '@/pubsub/pubsub'
 
-export const Subscription = {
-  bookingStatusChanged: {
-    subscribe: () => pubsub.asyncIterator([EVENT.BOOKING_STATUS_CHANGED]),
+export const bookingSubscription = {
+  Subscription: {
+    bookingStatusChanged: {
+      subscribe: () =>
+        pubsub.asyncIterator([EVENT.BOOKING_STATUS_CHANGED]),
+    },
   },
 }

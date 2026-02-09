@@ -16,7 +16,7 @@ import { AssignStaffByBookingRequest } from "../booking/resolvers/assign-staff.r
 import { CancelBooking } from "../booking/resolvers/cancel-booking.resolver"
 import { ViewBookingDetail } from "../booking/resolvers/view-booking-detail.resolver"
 import { GetBookingList } from "../booking/resolvers/get-booking-list.resolver"
-import { Subscription } from '@/booking/subscription/booking.subscription'
+import { bookingSubscription } from '@/booking/subscription/booking.subscription'
 
 
 // ██████████████████████████████████████████████████████████████████████
@@ -45,7 +45,7 @@ export const resolvers = [
   CancelBooking,
   ViewBookingDetail,
   GetBookingList,
-  Subscription.bookingStatusChanged,
+  bookingSubscription,
 
   // ──────────────────────── SERVICE ────────────────────────
   CreateService,
