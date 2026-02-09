@@ -185,4 +185,21 @@ export class BookingRepository {
         where: { serviceId }
         })
     }
+
+    async changeUpcommingBookingStatus (now: Date, minutes: number) {
+        const threshold = new Date(now.getTime() + minutes * 60 * 1000)
+        return this.prisma.booking.findMany({
+            where: {
+              status: BookingStatus.UPCOMMING,
+              slot : {
+                is : {
+                    startTime : {
+                        gt: now,
+                        lte: threshold,
+                    }
+                }
+              }
+            },
+        })
+    }
 }

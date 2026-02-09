@@ -47,6 +47,8 @@ enum MediaType {
 enum BookingStatus {
   PENDING
   CONFIRMED
+  UPCOMMING
+  IN_PROGRESS
   COMPLETED
   CANCELLED
   NO_SHOW
