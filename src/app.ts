@@ -1,7 +1,6 @@
 import { typeDefs } from './typeDefs';
 import express from 'express';
 import { createServer } from 'http';
-import { PubSub } from 'graphql-subscriptions';
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import { makeExecutableSchema } from '@graphql-tools/schema';

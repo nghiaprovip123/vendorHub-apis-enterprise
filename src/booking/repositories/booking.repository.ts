@@ -186,25 +186,47 @@ export class BookingRepository {
         })
     }
 
-    async findUpcommingBookingStatus (now: Date, minutes: number) {
+    async findUpcomingConfirmedBookings(now: Date, minutes: number) {
         const threshold = new Date(now.getTime() + minutes * 60 * 1000)
+      
         return this.prisma.booking.findMany({
-            where: {
-              status: BookingStatus.UPCOMMING,
-              slot : {
-                is : {
-                    startTime : {
-                        gt: now,
-                        lte: threshold,
-                    }
-                }
-              }
+          where: {
+            status: BookingStatus.CONFIRMED,
+            slot: {
+              is: {
+                startTime: {
+                  gt: now,
+                  lte: threshold,
+                },
+              },
             },
-            select : {
-                id : true
-            }
+          },
+          select: {
+            id: true,
+          },
         })
     }
+
+    async findInProgressBookings (now: Date) {
+        return this.prisma.booking.findMany(
+            {
+                where : {
+                    slot : {
+                        is : {
+                            startTime : {
+                                lte : now
+                            },
+                            endTime : {
+                                gte : now
+                            }
+                        }
+                    }
+                    
+                }
+            }
+        )
+    }
+      
 
     async updateStatus(id: string, status: BookingStatus) {
         return this.prisma.booking.update({

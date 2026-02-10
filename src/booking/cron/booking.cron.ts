@@ -1,11 +1,14 @@
 import cron from 'node-cron'
-import { updateUpcomingBookingsToSoon } from '@/booking/services/update-upcomming.service'
+import { CronUpdateBookingStatus } from '@/booking/services/update-cron-status.service'
 import { pubsub } from '@/pubsub/pubsub'
-import { prisma } from "@/lib/prisma"
 
 export function startBookingStatusCron() {
 
-  cron.schedule('* * * * *', async () => {
-    await updateUpcomingBookingsToSoon(pubsub)
+  cron.schedule('0 0 * * *', async () => {
+    await CronUpdateBookingStatus.updateConfirmedToUpcoming(pubsub)
+  })
+
+  cron.schedule('0 0 * * *', async () => {
+    await CronUpdateBookingStatus.updateUpcomingToInProgress(pubsub)
   })
 }
