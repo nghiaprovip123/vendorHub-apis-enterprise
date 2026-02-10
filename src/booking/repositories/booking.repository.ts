@@ -199,6 +199,7 @@ export class BookingRepository {
       return this.prisma.booking.findMany(
         {
           where : {
+            status : BookingStatus.IN_PROGRESS,
             slot : {
               is : {
                 endTime : {
