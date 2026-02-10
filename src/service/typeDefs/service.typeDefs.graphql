@@ -8,6 +8,10 @@ enum ServiceMediaType {
   IMAGE
   VIDEO
 } 
+enum CategoryLevel {
+  LEVEL_1
+  LEVEL_2
+} 
 #######################################CORE SERVICE ENTITIY#####################################
 type Service {
   id: ID!
@@ -30,6 +34,16 @@ type ServiceMedia {
   type: ServiceMediaType
   order: Int
 } 
+
+type Category {
+  id: ID
+  name: String
+  slug: String
+  level: CategoryLevel
+  description: String
+  displayOrder: Int
+  createAt: DateTime
+}
 #######################################CREATE SERVICE INPUT SCHEMA##############################
 input CreateServiceMediaInput {
   file: Upload!
@@ -93,6 +107,10 @@ type ViewServiceListResponse {
   success: Boolean!
   message: String!
 }
+#####################################GET LIST OF SERVICE CATEGORY##############################
+type ViewCategoryListResponse {
+  result: [Category]
+}
 
 #######################################RESOLVER#################################################
 extend type Mutation {
@@ -104,4 +122,5 @@ extend type Mutation {
 extend type Query {
   viewServiceList(input: ViewServiceListInput!): ViewServiceListResponse!
   viewServiceDetail(input: ViewServiceDetailInput!): ServiceResponse!
+  viewCategoryList: ViewCategoryListResponse!
 }
