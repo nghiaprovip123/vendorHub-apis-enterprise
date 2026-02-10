@@ -227,7 +227,6 @@ export class BookingRepository {
         )
     }
       
-
     async updateStatus(id: string, status: BookingStatus) {
         return this.prisma.booking.update({
           where: { id },

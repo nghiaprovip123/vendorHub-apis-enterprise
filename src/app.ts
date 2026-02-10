@@ -102,7 +102,7 @@ dotenv.config();
         })
       )
     app.use('/auth', apiLimiter, AuthRouter)
-    app.use('/graphql', apiLimiter,cors(), bodyParser.json(), expressMiddleware(server, {
+    app.use('/graphql', cors(), bodyParser.json(), expressMiddleware(server, {
         context: async ({ req, res }: any) => {
             const contextLogger = createContextLogger({
                 request_id: req.id,
