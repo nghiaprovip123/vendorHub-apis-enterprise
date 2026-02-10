@@ -31,6 +31,7 @@ export class StaffRepository {
       where: {
         id: { in: ids },
         isDeleted: false,
+        isActive: true
       },
     })
   }

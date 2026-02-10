@@ -45,9 +45,8 @@ export class BookingRepository {
             },
           },
         })
-      }
+    }
       
-    
     async createBooking (
         data : CreateBookingData
     ) {
@@ -142,7 +141,8 @@ export class BookingRepository {
                     id : bookingId
                 },
                 data : {
-                    staffId: staffId
+                    staffId: staffId,
+                    status: BookingStatus.CONFIRMED
                 }
             }
         )
@@ -193,6 +193,22 @@ export class BookingRepository {
                 }
             }
         )
+    }
+
+    async findCompletedBookings (now: Date) {
+      return this.prisma.booking.findMany(
+        {
+          where : {
+            slot : {
+              is : {
+                endTime : {
+                  lte : now
+                }
+              }
+            }
+          }
+        }
+      )
     }
       
     async updateStatus(id: string, status: BookingStatus) {

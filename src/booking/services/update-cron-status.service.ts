@@ -36,5 +36,21 @@ export class CronUpdateBookingStatus {
             })
         }
     }
+
+    static async updateInProgressToCompleted (
+        pubsub : PubSub
+    ) {
+        const bookingRepo = new BookingRepository(prisma)
+        const now = new Date()
+        const bookings = await bookingRepo.findCompletedBookings(now)
+
+        for (const booking of bookings) {
+            const updated = await bookingRepo.updateStatus(booking.id, BookingStatus.COMPLETED)
+
+            pubsub.publish(EVENT.BOOKING_STATUS_CHANGED, {
+                bookingStatusChanged: updated
+            })
+        }
+    }
 }
 

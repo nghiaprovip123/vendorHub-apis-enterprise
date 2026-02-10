@@ -87,6 +87,24 @@ export class CreateBooking {
       }
       await sendBookingRequestEmail(bookingData)
 
+      if (staffId) {
+        return bookingRepo.createBooking({
+            serviceId,
+            staffId,
+            customerName,
+            customerPhone,
+            customerEmail,
+            notes,
+            status: BookingStatus.CONFIRMED,
+            slot: {
+              day: bookingDate,
+              startTime: bookingStartDate,
+              endTime: bookingEndDate,
+              durationInMinutes: duration,
+            },
+          })
+      }
+
       return bookingRepo.createBooking({
         serviceId,
         staffId,
