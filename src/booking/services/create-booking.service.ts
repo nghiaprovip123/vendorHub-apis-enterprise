@@ -8,6 +8,7 @@ import { ServiceRepository } from "@/service/repositories/service.repository"
 import { BookingRepository } from "@/booking/repositories/booking.repository"
 import { BookingStatus } from "@prisma/client"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
+import { sendBookingRequestEmail } from "@/common/utils/send-otp-helper.utils"
 
 export const VN_TIMEZONE = "Asia/Ho_Chi_Minh"
 
@@ -74,6 +75,17 @@ export class CreateBooking {
       if (isOverlap) {
         throw new Error(BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION)
       }
+      const bookingData = {
+        customerName : customerName,
+        serviceName : service.name,
+        day : bookingDate,
+        startTime : bookingStartDate,
+        endTime : bookingEndDate,
+        staffName : 'Edogawa Trần',
+        notes : notes,
+        customerEmail : customerEmail
+      }
+      await sendBookingRequestEmail(bookingData)
 
       return bookingRepo.createBooking({
         serviceId,
