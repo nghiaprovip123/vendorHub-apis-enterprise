@@ -208,7 +208,7 @@ model Booking {
   notes                           String?
   status                          BookingStatus?
   
-  cancelledAt                     DateTime? @default(now())
+  cancelledAt                     DateTime? 
   cancelledBy                     String?   
   cancelReason                    String?   
 
