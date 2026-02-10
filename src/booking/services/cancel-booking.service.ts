@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { BookingError } from "@/common/utils/error/booking.error"
 import { BookingStatus } from "@prisma/client"
+import { getDate } from "date-fns"
 
 type cancelBookingSerivceType = {
     bookingId: string,
@@ -37,6 +38,7 @@ export const cancelBookingSerivce = async( input: cancelBookingSerivceType ) => 
             data: {
                 status: BookingStatus.CANCELLED,
                 cancelReason: input.cancelReason,
+                cancelledAt : new Date()
             }
         }
     )

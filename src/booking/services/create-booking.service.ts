@@ -68,7 +68,7 @@ export class CreateBooking {
         bookingStartDate,
         bookingEndDate,
         staffId,
-        [BookingStatus.PENDING, BookingStatus.CONFIRMED]
+        [BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.UPCOMMING, BookingStatus.IN_PROGRESS]
       )
 
       if (isOverlap) {
@@ -147,6 +147,8 @@ export class CreateBooking {
           BookingStatus.PENDING,
           BookingStatus.CONFIRMED,
           BookingStatus.COMPLETED,
+          BookingStatus.IN_PROGRESS,
+          BookingStatus.UPCOMMING,
         ]
       )
 

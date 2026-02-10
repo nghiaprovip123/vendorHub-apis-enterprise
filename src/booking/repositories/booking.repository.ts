@@ -21,64 +21,32 @@ type CreateBookingData = {
 export class BookingRepository {
     constructor (private readonly prisma : PrismaProvider) {}
 
-    async checkOverlapWorkingHour (
-        bookingStartDate : Date,
-        bookingEndDate : Date,
-        staffId? : string,
-        statuses? : BookingStatus[]
-    ) {
-        return this.prisma.booking.findFirst(
-            {
-                where : {
-                    staffId : staffId,
-                    status : {
-                        in : statuses
-                    },
-                    OR : [
-                        {
-                            slot : {
-                                is : {
-                                    startTime : {
-                                        lte : bookingEndDate,
-                                    }, 
-                                    endTime : {
-                                        gte : bookingEndDate
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            slot : {
-                                is : {
-                                    endTime : {
-                                        gte : bookingStartDate
-                                    },
-                                    startTime : {
-                                        lte : bookingStartDate
-                                    }
-                                }
-                            }
-                        }
-
-                    ],
-                    AND : [
-                        {
-                            slot : {
-                                is : {
-                                    startTime : {
-                                        gte : bookingStartDate
-                                    },
-                                    endTime : {
-                                        lte : bookingEndDate
-                                    }
-                                }
-                            }
-                        }
-                    ]
-                }            
-            }
-        )
-    }
+    async checkOverlapWorkingHour(
+        bookingStartDate: Date,
+        bookingEndDate: Date,
+        staffId?: string,
+        statuses?: BookingStatus[]
+      ) {
+        return this.prisma.booking.findFirst({
+          where: {
+            staffId,
+            status: {
+              in: statuses,
+            },
+            slot: {
+              is: {
+                startTime: {
+                  lt: bookingEndDate,   // existing.start < new.end
+                },
+                endTime: {
+                  gt: bookingStartDate, // existing.end > new.start
+                },
+              },
+            },
+          },
+        })
+      }
+      
     
     async createBooking (
         data : CreateBookingData
