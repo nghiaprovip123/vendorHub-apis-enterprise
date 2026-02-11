@@ -1,5 +1,6 @@
 import cron from 'node-cron'
 import { CronUpdateBookingStatus } from '@/booking/services/update-cron-status.service'
+import { AutoAssignStaffService } from "@/booking/services/auto-assign.service"
 import { pubsub } from '@/pubsub/pubsub'
 
 export function startBookingStatusCron() {
@@ -16,5 +17,6 @@ export function startBookingStatusCron() {
     await CronUpdateBookingStatus.updateInProgressToCompleted(pubsub)
   })
 
-  // cron.schedule('')
-}
+  cron.schedule('*/10 * * * * *', async () => {
+    await AutoAssignStaffService(pubsub)
+  })}

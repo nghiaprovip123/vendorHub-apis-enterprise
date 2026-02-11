@@ -6,6 +6,7 @@ import { createStaffSchema } from "@/staff/dto/staffs.validation"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
 import { WorkingHoursRepository } from "@/staff/repositories/working-hours.repository"
 import { StaffServiceRepository } from "@/staff/repositories/staff-service.repository"
+import { DateTimeStandardizer } from "@/common/utils/date-standard.utils"
 
 type CreateStaffServiceType = z.infer<typeof createStaffSchema>
 
@@ -67,8 +68,8 @@ export const createStaffService = async (input: CreateStaffServiceType) => {
     await workingHoursRepo.createManyWorkingHour(
       input.workingHours.map((wh) => ({
         day: wh.day,
-        startTime: wh.startTime,
-        endTime: wh.endTime,
+        startTime: DateTimeStandardizer.normalizeVNHHmmToUTC(wh.startTime),
+        endTime: DateTimeStandardizer.normalizeVNHHmmToUTC(wh.endTime),
         staffId: staff.id,
       }))
     )

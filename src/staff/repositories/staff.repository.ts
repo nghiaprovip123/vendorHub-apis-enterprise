@@ -71,6 +71,7 @@ export class StaffRepository {
     const daysOfWeek = day.getDay()
     const bookingStart = DateTimeStandardizer.toHHmm(startTime)
     const bookingEnd   = DateTimeStandardizer.toHHmm(endTime)
+    console.log(bookingStart)
     return this.prisma.staff.findUnique(
       {
         where : {
