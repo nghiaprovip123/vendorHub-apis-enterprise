@@ -9,12 +9,12 @@ import { BookingRepository } from "@/booking/repositories/booking.repository"
 import { BookingStatus } from "@prisma/client"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
 import { sendBookingRequestEmail } from "@/common/utils/send-otp-helper.utils"
+import { sendBookingRequestEmailConfirm } from "@/common/utils/send-otp-helper.utils"
 
 export const VN_TIMEZONE = "Asia/Ho_Chi_Minh"
 
 type CreateBookingInput = z.infer<typeof CreateBookingDto>
 
-// Helper: VN time → UTC
 function vnToUtc(dateTime: string) {
   return fromZonedTime(dateTime, VN_TIMEZONE)
 }
@@ -44,6 +44,7 @@ export class CreateBooking {
     return prisma.$transaction(async (tx) => {
       const serviceRepo = new ServiceRepository(tx)
       const bookingRepo = new BookingRepository(tx)
+      const staffRepo = new StaffRepository(tx)
 
       const service = await serviceRepo.findAvailableService(serviceId)
       if (!service) {
@@ -75,19 +76,20 @@ export class CreateBooking {
       if (isOverlap) {
         throw new Error(BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION)
       }
-      const bookingData = {
-        customerName : customerName,
-        serviceName : service.name,
-        day : bookingDate,
-        startTime : bookingStartDate,
-        endTime : bookingEndDate,
-        staffName : 'Edogawa Trần',
-        notes : notes,
-        customerEmail : customerEmail
-      }
-      await sendBookingRequestEmail(bookingData)
 
-      if (staffId) {
+      if (!staffId) {
+        const bookingData = {
+            customerName : customerName,
+            serviceName : service.name,
+            day : bookingDate,
+            startTime : bookingStartDate,
+            endTime : bookingEndDate,
+            staffName : 'No assignment',
+            notes : notes,
+            customerEmail : customerEmail
+          }
+          await sendBookingRequestEmail(bookingData)
+
         return bookingRepo.createBooking({
             serviceId,
             staffId,
@@ -95,7 +97,7 @@ export class CreateBooking {
             customerPhone,
             customerEmail,
             notes,
-            status: BookingStatus.CONFIRMED,
+            status: BookingStatus.PENDING,
             slot: {
               day: bookingDate,
               startTime: bookingStartDate,
@@ -103,7 +105,19 @@ export class CreateBooking {
               durationInMinutes: duration,
             },
           })
+        }
+    const staffName = await staffRepo.findById(staffId)
+    const bookingData = {
+        customerName : customerName,
+        serviceName : service.name,
+        day : bookingDate,
+        startTime : bookingStartDate,
+        endTime : bookingEndDate,
+        staffName : staffName?.fullName,
+        notes : notes,
+        customerEmail : customerEmail
       }
+      await sendBookingRequestEmailConfirm(bookingData)
 
       return bookingRepo.createBooking({
         serviceId,
