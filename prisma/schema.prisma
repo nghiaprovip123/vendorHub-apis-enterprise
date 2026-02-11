@@ -178,7 +178,7 @@ model Staff {
 // ======================================================================
 model WorkingHour {
   id                String @id @map("_id") @default(auto()) @db.ObjectId
-  day               String  
+  day               Int  
   startTime         String
   endTime           String
   createdAt         DateTime @default(now())  // Fixed from createAt

@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
+import { DateTimeStandardizer } from "@/common/utils/date-standard.utils"
 
 type PrismaProvider = PrismaClient | Prisma.TransactionClient
 
@@ -60,4 +61,52 @@ export class StaffRepository {
   count() {
     return this.prisma.staff.count()
   }
+
+  findAvailableForAssignment(
+    id: string | undefined,
+    day: Date,
+    endTime: Date,
+    startTime: Date
+  ) {
+    const daysOfWeek = day.getDay()
+    const bookingStart = DateTimeStandardizer.toHHmm(startTime)
+    const bookingEnd   = DateTimeStandardizer.toHHmm(endTime)
+    return this.prisma.staff.findUnique(
+      {
+        where : {
+          id : id,
+          workingHours: {
+            some: {
+              day: daysOfWeek,
+              startTime: {
+                 lte: bookingStart 
+              },
+              endTime:   {
+                 gte: bookingEnd 
+              },
+            }
+          },
+          bookings : {
+            none : {
+              slot: {
+                is: {
+                  startTime: {
+                    lt: endTime,   // existing.start < new.end
+                  },
+                  endTime: {
+                    gt: startTime, // existing.end > new.start
+                  },
+                },
+              },
+            }
+          }
+        },
+        include : {
+          workingHours : true,
+          bookings : true
+        }
+      }
+    )
+  }
+
 }

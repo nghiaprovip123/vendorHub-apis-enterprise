@@ -4,7 +4,7 @@ import { pubsub } from '@/pubsub/pubsub'
 
 export function startBookingStatusCron() {
 
-  cron.schedule('**/30 * * * * *', async () => {
+  cron.schedule('*/30 * * * * *', async () => {
     await CronUpdateBookingStatus.updateConfirmedToUpcoming(pubsub)
   })
 
@@ -15,4 +15,6 @@ export function startBookingStatusCron() {
   cron.schedule('*/30 * * * * *', async () => {
     await CronUpdateBookingStatus.updateInProgressToCompleted(pubsub)
   })
+
+  // cron.schedule('')
 }

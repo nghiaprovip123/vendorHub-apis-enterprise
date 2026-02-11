@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const createWorkingHourSchema = z.object({
-  day: z.string(),
+  day: z.int(),
   startTime: z.string(),
   endTime: z.string(),
 });

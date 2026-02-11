@@ -27,7 +27,7 @@ export class WorkingHoursRepository {
         })
       }
     
-    async getAcceptableWorkingHourbyBookingTime(day: string, startTime: string, endTime: string) {
+    async getAcceptableWorkingHourbyBookingTime(day: number, startTime: string, endTime: string) {
       return this.prisma.workingHour.findMany(
         {
           where: {

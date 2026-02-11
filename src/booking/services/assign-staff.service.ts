@@ -18,12 +18,7 @@ export const assignStaffByBookingRequestService = async(input: assignStaffByBook
         async (tx) => {
             const staffRepo = new StaffRepository(tx)
             const bookingRepo = new BookingRepository(tx)
-            const findStaff = await staffRepo.findById(input.staffId)
-    
-            if (!findStaff) {
-                throw new Error(StaffError.NOT_FOUND_STAFF_ERROR)
-            }
-        
+
             const findBookingInformation = await bookingRepo.findBookingByIdAndStatus(
                 input.bookingId,
                 BookingStatus.PENDING
@@ -35,6 +30,16 @@ export const assignStaffByBookingRequestService = async(input: assignStaffByBook
         
             if (findBookingInformation.staffId) {
                 throw new Error(BookingError.BOOKING_ALREADY_ASSIGNED_STAFF)
+            }
+
+            const findAvailableStaff = await staffRepo.findAvailableForAssignment(input.staffId, 
+                findBookingInformation.slot.day, 
+                findBookingInformation.slot.endTime,
+                findBookingInformation.slot.startTime
+            )
+    
+            if (!findAvailableStaff) {
+                throw new Error(StaffError.NOT_FOUND_STAFF_ERROR)
             }
         
             const assignBookingInformation = await bookingRepo.assignStaffIntoBooking(

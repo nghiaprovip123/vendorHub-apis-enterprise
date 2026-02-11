@@ -7,7 +7,7 @@ scalar Upload
 ################################################################################################
 type WorkingHour {
   id: ID!
-  day: String!        
+  day: Int!        
   startTime: String!  
   endTime: String!    
   createdAt: String!
@@ -40,7 +40,7 @@ type DeleteStaffResponse {
 #######################################INPUT SCHEMA#############################################
 ################################################################################################
 input WorkingHourInput {
-  day: String!
+  day: Int!
   startTime: String!
   endTime: String!
 }
@@ -77,7 +77,7 @@ input GetStaffListInput {
 }
 
 input GetAvailableStaffByBookingtimeInput {
-  day: String!
+  day: Int!
   startTime: String!
   endTime: String!
 }
