@@ -48,6 +48,7 @@
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.12",
     "postgres": "^3.4.8",
+    "redis": "^5.10.0",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^4.7.1",
     "winston-loki": "^6.1.3",

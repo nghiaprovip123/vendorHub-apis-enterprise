@@ -20,6 +20,8 @@ import cookieParser from "cookie-parser";
 import { apiLimiter } from "@/common/guards/rate-limiter"
 import { pubsub } from '@/pubsub/pubsub'
 import { startBookingStatusCron } from "@/booking/cron/booking.cron"
+import redisClient, { connectRedis, disconnectRedis } from '@/lib/redis';
+
 dotenv.config();
 
 (async function () {
@@ -33,7 +35,7 @@ dotenv.config();
         next();
     });
     morgan.token('request-id', (req: any) => req.id);
-
+    await connectRedis();
     app.use(
       morgan((tokens, req: any, res) => {
         return JSON.stringify({
@@ -57,6 +59,8 @@ dotenv.config();
     );
     
     const httpServer = createServer(app);
+    
+    
 
     interface createNewsEventInput {
         title: string
