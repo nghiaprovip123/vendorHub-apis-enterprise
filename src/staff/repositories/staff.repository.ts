@@ -21,7 +21,7 @@ export class StaffRepository {
     })
   }
 
-  findById(id: string | undefined) {
+  findById(id: string) {
     return this.prisma.staff.findUnique({
       where: { id },
     })
