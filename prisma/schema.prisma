@@ -141,7 +141,9 @@ model Service {
   staff     StaffService[]
   bookings  Booking[]
   medias     ServiceMedia[] @relation("mediaService")
+
   @@index([tenantId])
+  @@index([categoryId, isVisible, isDeleted])
 }
 // ======================================================================
 // STAFF SERVICE
@@ -172,6 +174,8 @@ model Staff {
   bookings          Booking[]
   createdAt         DateTime? @default(now())  // Added
   updatedAt         DateTime? @updatedAt       // Added
+
+  @@index([isActive, isDeleted])
 }
 // ======================================================================
 // WORKING HOUR
@@ -186,6 +190,8 @@ model WorkingHour {
 
   staffId           String @db.ObjectId 
   staff             Staff @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@index([day, startTime, endTime])
 }
 // ======================================================================
 // BOOKING
@@ -214,6 +220,10 @@ model Booking {
 
   createdAt                       DateTime? @default(now())
   updatedAt                       DateTime? @updatedAt
+
+  @@index([staffId, status])
+  @@index([serviceId])
+  @@index([slot.day])
 }
 
 // ======================================================================

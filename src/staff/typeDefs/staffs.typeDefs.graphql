@@ -2,6 +2,7 @@
 ## █                           STAFF DOMAIN API CONTRACT                █
 ## ██████████████████████████████████████████████████████████████████████
 scalar Upload
+scalar DateTime
 ################################################################################################ 
 #######################################CORE STAFF ENTITIY & RESPONSE############################
 ################################################################################################
@@ -10,8 +11,8 @@ type WorkingHour {
   day: Int!        
   startTime: String!  
   endTime: String!    
-  createdAt: String!
-  updatedAt: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Staff {
@@ -23,8 +24,8 @@ type Staff {
   isActive: Boolean!
   isDeleted: Boolean!
   workingHours: [WorkingHour!]!
-  createdAt: String
-  updatedAt: String
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 type GetStaffListResponse {

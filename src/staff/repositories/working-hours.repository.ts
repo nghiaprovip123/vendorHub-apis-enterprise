@@ -10,7 +10,8 @@ export class WorkingHoursRepository {
       ) {
         return this.prisma.workingHour.createMany({
           data,
-        })
+        }
+      )
     }
 
     async deleteManyWorkingHour(staffId: string) {
