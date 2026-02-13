@@ -13,7 +13,21 @@ export const CreateBookingDto = z.object(
         customerPhone: z.string(),
         customerEmail: z.string(),
         notes: z.string().optional()
-        
+    }
+)
+
+export const UpdateBookingDto = z.object(
+    {
+        id: z.string(),
+        serviceId: z.string().optional(),
+        staffId: z.string().optional(),      
+        day: z.string().optional(),
+        startTime: z.string().optional(),
+        endTime: z.string().optional(),
+        customerName: z.string().optional(),
+        customerPhone: z.string().optional(),
+        customerEmail: z.string().optional(),
+        notes: z.string().optional()
     }
 )
 

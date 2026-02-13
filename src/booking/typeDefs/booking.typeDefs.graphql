@@ -11,6 +11,19 @@ input CreateBookingInput {
   notes: String!
 }
 
+input UpdateBookingInput {
+  id: ID!
+  serviceId: String
+  staffId: String                       
+  day: String
+  startTime: String
+  endTime: String
+  customerName: String
+  customerPhone: String
+  customerEmail: String
+  notes: String
+}
+
 type CreateBookingResponse {
   id: ID!
   serviceId: String!
@@ -75,6 +88,7 @@ type Mutation {
   createBookingInBackOffice(input: CreateBookingInput): CreateBookingResponse
   assignStaffByBookingRequest(input: AssignStaffForBookingRequestInput): AssignStaffForBookingRequestResponse
   cancelBooking(input: CancelBookingInput): CancelBookingResponse
+  updateBooking(input: UpdateBookingInput): CreateBookingResponse
 }
 
 type Query {
