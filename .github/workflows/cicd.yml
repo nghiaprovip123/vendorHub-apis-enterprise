@@ -3,7 +3,7 @@ name: CI-CD VendorHub BackOffice APIs
 on:
   push:
     branches:
-      - develop
+      - main
 
 jobs:
   build-and-push:

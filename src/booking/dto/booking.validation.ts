@@ -30,4 +30,3 @@ export const assignStaffByBookingRequestDto = z.object(
         staffId: z.string(StaffError.MISSING_STAFF_ID_ERROR)
     }
 )
-
