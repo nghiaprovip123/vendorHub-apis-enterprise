@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteStaffSchema = exports.updateStaffSchema = exports.createStaffSchema = exports.createWorkingHourSchema = void 0;
 const zod_1 = require("zod");
 exports.createWorkingHourSchema = zod_1.z.object({
-    day: zod_1.z.string(),
+    day: zod_1.z.int(),
     startTime: zod_1.z.string(),
     endTime: zod_1.z.string(),
 });

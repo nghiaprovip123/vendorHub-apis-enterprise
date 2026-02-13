@@ -2,16 +2,17 @@
 ## █                           STAFF DOMAIN API CONTRACT                █
 ## ██████████████████████████████████████████████████████████████████████
 scalar Upload
+scalar DateTime
 ################################################################################################ 
 #######################################CORE STAFF ENTITIY & RESPONSE############################
 ################################################################################################
 type WorkingHour {
   id: ID!
-  day: String!        
+  day: Int!        
   startTime: String!  
   endTime: String!    
-  createdAt: String!
-  updatedAt: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Staff {
@@ -23,8 +24,8 @@ type Staff {
   isActive: Boolean!
   isDeleted: Boolean!
   workingHours: [WorkingHour!]!
-  createdAt: String
-  updatedAt: String
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 type GetStaffListResponse {
@@ -40,7 +41,7 @@ type DeleteStaffResponse {
 #######################################INPUT SCHEMA#############################################
 ################################################################################################
 input WorkingHourInput {
-  day: String!
+  day: Int!
   startTime: String!
   endTime: String!
 }
@@ -76,8 +77,12 @@ input GetStaffListInput {
   page: Int!
 }
 
+input GetStaffDetailInput {
+  id: ID!
+}
+
 input GetAvailableStaffByBookingtimeInput {
-  day: String!
+  day: Int!
   startTime: String!
   endTime: String!
 }
@@ -93,4 +98,5 @@ extend type Mutation {
 type Query {
   getStaffList(input: GetStaffListInput!): GetStaffListResponse!
   getAvailableStaffByBookingTime(input: GetAvailableStaffByBookingtimeInput!): [Staff]!
+  getStaffDetail(input : GetStaffDetailInput) : Staff
 }

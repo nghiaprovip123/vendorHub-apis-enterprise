@@ -80,3 +80,7 @@ type Query {
   viewBookingDetail(input: ViewBookingDetailInput): CreateBookingResponse
   getBookingList(input: getBookingListInput): getBookingListResponse
 }
+
+type Subscription {
+  bookingStatusChanged: CreateBookingResponse!
+}

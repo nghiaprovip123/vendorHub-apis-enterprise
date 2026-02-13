@@ -41,7 +41,11 @@ class ServiceRepository {
     async getServiceList(skip, take) {
         return this.prisma.service.findMany({
             skip,
-            take
+            take,
+            where: {
+                isVisible: true,
+                isDeleted: false
+            }
         });
     }
     async countTotal() {
@@ -60,6 +64,34 @@ class ServiceRepository {
         return this.prisma.service.findUnique({
             where: { id },
             include: { medias: { orderBy: { order: "asc" } } }
+        });
+    }
+    async softDeleteById(id) {
+        return this.prisma.service.update({
+            where: { id },
+            data: {
+                isDeleted: true,
+                isVisible: false
+            }
+        });
+    }
+    async findMediasByServiceId(serviceId) {
+        return this.prisma.serviceMedia.findMany({
+            where: { serviceId },
+            select: {
+                id: true,
+                public_id: true
+            }
+        });
+    }
+    async deleteMediasByServiceId(serviceId) {
+        return this.prisma.serviceMedia.deleteMany({
+            where: { serviceId }
+        });
+    }
+    async deleteServiceById(serviceId) {
+        return this.prisma.service.delete({
+            where: { id: serviceId }
         });
     }
 }

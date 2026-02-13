@@ -2,17 +2,17 @@
 ## █                       SERVICE DOMAIN API CONTRACT                  █
 ## ██████████████████████████████████████████████████████████████████████
 scalar Upload
-scalar DateTime
-################################################################################################ 
+scalar DateTime 
 #######################################ENUMERATED###############################################
-################################################################################################
 enum ServiceMediaType {
   IMAGE
   VIDEO
-}
-################################################################################################ 
+} 
+enum CategoryLevel {
+  LEVEL_1
+  LEVEL_2
+} 
 #######################################CORE SERVICE ENTITIY#####################################
-################################################################################################
 type Service {
   id: ID!
   categoryId: ID!
@@ -33,10 +33,18 @@ type ServiceMedia {
   url: String!
   type: ServiceMediaType
   order: Int
+} 
+
+type Category {
+  id: ID
+  name: String
+  slug: String
+  level: CategoryLevel
+  description: String
+  displayOrder: Int
+  createAt: DateTime
 }
-################################################################################################ 
 #######################################CREATE SERVICE INPUT SCHEMA##############################
-################################################################################################
 input CreateServiceMediaInput {
   file: Upload!
   type: ServiceMediaType!
@@ -53,16 +61,12 @@ input CreateServiceInput {
   price: Int!
   isVisible: Boolean = true
   medias: [CreateServiceMediaInput!]
-}
-################################################################################################ 
+} 
 ##################################VIEW LIST OF SERVICE INPUT SCHEMA#############################
-################################################################################################
 input ViewServiceListInput {
   page: Int!
 }
-################################################################################################ 
 #####################################UPDATE SERVICE INPUT SCHEMA################################
-################################################################################################
 input UpdateServiceMediaInput {
   file: Upload
   type: ServiceMediaType
@@ -81,28 +85,42 @@ input UpdateServiceInput {
   isVisible: Boolean
   medias: [CreateServiceMediaInput]
 }
-################################################################################################ 
+###################################VIEW SERVICE DETAIL INPUT SCHEMA##############################
+input ViewServiceDetailInput {
+  id: ID!
+}
+###################################DELETE SERVICE INPUT SCHEMA##############################
+input DeleteServiceInput {
+  id: ID!
+}
 #######################################CREATE SERVICE RESPONSE##################################
-################################################################################################
 type ServiceResponse {
   service: Service!
 }
-################################################################################################ 
 #####################################VIEW LIST OF SERVICE RESPONSE##############################
-################################################################################################
 type ViewServiceListResponse {
   items: [Service]
   total: Int
 }
-################################################################################################ 
+#####################################DELETE SERVICE RESPONSE##############################
+type ViewServiceListResponse {
+  success: Boolean!
+  message: String!
+}
+#####################################GET LIST OF SERVICE CATEGORY##############################
+type ViewCategoryListResponse {
+  result: [Category]
+}
+
 #######################################RESOLVER#################################################
-################################################################################################
 extend type Mutation {
   createService(input: CreateServiceInput!): ServiceResponse!
   updateService(input: UpdateServiceInput!): ServiceResponse!
-
+  deleteService(input: DeleteServiceInput!): ViewServiceListResponse!
 }
 
 extend type Query {
-  viewServiceList(input:ViewServiceListInput!): ViewServiceListResponse!
+  viewServiceList(input: ViewServiceListInput!): ViewServiceListResponse!
+  viewServiceDetail(input: ViewServiceDetailInput!): ServiceResponse!
+  viewCategoryList: ViewCategoryListResponse!
 }

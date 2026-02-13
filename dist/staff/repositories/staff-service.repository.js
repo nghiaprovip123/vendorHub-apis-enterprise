@@ -33,5 +33,10 @@ class StaffServiceRepository {
             }
         });
     }
+    async countByServiceId(serviceId) {
+        return this.prisma.staffService.count({
+            where: { serviceId }
+        });
+    }
 }
 exports.StaffServiceRepository = StaffServiceRepository;

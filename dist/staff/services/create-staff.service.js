@@ -7,6 +7,7 @@ const cloudinary_orchestration_utils_1 = require("../../common/utils/cloudinary-
 const staff_repository_1 = require("../../staff/repositories/staff.repository");
 const working_hours_repository_1 = require("../../staff/repositories/working-hours.repository");
 const staff_service_repository_1 = require("../../staff/repositories/staff-service.repository");
+const date_standard_utils_1 = require("../../common/utils/date-standard.utils");
 const createStaffService = async (input) => {
     return prisma_1.prisma.$transaction(async (tx) => {
         const staffRepo = new staff_repository_1.StaffRepository(tx);
@@ -49,8 +50,8 @@ const createStaffService = async (input) => {
         }
         await workingHoursRepo.createManyWorkingHour(input.workingHours.map((wh) => ({
             day: wh.day,
-            startTime: wh.startTime,
-            endTime: wh.endTime,
+            startTime: date_standard_utils_1.DateTimeStandardizer.normalizeVNHHmmToUTC(wh.startTime),
+            endTime: date_standard_utils_1.DateTimeStandardizer.normalizeVNHHmmToUTC(wh.endTime),
             staffId: staff.id,
         })));
         const workingHours = await workingHoursRepo.findManyWorkingHour(staff.id);

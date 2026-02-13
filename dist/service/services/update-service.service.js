@@ -68,7 +68,7 @@ const UpdateServiceService = async (input) => {
         if (isVisible !== undefined) {
             updateData.isVisible = isVisible;
         }
-        const updatedService = await prisma_1.prisma.service.updateMany({
+        const updatedService = await tx.service.updateMany({
             data: updateData
         });
         if (!updatedService) {

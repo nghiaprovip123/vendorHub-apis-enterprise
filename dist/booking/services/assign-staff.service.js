@@ -12,16 +12,16 @@ const assignStaffByBookingRequestService = async (input) => {
     const service = await prisma_1.prisma.$transaction(async (tx) => {
         const staffRepo = new staff_repository_1.StaffRepository(tx);
         const bookingRepo = new booking_repository_1.BookingRepository(tx);
-        const findStaff = await staffRepo.findById(input.staffId);
-        if (!findStaff) {
-            throw new Error(staff_error_1.StaffError.NOT_FOUND_STAFF_ERROR);
-        }
         const findBookingInformation = await bookingRepo.findBookingByIdAndStatus(input.bookingId, client_1.BookingStatus.PENDING);
         if (!findBookingInformation) {
             throw new Error(booking_error_1.BookingError.BOOKING_VIEW_DETAIL_BOOKING_NOT_EXISTS);
         }
         if (findBookingInformation.staffId) {
             throw new Error(booking_error_1.BookingError.BOOKING_ALREADY_ASSIGNED_STAFF);
+        }
+        const findAvailableStaff = await staffRepo.findAvailableForAssignment(input.staffId, findBookingInformation.slot.day, findBookingInformation.slot.endTime, findBookingInformation.slot.startTime);
+        if (!findAvailableStaff) {
+            throw new Error(staff_error_1.StaffError.NOT_FOUND_STAFF_ERROR);
         }
         const assignBookingInformation = await bookingRepo.assignStaffIntoBooking(findBookingInformation.id, input.staffId);
         return assignBookingInformation;

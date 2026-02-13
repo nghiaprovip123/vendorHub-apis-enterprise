@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateServiceDto = exports.CreateServiceDto = exports.CreateServiceMediaDto = void 0;
+exports.DeleteServiceDto = exports.ViewServiceDetail = exports.UpdateServiceDto = exports.CreateServiceDto = exports.CreateServiceMediaDto = void 0;
 const zod_1 = __importDefault(require("zod"));
 const client_1 = require("@prisma/client");
 const service_error_1 = require("../../common/utils/error/service.error");
@@ -34,4 +34,10 @@ exports.UpdateServiceDto = zod_1.default.object({
     isVisible: zod_1.default.boolean().optional(),
     medias: zod_1.default.array(exports.CreateServiceMediaDto).optional(),
     price: zod_1.default.int(service_error_1.ServiceError.SERVICE_DTO_PRICE).optional()
+});
+exports.ViewServiceDetail = zod_1.default.object({
+    id: zod_1.default.string(service_error_1.ServiceError.SERVICE_IS_NOT_EXIST)
+});
+exports.DeleteServiceDto = zod_1.default.object({
+    id: zod_1.default.string(service_error_1.ServiceError.SERVICE_IS_NOT_EXIST)
 });

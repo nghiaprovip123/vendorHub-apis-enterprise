@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typeDefs_1 = require("./typeDefs");
 const express_1 = __importDefault(require("express"));
 const http_1 = require("http");
-const graphql_subscriptions_1 = require("graphql-subscriptions");
 const ws_1 = require("ws");
 const ws_2 = require("graphql-ws/lib/use/ws");
 const schema_1 = require("@graphql-tools/schema");
@@ -23,10 +22,13 @@ const morgan_1 = __importDefault(require("morgan"));
 const auth_route_1 = __importDefault(require("./auth/routes/auth.route"));
 const error_guard_1 = require("./common/guards/error.guard");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const rate_limiter_1 = require("./common/guards/rate-limiter");
+const pubsub_1 = require("./pubsub/pubsub");
+const booking_cron_1 = require("./booking/cron/booking.cron");
+const redis_1 = require("./lib/redis");
 dotenv_1.default.config();
 (async function () {
     const PORT = Number(process.env.PORT) || 3000;
-    const pubsub = new graphql_subscriptions_1.PubSub();
     const app = (0, express_1.default)();
     app.use(express_1.default.json());
     app.use((0, cookie_parser_1.default)());
@@ -36,6 +38,7 @@ dotenv_1.default.config();
         next();
     });
     morgan_1.default.token('request-id', (req) => req.id);
+    await (0, redis_1.connectRedis)();
     app.use((0, morgan_1.default)((tokens, req, res) => {
         return JSON.stringify({
             type: 'http_access',
@@ -88,7 +91,7 @@ dotenv_1.default.config();
         maxFileSize: 5000000,
         maxFiles: 5,
     }));
-    app.use('/auth', auth_route_1.default);
+    app.use('/auth', rate_limiter_1.apiLimiter, auth_route_1.default);
     app.use('/graphql', (0, cors_1.default)(), body_parser_1.default.json(), (0, express4_1.expressMiddleware)(server, {
         context: async ({ req, res }) => {
             const contextLogger = (0, logger_1.createContextLogger)({
@@ -97,7 +100,7 @@ dotenv_1.default.config();
             return {
                 req,
                 res,
-                pubsub,
+                pubsub: pubsub_1.pubsub,
                 logger: contextLogger, // ← Add logger to context
                 requestId: req.id,
             };
@@ -112,4 +115,5 @@ dotenv_1.default.config();
             loki_enabled: !!process.env.GRAFANA_LOKI_URL,
         });
     });
+    (0, booking_cron_1.startBookingStatusCron)(); // ✅ BẮT BUỘC
 })();

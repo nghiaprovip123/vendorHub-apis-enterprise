@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BookingRepository = void 0;
+const client_1 = require("@prisma/client");
 class BookingRepository {
     constructor(prisma) {
         this.prisma = prisma;
@@ -8,51 +9,21 @@ class BookingRepository {
     async checkOverlapWorkingHour(bookingStartDate, bookingEndDate, staffId, statuses) {
         return this.prisma.booking.findFirst({
             where: {
-                staffId: staffId,
+                staffId,
                 status: {
-                    in: statuses
+                    in: statuses,
                 },
-                OR: [
-                    {
-                        slot: {
-                            is: {
-                                startTime: {
-                                    lte: bookingEndDate,
-                                },
-                                endTime: {
-                                    gte: bookingEndDate
-                                }
-                            }
-                        }
+                slot: {
+                    is: {
+                        startTime: {
+                            lt: bookingEndDate, // existing.start < new.end
+                        },
+                        endTime: {
+                            gt: bookingStartDate, // existing.end > new.start
+                        },
                     },
-                    {
-                        slot: {
-                            is: {
-                                endTime: {
-                                    gte: bookingStartDate
-                                },
-                                startTime: {
-                                    lte: bookingStartDate
-                                }
-                            }
-                        }
-                    }
-                ],
-                AND: [
-                    {
-                        slot: {
-                            is: {
-                                startTime: {
-                                    gte: bookingStartDate
-                                },
-                                endTime: {
-                                    lte: bookingEndDate
-                                }
-                            }
-                        }
-                    }
-                ]
-            }
+                },
+            },
         });
     }
     async createBooking(data) {
@@ -123,8 +94,69 @@ class BookingRepository {
                 id: bookingId
             },
             data: {
-                staffId: staffId
+                staffId: staffId,
+                status: client_1.BookingStatus.CONFIRMED
             }
+        });
+    }
+    async countByServiceId(serviceId) {
+        return this.prisma.booking.count({
+            where: { serviceId }
+        });
+    }
+    async findUpcomingConfirmedBookings(now, minutes) {
+        const threshold = new Date(now.getTime() + minutes * 60 * 1000);
+        return this.prisma.booking.findMany({
+            where: {
+                status: client_1.BookingStatus.CONFIRMED,
+                slot: {
+                    is: {
+                        startTime: {
+                            gt: now,
+                            lte: threshold,
+                        },
+                    },
+                },
+            },
+            select: {
+                id: true,
+            },
+        });
+    }
+    async findInProgressBookings(now) {
+        return this.prisma.booking.findMany({
+            where: {
+                slot: {
+                    is: {
+                        startTime: {
+                            lte: now
+                        },
+                        endTime: {
+                            gte: now
+                        }
+                    }
+                }
+            }
+        });
+    }
+    async findCompletedBookings(now) {
+        return this.prisma.booking.findMany({
+            where: {
+                status: client_1.BookingStatus.IN_PROGRESS,
+                slot: {
+                    is: {
+                        endTime: {
+                            lte: now
+                        }
+                    }
+                }
+            }
+        });
+    }
+    async updateStatus(id, status) {
+        return this.prisma.booking.update({
+            where: { id },
+            data: { status },
         });
     }
 }

@@ -27,6 +27,7 @@ const cancelBookingSerivce = async (input) => {
         data: {
             status: client_1.BookingStatus.CANCELLED,
             cancelReason: input.cancelReason,
+            cancelledAt: new Date()
         }
     });
     return cancelBooking;

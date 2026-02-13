@@ -12,22 +12,35 @@ const deleteStaffService = async (input) => {
     }
     const staff = await prisma_1.prisma.$transaction(async (tx) => {
         const staffsRepo = new staff_repository_1.StaffRepository(tx);
-        const workingHourRepos = new working_hours_repository_1.WorkingHoursRepository(tx);
+        const workingHourRepo = new working_hours_repository_1.WorkingHoursRepository(tx);
         const existing = await staffsRepo.findById(input.id);
         if (!existing) {
             throw new Error(staff_error_1.StaffError.NOT_FOUND_STAFF_ERROR);
         }
-        await tx.staffService.deleteMany({
-            where: {
-                staffId: existing.id
-            }
+        const bookingCount = await tx.booking.count({
+            where: { staffId: input.id },
         });
-        await workingHourRepos.deleteManyWorkingHour(input.id);
+        if (bookingCount > 0) {
+            await tx.staff.update({
+                where: {
+                    id: input.id
+                },
+                data: {
+                    isDeleted: true,
+                    isActive: false
+                },
+            });
+            return existing;
+        }
+        await tx.staffService.deleteMany({
+            where: { staffId: input.id },
+        });
+        await workingHourRepo.deleteManyWorkingHour(input.id);
         return staffsRepo.delete(input.id);
     });
     if (input.public_id) {
         try {
-            await cloudinary_orchestration_utils_1.CloudinaryRest.DestroyImageInCloudinary(input.public_id, 'image');
+            await cloudinary_orchestration_utils_1.CloudinaryRest.DestroyImageInCloudinary(input.public_id, "image");
         }
         catch (err) {
             console.error("Cloudinary delete failed:", err);
