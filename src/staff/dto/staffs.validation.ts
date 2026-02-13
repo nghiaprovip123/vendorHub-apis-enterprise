@@ -13,6 +13,7 @@ export const createStaffSchema = z.object({
     isActive: z.boolean().optional().default(true),
     isDeleted: z.boolean().optional().default(false),
     workingHours: z.array(createWorkingHourSchema).min(1),
+    phoneNumber: z.string().min(9),
     services: z.array(z.string()).optional().default([]) // ✅ Array of strings
 });
   
@@ -23,6 +24,7 @@ export const updateStaffSchema = z.object({
     timezone: z.string().optional(),
     isActive: z.boolean().optional(),
     isDeleted: z.boolean().optional(),
+    phoneNumber: z.string().optional(),
     workingHours: z.array(createWorkingHourSchema).optional(),
     services: z.array(z.string()).optional(),
 });

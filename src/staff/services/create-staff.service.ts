@@ -23,6 +23,7 @@ export const createStaffService = async (input: CreateStaffServiceType) => {
       timezone: input.timezone,
       isActive: input.isActive ?? true,
       isDeleted: false,
+      phoneNumber: input.phoneNumber
     })
 
     if (input.avatar) {
