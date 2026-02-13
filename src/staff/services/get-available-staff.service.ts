@@ -4,6 +4,7 @@ import { createWorkingHourSchema } from "@/staff/dto/staffs.validation"
 import { WorkingHoursRepository } from "@/staff/repositories/working-hours.repository"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
 import { StaffError } from "@/common/utils/error/staff.error"
+import ApiError from "@/common/utils/ApiError.utils"
 
 type GetAvailableStaffByBookingTimeType =
   z.infer<typeof createWorkingHourSchema>
@@ -32,6 +33,6 @@ export const getAvailableStaffbyBookingTimeService = async (
 
     return staffRepo.findManyActiveByIds(staffIds)
   } catch (error) {
-    throw new Error(StaffError.FETCH_AVAILABLE_STAFF_ERROR)
+    throw new ApiError(500, StaffError.FETCH_AVAILABLE_STAFF_ERROR)
   }
 }

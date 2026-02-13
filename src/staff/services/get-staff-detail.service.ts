@@ -1,11 +1,13 @@
 import { prisma } from "@/lib/prisma"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
+import { StaffError } from "@/common/utils/error/staff.error"
+import ApiError from "@/common/utils/ApiError.utils"
 
 export const GetStaffDetailService = async (
     id: string | undefined
 ) => {
     if (!id) {
-        throw new Error("Missing Staff ID")
+        throw new ApiError(400, StaffError.MISSING_STAFF_ID_ERROR)
     }
 
     const staffRepo = new StaffRepository(prisma)

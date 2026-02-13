@@ -6,6 +6,7 @@ import { ServiceMediaRepository } from "@/service/repositories/service-media.rep
 import { ServiceRepository } from "@/service/repositories/service.repository"
 import { UpdateServiceDto } from "@/service/dto/service.validation"
 import * as z from "zod"
+import ApiError from "@/common/utils/ApiError.utils"
 
 type UpdateServiceServiceInput = z.infer< typeof UpdateServiceDto >
 export const UpdateServiceService = async (
@@ -30,7 +31,7 @@ export const UpdateServiceService = async (
             const findUpdatedService = await serviceRepo.findById(id)
         
             if (!findUpdatedService) {
-                throw new Error (ServiceError.SERVICE_IS_NOT_EXIST)
+                throw new ApiError (404, ServiceError.SERVICE_IS_NOT_EXIST)
             }
             
             await serviceMediaRepo.deleteByServiceId(findUpdatedService.id)
@@ -72,7 +73,7 @@ export const UpdateServiceService = async (
                     )
                 )
                 if (!uploadImage) {
-                    throw new Error (ServiceError.SERVICE_MEDIA_UPLOAD_ERROR)
+                    throw new ApiError (400, ServiceError.SERVICE_MEDIA_UPLOAD_ERROR)
                 }
                 await serviceMediaRepo.createMany(
                     uploadImage
@@ -111,13 +112,13 @@ export const UpdateServiceService = async (
             )
         
             if (!updatedService) {
-                throw new Error (ServiceError.SERVICE_PRISMA_ERROR)
+                throw new ApiError (500, ServiceError.SERVICE_PRISMA_ERROR)
             }
             
             const serviceWithMedias = await serviceRepo.findWithMedias(findUpdatedService.id)
         
             if (!serviceWithMedias) {
-                throw new Error('Failed to fetch created service')
+                throw new ApiError(500, 'Failed to fetch created service')
             }
         
             return { service: serviceWithMedias }

@@ -6,6 +6,7 @@ import * as z from "zod"
 import { ServiceMediaType } from "@prisma/client"
 import { ServiceRepository } from "@/service/repositories/service.repository"
 import { ServiceMediaRepository } from "@/service/repositories/service-media.repository"
+import ApiError from "@/common/utils/ApiError.utils"
 
 type CreateServiceInput = z.infer< typeof CreateServiceDto >
 
@@ -69,7 +70,7 @@ export const CreateServiceService = async (
                     )
                 )
                 if (!uploadMedias) {
-                    throw new Error (ServiceError.SERVICE_MEDIA_UPLOAD_ERROR)
+                    throw new ApiError (500, ServiceError.SERVICE_MEDIA_UPLOAD_ERROR)
                 }
                 await serviceMediaRepo.createMany(
                     uploadMedias
@@ -86,7 +87,7 @@ export const CreateServiceService = async (
             })
 
             if (!serviceWithMedias) {
-                throw new Error('Failed to fetch created service')
+                throw new ApiError(500, 'Failed to fetch created service')
               }
         
           

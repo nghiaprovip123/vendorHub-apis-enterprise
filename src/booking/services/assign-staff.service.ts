@@ -6,6 +6,7 @@ import { BookingError } from "@/common/utils/error/booking.error"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
 import { StaffError } from "@/common/utils/error/staff.error"
 import { BookingRepository } from "@/booking/repositories/booking.repository"
+import ApiError from "@/common/utils/ApiError.utils"
 
 type assignStaffByBookingRequestServiceType = z.infer< typeof assignStaffByBookingRequestDto >
 
@@ -25,11 +26,11 @@ export const assignStaffByBookingRequestService = async(input: assignStaffByBook
             )
                     
             if (!findBookingInformation) {
-                throw new Error(BookingError.BOOKING_VIEW_DETAIL_BOOKING_NOT_EXISTS)
+                throw new ApiError(400, BookingError.BOOKING_VIEW_DETAIL_BOOKING_NOT_EXISTS)
             }
         
             if (findBookingInformation.staffId) {
-                throw new Error(BookingError.BOOKING_ALREADY_ASSIGNED_STAFF)
+                throw new ApiError(400, BookingError.BOOKING_ALREADY_ASSIGNED_STAFF)
             }
 
             const findAvailableStaff = await staffRepo.findAvailableForAssignment(input.staffId, 
@@ -39,7 +40,7 @@ export const assignStaffByBookingRequestService = async(input: assignStaffByBook
             )
     
             if (!findAvailableStaff) {
-                throw new Error(StaffError.NOT_FOUND_STAFF_ERROR)
+                throw new ApiError(204, StaffError.NOT_FOUND_STAFF_ERROR)
             }
         
             const assignBookingInformation = await bookingRepo.assignStaffIntoBooking(

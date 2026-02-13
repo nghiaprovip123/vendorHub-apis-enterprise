@@ -4,8 +4,8 @@ import * as z from "zod"
 import { deleteStaffSchema } from "@/staff/dto/staffs.validation"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
 import { WorkingHoursRepository } from "@/staff/repositories/working-hours.repository"
-import { BookingRepository } from "@/booking/repositories/booking.repository"
 import { StaffError } from "@/common/utils/error/staff.error"
+import ApiError from "@/common/utils/ApiError.utils"
 
 type DeleteStaffInput = z.infer<typeof deleteStaffSchema>
 
@@ -20,7 +20,7 @@ export const deleteStaffService = async (input: DeleteStaffInput) => {
 
     const existing = await staffsRepo.findById(input.id)
     if (!existing) {
-      throw new Error(StaffError.NOT_FOUND_STAFF_ERROR)
+      throw new ApiError(400, StaffError.NOT_FOUND_STAFF_ERROR)
     }
 
     const bookingCount = await tx.booking.count({

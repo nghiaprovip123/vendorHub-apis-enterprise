@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma"
 import { DateTimeStandardizer } from "@/common/utils/date-standard.utils"
 import { BookingStatus } from "@prisma/client"
+import ApiError from "@/common/utils/ApiError.utils"
+import { BookingError } from "@/common/utils/error/booking.error"
+import { StaffError } from "@/common/utils/error/staff.error"
 
 type BookingSlot = {
   day: Date
@@ -22,7 +25,7 @@ export const AssignStaffEngine = async (
   })
 
   if (!booking) {
-    throw new Error("BOOKING_NOT_FOUND")
+    throw new ApiError(404, BookingError.BOOKING_VIEW_DETAIL_BOOKING_NOT_EXISTS)
   }
 
   if (booking.status !== BookingStatus.PENDING) {
@@ -83,7 +86,7 @@ export const AssignStaffEngine = async (
   console.log(candidateStaff)
 
   if (candidateStaff.length === 0) {
-    throw new Error("NO_AVAILABLE_STAFF")
+    throw new ApiError(404, StaffError.NOT_FOUND_STAFF_ERROR)
   }
 
   const staffIds = candidateStaff.map(s => s.id)
@@ -158,7 +161,7 @@ export const AssignStaffEngine = async (
         })
 
         if (conflict) {
-          throw new Error("STAFF_CONFLICT")
+          throw new ApiError(404, "STAFF_CONFLICT")
         }
 
         return tx.booking.update({
@@ -180,5 +183,5 @@ export const AssignStaffEngine = async (
     }
   }
 
-  throw new Error("NO_STAFF_ASSIGNABLE_AFTER_RETRY")
+  throw new ApiError(404, "NO_STAFF_ASSIGNABLE_AFTER_RETRY")
 }

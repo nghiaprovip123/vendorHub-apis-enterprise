@@ -8,6 +8,7 @@ import { StaffError } from "@/common/utils/error/staff.error"
 import { ServiceRepository } from "@/service/repositories/service.repository"
 import { ServiceError } from "@/common/utils/error/service.error"
 import { StaffServiceRepository } from "@/staff/repositories/staff-service.repository"
+import ApiError from "@/common/utils/ApiError.utils"
 
 type UpdateStaffType = z.infer<typeof updateStaffSchema>
 
@@ -17,7 +18,7 @@ export const updateStaffService = async (input: UpdateStaffType) => {
     });
 
     if (!existingStaff) {
-        throw new Error(StaffError.NOT_FOUND_STAFF_ERROR);
+        throw new ApiError(204, StaffError.NOT_FOUND_STAFF_ERROR);
     }
 
     let avatar_url: string | undefined = existingStaff.avatar_url || undefined;
@@ -59,7 +60,7 @@ export const updateStaffService = async (input: UpdateStaffType) => {
                 avatar_public_id = upload.public_id;
             }
         } catch (error) {
-            throw new Error('Failed to upload avatar image')
+            throw new ApiError(400, 'Failed to upload avatar image')
         }
     }
 
@@ -83,7 +84,7 @@ export const updateStaffService = async (input: UpdateStaffType) => {
                 const validServices = await serviceRepo.findManyExistingService(input.services)
                 
                 if (validServices.length !== input.services.length) {
-                    throw new Error(ServiceError.SERVICE_IS_NOT_EXIST)
+                    throw new ApiError(400, ServiceError.SERVICE_IS_NOT_EXIST)
                 }
             }
 

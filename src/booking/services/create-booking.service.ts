@@ -10,6 +10,7 @@ import { BookingStatus } from "@prisma/client"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
 import { sendBookingRequestEmail } from "@/common/utils/send-otp-helper.utils"
 import { sendBookingRequestEmailConfirm } from "@/common/utils/send-otp-helper.utils"
+import ApiError from "@/common/utils/ApiError.utils" // Import ApiError
 
 export const VN_TIMEZONE = "Asia/Ho_Chi_Minh"
 
@@ -34,11 +35,11 @@ export class CreateBooking {
     } = input
 
     if (!serviceId) {
-      throw new Error(BookingError.BOOKING_CREATION_MISSING_SERVICE_INFORMATION)
+      throw new ApiError(400, BookingError.BOOKING_CREATION_MISSING_SERVICE_INFORMATION)
     }
 
     if (!customerName || !customerPhone || !customerEmail) {
-      throw new Error(BookingError.BOOKING_CREATION_MISSING_CUSTOMER_INFORMATION)
+      throw new ApiError(400, BookingError.BOOKING_CREATION_MISSING_CUSTOMER_INFORMATION)
     }
 
     return prisma.$transaction(async (tx) => {
@@ -48,7 +49,7 @@ export class CreateBooking {
 
       const service = await serviceRepo.findAvailableService(serviceId)
       if (!service) {
-        throw new Error(BookingError.BOOKING_CREATION_SERVICE_NOT_AVAILABLE)
+        throw new ApiError(404, BookingError.BOOKING_CREATION_SERVICE_NOT_AVAILABLE)
       }
 
       const bookingStartDate = vnToUtc(`${day}T${startTime}`)
@@ -57,11 +58,11 @@ export class CreateBooking {
       const now = new Date()
 
       if (bookingStartDate < now) {
-        throw new Error(BookingError.BOOKING_CREATION_BOOKING_START_DATE_INVALID)
+        throw new ApiError(400, BookingError.BOOKING_CREATION_BOOKING_START_DATE_INVALID)
       }
 
       if (bookingEndDate <= bookingStartDate) {
-        throw new Error(BookingError.BOOKING_CREATION_BOOKING_END_DATE_INVALID)
+        throw new ApiError(400, BookingError.BOOKING_CREATION_BOOKING_END_DATE_INVALID)
       }
 
       const duration = differenceInMinutes(bookingEndDate, bookingStartDate)
@@ -74,7 +75,7 @@ export class CreateBooking {
       )
 
       if (isOverlap) {
-        throw new Error(BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION)
+        throw new ApiError(409, BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION)
       }
 
       if (!staffId) {
@@ -150,7 +151,7 @@ export class CreateBooking {
     } = input
 
     if (!serviceId || !staffId) {
-      throw new Error(BookingError.BOOKING_CREATION_MISSING_SERVICE_INFORMATION)
+      throw new ApiError(400, BookingError.BOOKING_CREATION_MISSING_SERVICE_INFORMATION)
     }
 
     return prisma.$transaction(async (tx) => {
@@ -160,12 +161,12 @@ export class CreateBooking {
 
       const service = await serviceRepo.findAvailableService(serviceId)
       if (!service) {
-        throw new Error(BookingError.BOOKING_CREATION_SERVICE_NOT_AVAILABLE)
+        throw new ApiError(404, BookingError.BOOKING_CREATION_SERVICE_NOT_AVAILABLE)
       }
 
       const staff = await staffRepo.findById(staffId)
       if (!staff) {
-        throw new Error(BookingError.BOOKING_CREATION_STAFF_NOT_AVAILABLE)
+        throw new ApiError(404, BookingError.BOOKING_CREATION_STAFF_NOT_AVAILABLE)
       }
 
       const bookingStartDate = vnToUtc(`${day}T${startTime}`)
@@ -174,11 +175,11 @@ export class CreateBooking {
       const now = new Date()
 
       if (bookingStartDate < now) {
-        throw new Error(BookingError.BOOKING_CREATION_BOOKING_START_DATE_INVALID)
+        throw new ApiError(400, BookingError.BOOKING_CREATION_BOOKING_START_DATE_INVALID)
       }
 
       if (bookingEndDate <= bookingStartDate) {
-        throw new Error(BookingError.BOOKING_CREATION_BOOKING_END_DATE_INVALID)
+        throw new ApiError(400, BookingError.BOOKING_CREATION_BOOKING_END_DATE_INVALID)
       }
 
       const duration = differenceInMinutes(bookingEndDate, bookingStartDate)
@@ -197,7 +198,7 @@ export class CreateBooking {
       )
 
       if (isOverlap) {
-        throw new Error(BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION)
+        throw new ApiError(409, BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION)
       }
 
       return bookingRepo.createBooking({

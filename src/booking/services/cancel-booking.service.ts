@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { BookingError } from "@/common/utils/error/booking.error"
 import { BookingStatus } from "@prisma/client"
-import { getDate } from "date-fns"
+import ApiError from "@/common/utils/ApiError.utils"
 
 type cancelBookingSerivceType = {
     bookingId: string,
@@ -9,7 +9,7 @@ type cancelBookingSerivceType = {
 }
 export const cancelBookingSerivce = async( input: cancelBookingSerivceType ) => {
     if(!input.bookingId) {
-        throw new Error(BookingError.BOOKING_VIEW_DETAIL_MISSING_BOOKING_ID)
+        throw new ApiError(400, BookingError.BOOKING_VIEW_DETAIL_MISSING_BOOKING_ID)
     }
 
     const checkBookingId = await prisma.booking.findFirst(
@@ -29,7 +29,7 @@ export const cancelBookingSerivce = async( input: cancelBookingSerivceType ) => 
         
 
     if(!checkBookingId) {
-        throw new Error(BookingError.BOOKING_CANCELLATION_BOOKING_CANNOT_BE_CANCEL)
+        throw new ApiError(400, BookingError.BOOKING_CANCELLATION_BOOKING_CANNOT_BE_CANCEL)
     }
 
     const cancelBooking = await prisma.booking.update(

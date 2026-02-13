@@ -1,16 +1,16 @@
 import { prisma } from "@/lib/prisma"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
 import { StaffError } from "@/common/utils/error/staff.error"
-
-const PAGE_SIZE = 10
+import ApiError from "@/common/utils/ApiError.utils"
+import { DEFAULT_PAGE_SIZE } from "@/common/utils/constraint/pagnition"
 
 export const getStaffListService = async ( page: number) => {
   try {
     const staffRepos = new StaffRepository(prisma)
     const getPage = page ?? 1
-    const skip = (getPage - 1) * PAGE_SIZE
+    const skip = (getPage - 1) * DEFAULT_PAGE_SIZE
 
-    const staffs = await staffRepos.getPagnition(skip, PAGE_SIZE)
+    const staffs = await staffRepos.getPagnition(skip, DEFAULT_PAGE_SIZE)
 
     const total = staffRepos.count()
 
@@ -19,6 +19,6 @@ export const getStaffListService = async ( page: number) => {
       total
     }
   } catch (error) {
-    throw new Error(StaffError.FETCH_STAFF_LIST_ERROR)
+    throw new ApiError(500, StaffError.FETCH_STAFF_LIST_ERROR)
   }
 }
