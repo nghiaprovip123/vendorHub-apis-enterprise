@@ -1,3 +1,4 @@
+scalar DateTime
 input CreateBookingInput { 
   serviceId: String!
   staffId: String                       
@@ -21,15 +22,15 @@ type CreateBookingResponse {
   status: String
   cancelledAt: String
   cancelReason: String
-  createdAt: String
-  updatedAt: String
+  createdAt: DateTime
+  updatedAt: DateTime
   slot: Slot
 }
 
 type Slot {
-  day: String
-  startTime: String
-  endTime: String
+  day: DateTime
+  startTime: DateTime
+  endTime: DateTime
   durationInMinutes: Int
 }
 
