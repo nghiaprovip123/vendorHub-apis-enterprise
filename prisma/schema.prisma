@@ -174,7 +174,7 @@ model Staff {
   bookings          Booking[]
   createdAt         DateTime? @default(now())  // Added
   updatedAt         DateTime? @updatedAt       // Added
-
+  phoneNumber       String?
   @@index([isActive, isDeleted])
 }
 // ======================================================================
