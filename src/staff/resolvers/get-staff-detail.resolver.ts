@@ -1,4 +1,4 @@
-import { GetStaffDetailService } from "@/staff/services/view-staff-detail.service"
+import { GetStaffDetailService } from "@/staff/services/get-staff-detail.service"
 const getStaffDetail = async (
     _: unknown,
     args : { input : any },

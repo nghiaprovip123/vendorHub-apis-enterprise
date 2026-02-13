@@ -4,8 +4,8 @@
 import { CreateStaff } from "../staff/resolvers/create-staff.resolver"
 import { UpdateStaff } from "../staff/resolvers/update-staff.resolver"
 import { DeleteStaff } from "../staff/resolvers/delete-staff.resolver"
-import { ViewStaffList } from "../staff/resolvers/view-staff-list.resolver"
-import { GetStaffDetail } from "../staff/resolvers/view-staff-detail.resolver"
+import { ViewStaffList } from "../staff/resolvers/get-staff-list.resolver"
+import { GetStaffDetail } from "../staff/resolvers/get-staff-detail.resolver"
 
 
 // ██████████████████████████████████████████████████████████████████████
@@ -15,7 +15,7 @@ import { GetAvailableStaff } from "../staff/resolvers/get-available-staff.resolv
 import { CreateBookingResolver } from "../booking/resolvers/create-booking.resolver"
 import { AssignStaffByBookingRequest } from "../booking/resolvers/assign-staff.resolver"
 import { CancelBooking } from "../booking/resolvers/cancel-booking.resolver"
-import { ViewBookingDetail } from "../booking/resolvers/view-booking-detail.resolver"
+import { ViewBookingDetail } from "../booking/resolvers/get-booking-detail.resolver"
 import { GetBookingList } from "../booking/resolvers/get-booking-list.resolver"
 import { bookingSubscription } from '@/booking/subscription/booking.subscription'
 

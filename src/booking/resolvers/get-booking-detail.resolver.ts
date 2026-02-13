@@ -1,4 +1,4 @@
-import { viewBookingDetailService } from "@/booking/services/view-booking-detail.service"
+import { viewBookingDetailService } from "@/booking/services/get-booking-detail.service"
 const viewBookingDetail = async(
     _: unknown,
     args: { input: any },

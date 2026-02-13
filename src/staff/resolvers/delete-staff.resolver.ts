@@ -1,4 +1,4 @@
-import { deleteStaffService } from "@/staff/services/delete-stafff.service"
+import { deleteStaffService } from "@/staff/services/delete-staff.service"
 
 const deleteStaff = async (
   _: unknown,
