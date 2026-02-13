@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createPasswordService = exports.CreatePasswordService = void 0;
 const identifier_type_enum_1 = require("../../auth/enum/identifier-type.enum");
-const veirfy_otp_type_enum_1 = require("../../auth/enum/veirfy-otp-type.enum");
+const verify_otp_type_enum_1 = require("../../auth/enum/verify-otp-type.enum");
 const postgresQL_1 = __importDefault(require("../../lib/postgresQL"));
 const password_utils_1 = require("../../common/utils/password.utils");
 const identifiers_repository_1 = require("../../auth/repositories/identifiers.repository");
@@ -43,7 +43,7 @@ class CreatePasswordService {
         if (!user) {
             throw new Error("KHÔNG TÌM THẤY USER");
         }
-        if (purpose !== veirfy_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD) {
+        if (purpose !== verify_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD) {
             throw new Error("TOKEN KHÔNG CÓ HIỆU LỰC Ở API NÀY");
         }
         const hashPassword = await password_utils_1.PasswordUtilities.hashPassword(password);

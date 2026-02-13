@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateServiceService = void 0;
 const prisma_1 = require("../../lib/prisma");
@@ -6,6 +9,7 @@ const service_error_1 = require("../../common/utils/error/service.error");
 const cloudinary_orchestration_utils_1 = require("../../common/utils/cloudinary-orchestration.utils");
 const service_media_repository_1 = require("../../service/repositories/service-media.repository");
 const service_repository_1 = require("../../service/repositories/service.repository");
+const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
 const UpdateServiceService = async (input) => {
     const { id, categoryId, name, description, currency, displayPrice, duration, price, isVisible, medias = [] } = input;
     const service = await prisma_1.prisma.$transaction(async (tx) => {
@@ -13,7 +17,7 @@ const UpdateServiceService = async (input) => {
         const serviceRepo = new service_repository_1.ServiceRepository(tx);
         const findUpdatedService = await serviceRepo.findById(id);
         if (!findUpdatedService) {
-            throw new Error(service_error_1.ServiceError.SERVICE_IS_NOT_EXIST);
+            throw new ApiError_utils_1.default(404, service_error_1.ServiceError.SERVICE_IS_NOT_EXIST);
         }
         await serviceMediaRepo.deleteByServiceId(findUpdatedService.id);
         if (medias && medias.length > 0) {
@@ -39,7 +43,7 @@ const UpdateServiceService = async (input) => {
                 };
             }));
             if (!uploadImage) {
-                throw new Error(service_error_1.ServiceError.SERVICE_MEDIA_UPLOAD_ERROR);
+                throw new ApiError_utils_1.default(400, service_error_1.ServiceError.SERVICE_MEDIA_UPLOAD_ERROR);
             }
             await serviceMediaRepo.createMany(uploadImage);
         }
@@ -72,11 +76,11 @@ const UpdateServiceService = async (input) => {
             data: updateData
         });
         if (!updatedService) {
-            throw new Error(service_error_1.ServiceError.SERVICE_PRISMA_ERROR);
+            throw new ApiError_utils_1.default(500, service_error_1.ServiceError.SERVICE_PRISMA_ERROR);
         }
         const serviceWithMedias = await serviceRepo.findWithMedias(findUpdatedService.id);
         if (!serviceWithMedias) {
-            throw new Error('Failed to fetch created service');
+            throw new ApiError_utils_1.default(500, 'Failed to fetch created service');
         }
         return { service: serviceWithMedias };
     });

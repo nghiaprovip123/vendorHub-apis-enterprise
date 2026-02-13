@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateServiceService = void 0;
 const prisma_1 = require("../../lib/prisma");
@@ -6,6 +9,7 @@ const cloudinary_orchestration_utils_1 = require("../../common/utils/cloudinary-
 const service_error_1 = require("../../common/utils/error/service.error");
 const service_repository_1 = require("../../service/repositories/service.repository");
 const service_media_repository_1 = require("../../service/repositories/service-media.repository");
+const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
 const CreateServiceService = async (input) => {
     const { categoryId, name, description, currency = "VND", displayPrice, duration, price, isVisible, medias = [] } = input;
     const service = await prisma_1.prisma.$transaction(async (tx) => {
@@ -34,7 +38,7 @@ const CreateServiceService = async (input) => {
                 };
             }));
             if (!uploadMedias) {
-                throw new Error(service_error_1.ServiceError.SERVICE_MEDIA_UPLOAD_ERROR);
+                throw new ApiError_utils_1.default(500, service_error_1.ServiceError.SERVICE_MEDIA_UPLOAD_ERROR);
             }
             await serviceMediaRepo.createMany(uploadMedias);
         }
@@ -47,7 +51,7 @@ const CreateServiceService = async (input) => {
             }
         });
         if (!serviceWithMedias) {
-            throw new Error('Failed to fetch created service');
+            throw new ApiError_utils_1.default(500, 'Failed to fetch created service');
         }
         return { service: serviceWithMedias };
     });

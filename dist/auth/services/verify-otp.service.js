@@ -7,7 +7,7 @@ exports.verifyOTPService = exports.VerifyOTPService = void 0;
 const postgresQL_1 = __importDefault(require("../../lib/postgresQL"));
 const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
 const index_jwt_1 = require("../../common/jwt/index.jwt");
-const veirfy_otp_type_enum_1 = require("../../auth/enum/veirfy-otp-type.enum");
+const verify_otp_type_enum_1 = require("../../auth/enum/verify-otp-type.enum");
 const identifier_type_enum_1 = require("../../auth/enum/identifier-type.enum");
 const otp_repository_1 = require("../../auth/repositories/otp.repository");
 const identifiers_repository_1 = require("../../auth/repositories/identifiers.repository");
@@ -18,7 +18,7 @@ class VerifyOTPService {
             const otpRepo = new otp_repository_1.OTPRepository(tx);
             const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(tx);
             const authenticationUserRepository = new auth_user_repository_1.AuthenticationUserRepository(tx);
-            const otpRow = await otpRepo.findOTPForVerification(otp, email, veirfy_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_REGISTERATION);
+            const otpRow = await otpRepo.findOTPForVerification(otp, email, verify_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_REGISTERATION);
             if (!otpRow) {
                 throw new ApiError_utils_1.default(400, 'OTP KHÔNG HỢP LỆ HOẶC ĐÃ HẾT HẠN');
             }
@@ -53,7 +53,7 @@ class VerifyOTPService {
         const result = await postgresQL_1.default.begin(async (tx) => {
             const otpRepo = new otp_repository_1.OTPRepository(tx);
             const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(tx);
-            const otpRow = await otpRepo.findOTPForVerification(otp, email, veirfy_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD);
+            const otpRow = await otpRepo.findOTPForVerification(otp, email, verify_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD);
             if (!otpRow) {
                 throw new ApiError_utils_1.default(401, 'OTP KHÔNG HỢP LỆ HOẶC ĐÃ HẾT HẠN');
             }
@@ -68,7 +68,7 @@ class VerifyOTPService {
         });
         const resetToken = index_jwt_1.jwtService.generateResetToken({
             sub: result.authUserId,
-            purpose: veirfy_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD,
+            purpose: verify_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD,
             jti: index_jwt_1.jwtService.generateJit()
         }, 150);
         return { resetToken };

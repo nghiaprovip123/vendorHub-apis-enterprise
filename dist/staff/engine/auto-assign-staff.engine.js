@@ -1,15 +1,21 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssignStaffEngine = void 0;
 const prisma_1 = require("../../lib/prisma");
 const date_standard_utils_1 = require("../../common/utils/date-standard.utils");
 const client_1 = require("@prisma/client");
+const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
+const booking_error_1 = require("../../common/utils/error/booking.error");
+const staff_error_1 = require("../../common/utils/error/staff.error");
 const AssignStaffEngine = async (input) => {
     const booking = await prisma_1.prisma.booking.findUnique({
         where: { id: input.bookingId }
     });
     if (!booking) {
-        throw new Error("BOOKING_NOT_FOUND");
+        throw new ApiError_utils_1.default(404, booking_error_1.BookingError.BOOKING_VIEW_DETAIL_BOOKING_NOT_EXISTS);
     }
     if (booking.status !== client_1.BookingStatus.PENDING) {
         return booking;
@@ -60,7 +66,7 @@ const AssignStaffEngine = async (input) => {
     });
     console.log(candidateStaff);
     if (candidateStaff.length === 0) {
-        throw new Error("NO_AVAILABLE_STAFF");
+        throw new ApiError_utils_1.default(404, staff_error_1.StaffError.NOT_FOUND_STAFF_ERROR);
     }
     const staffIds = candidateStaff.map(s => s.id);
     const workloads = await prisma_1.prisma.booking.groupBy({
@@ -123,7 +129,7 @@ const AssignStaffEngine = async (input) => {
                     }
                 });
                 if (conflict) {
-                    throw new Error("STAFF_CONFLICT");
+                    throw new ApiError_utils_1.default(404, "STAFF_CONFLICT");
                 }
                 return tx.booking.update({
                     where: { id: input.bookingId },
@@ -142,6 +148,6 @@ const AssignStaffEngine = async (input) => {
             throw err;
         }
     }
-    throw new Error("NO_STAFF_ASSIGNABLE_AFTER_RETRY");
+    throw new ApiError_utils_1.default(404, "NO_STAFF_ASSIGNABLE_AFTER_RETRY");
 };
 exports.AssignStaffEngine = AssignStaffEngine;

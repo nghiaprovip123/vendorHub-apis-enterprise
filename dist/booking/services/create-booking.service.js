@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateBooking = exports.VN_TIMEZONE = void 0;
 const prisma_1 = require("../../lib/prisma");
@@ -11,6 +14,7 @@ const client_1 = require("@prisma/client");
 const staff_repository_1 = require("../../staff/repositories/staff.repository");
 const send_otp_helper_utils_1 = require("../../common/utils/send-otp-helper.utils");
 const send_otp_helper_utils_2 = require("../../common/utils/send-otp-helper.utils");
+const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils")); // Import ApiError
 exports.VN_TIMEZONE = "Asia/Ho_Chi_Minh";
 function vnToUtc(dateTime) {
     return (0, date_fns_tz_1.fromZonedTime)(dateTime, exports.VN_TIMEZONE);
@@ -19,10 +23,10 @@ class CreateBooking {
     static async createBookingByCustomer(input) {
         const { serviceId, staffId, day, startTime, endTime, customerName, customerPhone, customerEmail, notes, } = input;
         if (!serviceId) {
-            throw new Error(booking_error_1.BookingError.BOOKING_CREATION_MISSING_SERVICE_INFORMATION);
+            throw new ApiError_utils_1.default(400, booking_error_1.BookingError.BOOKING_CREATION_MISSING_SERVICE_INFORMATION);
         }
         if (!customerName || !customerPhone || !customerEmail) {
-            throw new Error(booking_error_1.BookingError.BOOKING_CREATION_MISSING_CUSTOMER_INFORMATION);
+            throw new ApiError_utils_1.default(400, booking_error_1.BookingError.BOOKING_CREATION_MISSING_CUSTOMER_INFORMATION);
         }
         return prisma_1.prisma.$transaction(async (tx) => {
             const serviceRepo = new service_repository_1.ServiceRepository(tx);
@@ -30,22 +34,22 @@ class CreateBooking {
             const staffRepo = new staff_repository_1.StaffRepository(tx);
             const service = await serviceRepo.findAvailableService(serviceId);
             if (!service) {
-                throw new Error(booking_error_1.BookingError.BOOKING_CREATION_SERVICE_NOT_AVAILABLE);
+                throw new ApiError_utils_1.default(404, booking_error_1.BookingError.BOOKING_CREATION_SERVICE_NOT_AVAILABLE);
             }
             const bookingStartDate = vnToUtc(`${day}T${startTime}`);
             const bookingEndDate = vnToUtc(`${day}T${endTime}`);
             const bookingDate = vnToUtc(`${day}T00:00:00`);
             const now = new Date();
             if (bookingStartDate < now) {
-                throw new Error(booking_error_1.BookingError.BOOKING_CREATION_BOOKING_START_DATE_INVALID);
+                throw new ApiError_utils_1.default(400, booking_error_1.BookingError.BOOKING_CREATION_BOOKING_START_DATE_INVALID);
             }
             if (bookingEndDate <= bookingStartDate) {
-                throw new Error(booking_error_1.BookingError.BOOKING_CREATION_BOOKING_END_DATE_INVALID);
+                throw new ApiError_utils_1.default(400, booking_error_1.BookingError.BOOKING_CREATION_BOOKING_END_DATE_INVALID);
             }
             const duration = (0, date_fns_1.differenceInMinutes)(bookingEndDate, bookingStartDate);
             const isOverlap = await bookingRepo.checkOverlapWorkingHour(bookingStartDate, bookingEndDate, staffId, [client_1.BookingStatus.PENDING, client_1.BookingStatus.CONFIRMED, client_1.BookingStatus.UPCOMMING, client_1.BookingStatus.IN_PROGRESS]);
             if (isOverlap) {
-                throw new Error(booking_error_1.BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION);
+                throw new ApiError_utils_1.default(409, booking_error_1.BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION);
             }
             if (!staffId) {
                 const bookingData = {
@@ -107,7 +111,7 @@ class CreateBooking {
     static async createBookingInBackOffice(input) {
         const { serviceId, staffId, day, startTime, endTime, customerName, customerEmail, customerPhone, } = input;
         if (!serviceId || !staffId) {
-            throw new Error(booking_error_1.BookingError.BOOKING_CREATION_MISSING_SERVICE_INFORMATION);
+            throw new ApiError_utils_1.default(400, booking_error_1.BookingError.BOOKING_CREATION_MISSING_SERVICE_INFORMATION);
         }
         return prisma_1.prisma.$transaction(async (tx) => {
             const serviceRepo = new service_repository_1.ServiceRepository(tx);
@@ -115,21 +119,21 @@ class CreateBooking {
             const staffRepo = new staff_repository_1.StaffRepository(tx);
             const service = await serviceRepo.findAvailableService(serviceId);
             if (!service) {
-                throw new Error(booking_error_1.BookingError.BOOKING_CREATION_SERVICE_NOT_AVAILABLE);
+                throw new ApiError_utils_1.default(404, booking_error_1.BookingError.BOOKING_CREATION_SERVICE_NOT_AVAILABLE);
             }
             const staff = await staffRepo.findById(staffId);
             if (!staff) {
-                throw new Error(booking_error_1.BookingError.BOOKING_CREATION_STAFF_NOT_AVAILABLE);
+                throw new ApiError_utils_1.default(404, booking_error_1.BookingError.BOOKING_CREATION_STAFF_NOT_AVAILABLE);
             }
             const bookingStartDate = vnToUtc(`${day}T${startTime}`);
             const bookingEndDate = vnToUtc(`${day}T${endTime}`);
             const bookingDate = vnToUtc(`${day}T00:00:00`);
             const now = new Date();
             if (bookingStartDate < now) {
-                throw new Error(booking_error_1.BookingError.BOOKING_CREATION_BOOKING_START_DATE_INVALID);
+                throw new ApiError_utils_1.default(400, booking_error_1.BookingError.BOOKING_CREATION_BOOKING_START_DATE_INVALID);
             }
             if (bookingEndDate <= bookingStartDate) {
-                throw new Error(booking_error_1.BookingError.BOOKING_CREATION_BOOKING_END_DATE_INVALID);
+                throw new ApiError_utils_1.default(400, booking_error_1.BookingError.BOOKING_CREATION_BOOKING_END_DATE_INVALID);
             }
             const duration = (0, date_fns_1.differenceInMinutes)(bookingEndDate, bookingStartDate);
             const isOverlap = await bookingRepo.checkOverlapWorkingHour(bookingStartDate, bookingEndDate, staffId, [
@@ -140,7 +144,7 @@ class CreateBooking {
                 client_1.BookingStatus.UPCOMMING,
             ]);
             if (isOverlap) {
-                throw new Error(booking_error_1.BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION);
+                throw new ApiError_utils_1.default(409, booking_error_1.BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION);
             }
             return bookingRepo.createBooking({
                 serviceId,

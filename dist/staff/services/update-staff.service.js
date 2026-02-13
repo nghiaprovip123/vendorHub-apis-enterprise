@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateStaffService = void 0;
 const prisma_1 = require("../../lib/prisma");
@@ -9,12 +12,13 @@ const staff_error_1 = require("../../common/utils/error/staff.error");
 const service_repository_1 = require("../../service/repositories/service.repository");
 const service_error_1 = require("../../common/utils/error/service.error");
 const staff_service_repository_1 = require("../../staff/repositories/staff-service.repository");
+const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
 const updateStaffService = async (input) => {
     const existingStaff = await prisma_1.prisma.staff.findUnique({
         where: { id: input.id }
     });
     if (!existingStaff) {
-        throw new Error(staff_error_1.StaffError.NOT_FOUND_STAFF_ERROR);
+        throw new ApiError_utils_1.default(204, staff_error_1.StaffError.NOT_FOUND_STAFF_ERROR);
     }
     let avatar_url = existingStaff.avatar_url || undefined;
     let avatar_public_id = existingStaff.avatar_public_id || undefined;
@@ -48,7 +52,7 @@ const updateStaffService = async (input) => {
             }
         }
         catch (error) {
-            throw new Error('Failed to upload avatar image');
+            throw new ApiError_utils_1.default(400, 'Failed to upload avatar image');
         }
     }
     const result = await prisma_1.prisma.$transaction(async (tx) => {
@@ -74,7 +78,7 @@ const updateStaffService = async (input) => {
             if (input.services.length > 0) {
                 const validServices = await serviceRepo.findManyExistingService(input.services);
                 if (validServices.length !== input.services.length) {
-                    throw new Error(service_error_1.ServiceError.SERVICE_IS_NOT_EXIST);
+                    throw new ApiError_utils_1.default(400, service_error_1.ServiceError.SERVICE_IS_NOT_EXIST);
                 }
             }
             await staffServiceRepo.deleteManyByStaffId(staff.id);
