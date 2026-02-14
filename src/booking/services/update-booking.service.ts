@@ -5,6 +5,7 @@ import { UpdateBookingDto } from "@/booking/dto/booking.validation"
 import ApiError from "@/common/utils/ApiError.utils"
 import { BookingError } from "@/common/utils/error/booking.error"
 import { fromZonedTime } from "date-fns-tz"
+import { BookingRepository } from "@/booking/repositories/booking.repository"
 
 
 type updateBookingInput = z.infer< typeof UpdateBookingDto >
@@ -29,89 +30,86 @@ export const updateBookingService = async (
         customerEmail,
         notes
     } = input
+    const service = await prisma.$transaction(
+        async (tx) => {
+            const bookingRepo = new BookingRepository(tx)
+            const bookingStartDate = vnToUtc(`${day}T${startTime}`)
+            const bookingEndDate = vnToUtc(`${day}T${endTime}`)
+            const bookingDate = vnToUtc(`${day}T00:00:00`)
+            const findExistingBooking = await bookingRepo.findBookingById(id)
 
-
-    const bookingStartDate = vnToUtc(`${day}T${startTime}`)
-    const bookingEndDate = vnToUtc(`${day}T${endTime}`)
-    const bookingDate = vnToUtc(`${day}T00:00:00`)
-    const findExistingBooking = await prisma.booking.findUnique(
-        {
-            where : { 
-                id : id
-             }
+            if (!findExistingBooking) {
+                throw new ApiError(400, BookingError.BOOKING_VIEW_DETAIL_BOOKING_NOT_EXISTS)
+            }
+        
+            if (
+                findExistingBooking.status === BookingStatus.NO_SHOW
+                || findExistingBooking.status === BookingStatus.COMPLETED
+                || findExistingBooking.status === BookingStatus.IN_PROGRESS
+            ) {
+                throw new ApiError(400, 'Invalidation for Booking')
+            }
+        
+            const update : Prisma.BookingUpdateInput = {}
+                if (serviceId !== undefined) {
+                    update.bookingService = {
+                        connect : {
+                            id : serviceId
+                        }
+                    }
+                }
+                if (customerName !== undefined) {
+                    update.customerName = customerName
+                }
+                if (customerEmail !== undefined) {
+                    update.customerEmail = customerEmail
+                }
+                if (customerPhone !== undefined) {
+                    update.customerPhone = customerPhone
+                }
+                if (notes !== undefined) {
+                    update.notes = notes
+                }
+                if (staffId !== undefined) {
+                    update.bookingStaff = {
+                        connect : {
+                            id : staffId
+                        }
+                    }
+                }
+        
+                if (
+                    day !== undefined ||
+                    startTime !== undefined ||
+                    endTime !== undefined
+                ) {
+                    let updateSlot : any = {}
+                    if (day !== undefined) {
+                        updateSlot.day = bookingDate
+                    } 
+                    if (startTime !== undefined) {
+                        updateSlot.startTime = bookingStartDate
+                    } 
+                    if (endTime !== undefined) {
+                        updateSlot.endTime = bookingEndDate
+                    }
+        
+                    update.slot = {
+                        update : updateSlot
+                    }
+                }
+        
+            const updateBooking = await tx.booking.update(
+                {
+                    where : {
+                        id : id
+                    },
+                    data : update
+                }
+            )
+        
+            return updateBooking
         }
     )
-
-    if (!findExistingBooking) {
-        throw new ApiError(400, BookingError.BOOKING_VIEW_DETAIL_BOOKING_NOT_EXISTS)
-    }
-
-    if (
-        findExistingBooking.status === BookingStatus.NO_SHOW
-        || findExistingBooking.status === BookingStatus.COMPLETED
-        || findExistingBooking.status === BookingStatus.IN_PROGRESS
-    ) {
-        throw new ApiError(400, 'Invalidation for Booking')
-    }
-
-    const update : Prisma.BookingUpdateInput = {}
-        if (serviceId !== undefined) {
-            update.bookingService = {
-                connect : {
-                    id : serviceId
-                }
-            }
-        }
-        if (customerName !== undefined) {
-            update.customerName = customerName
-        }
-        if (customerEmail !== undefined) {
-            update.customerEmail = customerEmail
-        }
-        if (customerPhone !== undefined) {
-            update.customerPhone = customerPhone
-        }
-        if (notes !== undefined) {
-            update.notes = notes
-        }
-        if (staffId !== undefined) {
-            update.bookingStaff = {
-                connect : {
-                    id : staffId
-                }
-            }
-        }
-
-        if (
-            day !== undefined ||
-            startTime !== undefined ||
-            endTime !== undefined
-        ) {
-            let updateSlot : any = {}
-            if (day !== undefined) {
-                updateSlot.day = bookingDate
-            } 
-            if (startTime !== undefined) {
-                updateSlot.startTime = bookingStartDate
-            } 
-            if (endTime !== undefined) {
-                updateSlot.endTime = bookingEndDate
-            }
-
-            update.slot = {
-                update : updateSlot
-            }
-        }
-
-    
-    const updateBooking = await prisma.booking.update(
-        {
-            where : {
-                id : id
-            },
-            data : update
-        }
-    )
-
-    return updateBooking
+    return service
 }
