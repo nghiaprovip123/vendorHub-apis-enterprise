@@ -6,6 +6,7 @@ import ApiError from "@/common/utils/ApiError.utils"
 import { BookingError } from "@/common/utils/error/booking.error"
 import { fromZonedTime } from "date-fns-tz"
 import { BookingRepository } from "@/booking/repositories/booking.repository"
+import { differenceInMinutes } from "date-fns"
 
 
 type updateBookingInput = z.infer< typeof UpdateBookingDto >
@@ -36,6 +37,8 @@ export const updateBookingService = async (
             const bookingStartDate = vnToUtc(`${day}T${startTime}`)
             const bookingEndDate = vnToUtc(`${day}T${endTime}`)
             const bookingDate = vnToUtc(`${day}T00:00:00`)
+            const duration = differenceInMinutes(bookingEndDate, bookingStartDate)
+
             const findExistingBooking = await bookingRepo.findBookingById(id)
 
             if (!findExistingBooking) {
@@ -47,7 +50,18 @@ export const updateBookingService = async (
                 || findExistingBooking.status === BookingStatus.COMPLETED
                 || findExistingBooking.status === BookingStatus.IN_PROGRESS
             ) {
-                throw new ApiError(400, 'Invalidation for Booking')
+                throw new ApiError(400, 'Invalidation for Updating Booking')
+            }
+
+            const isBookingOverlap = await bookingRepo.checkOverlapWorkingHour(
+                bookingStartDate,
+                bookingEndDate,
+                findExistingBooking.staffId || undefined,
+                [BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.UPCOMMING, BookingStatus.IN_PROGRESS]
+            )
+            console.log(isBookingOverlap)
+            if (isBookingOverlap) {
+                throw new ApiError(400, 'Overlap Booking')
             }
         
             const update : Prisma.BookingUpdateInput = {}
@@ -93,6 +107,7 @@ export const updateBookingService = async (
                     if (endTime !== undefined) {
                         updateSlot.endTime = bookingEndDate
                     }
+                    updateSlot.durationInMinutes = duration
         
                     update.slot = {
                         update : updateSlot
