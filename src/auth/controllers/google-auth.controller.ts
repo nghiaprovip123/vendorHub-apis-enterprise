@@ -24,10 +24,7 @@ export const GoogleOAuthCallbackController = async (
 
     res.cookie("refreshToken", refreshToken, optionsCookie);
 
-    return res.status(200).json({
-      success: true,
-      accessToken,
-    });
+    return res.redirect(process.env.FRONTEND_URL!)
   } catch (err) {
     next(err);
   }
