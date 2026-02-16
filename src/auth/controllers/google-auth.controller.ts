@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { optionsCookie } from "@/common/utils/cookie.utils";
 import { GoogleCallbackAuthService } from "@/auth/services/google-auth.service";
+import { access } from "node:fs";
 
 
 export const GoogleOAuthCallbackController = async (
@@ -22,9 +22,12 @@ export const GoogleOAuthCallbackController = async (
         userAgent,
       });
 
-    res.cookie("refreshToken", refreshToken, optionsCookie);
+    // ✅ FIX: Truyền tokens qua URL params để FE tự set cookie
+    // Dùng encodeURIComponent để encode special characters trong token
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+    const redirectUrl = `${frontendUrl}/auth/callback?accessToken=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`;
 
-    return res.redirect(process.env.FRONTEND_URL!)
+    return res.redirect(redirectUrl);
   } catch (err) {
     next(err);
   }

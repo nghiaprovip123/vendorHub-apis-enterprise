@@ -1,10 +1,10 @@
 export const optionsCookie = {
   httpOnly: true,
-  secure: false,             // dev HTTP
+  secure: false,             
   sameSite: 'lax' as const,
-  domain: '.vh.local',       // QUAN TRỌNG
   path: '/',
   maxAge: 7 * 24 * 60 * 60 * 1000,
+  domain: 'vh.local'
 } as const;
 
 export const optionsRevokedCookie = {

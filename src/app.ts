@@ -67,9 +67,9 @@ dotenv.config();
         description: string
     }
     app.use(cors({
-      origin: true, // hoặc '*'
+      origin: true,
       credentials: true,
-    }));
+    }));    
     
     const schema = makeExecutableSchema({ typeDefs, resolvers: resolvers });
 
