@@ -99,6 +99,7 @@ dotenv.config();
     });
 
     await server.start();
+    
     app.use(
         graphqlUploadExpress({
           maxFileSize: 5_000_000,
@@ -106,6 +107,9 @@ dotenv.config();
         })
       )
     app.use('/auth', apiLimiter, AuthRouter)
+    app.get("/health", (req, res) => {
+      res.status(200).send("OK");
+    });
     app.use('/graphql', cors(), bodyParser.json(), expressMiddleware(server, {
         context: async ({ req, res }: any) => {
             const contextLogger = createContextLogger({
