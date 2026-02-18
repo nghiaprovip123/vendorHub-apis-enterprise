@@ -4,9 +4,10 @@ exports.optionsRevokedCookie = exports.optionsCookie = void 0;
 exports.optionsCookie = {
     httpOnly: true,
     secure: false,
-    sameSite: 'strict',
+    sameSite: 'lax',
     path: '/',
     maxAge: 7 * 24 * 60 * 60 * 1000,
+    domain: 'vh.local'
 };
 exports.optionsRevokedCookie = {
     httpOnly: true,

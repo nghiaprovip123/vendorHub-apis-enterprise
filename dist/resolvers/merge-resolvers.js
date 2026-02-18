@@ -19,6 +19,7 @@ const cancel_booking_resolver_1 = require("../booking/resolvers/cancel-booking.r
 const get_booking_detail_resolver_1 = require("../booking/resolvers/get-booking-detail.resolver");
 const get_booking_list_resolver_1 = require("../booking/resolvers/get-booking-list.resolver");
 const booking_subscription_1 = require("../booking/subscription/booking.subscription");
+const update_booking_resolver_1 = require("../booking/resolvers/update-booking.resolver");
 // ██████████████████████████████████████████████████████████████████████
 // █                           SERVICE DOMAIN                           █
 // ██████████████████████████████████████████████████████████████████████
@@ -46,6 +47,7 @@ exports.resolvers = [
     get_booking_detail_resolver_1.ViewBookingDetail,
     get_booking_list_resolver_1.GetBookingList,
     booking_subscription_1.bookingSubscription,
+    update_booking_resolver_1.UpdateBooking,
     // ──────────────────────── SERVICE ────────────────────────
     create_service_resolver_1.CreateService,
     view_service_list_resolver_1.ViewServiceList,

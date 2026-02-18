@@ -23,6 +23,7 @@ type Staff {
   timezone: String!
   isActive: Boolean!
   isDeleted: Boolean!
+  phoneNumber: String!
   workingHours: [WorkingHour!]!
   createdAt: DateTime
   updatedAt: DateTime
@@ -52,6 +53,7 @@ input CreateStaffInput {
   timezone: String! 
   isActive: Boolean
   isDeleted: Boolean
+  phoneNumber: String!
   workingHours: [WorkingHourInput!]!
   services: [ID!]!
 }
@@ -63,6 +65,7 @@ input UpdateStaffInput {
   timezone: String
   isActive: Boolean
   isDeleted: Boolean
+  phoneNumber: String
   workingHours: [WorkingHourInput]
   services: [ID]
 

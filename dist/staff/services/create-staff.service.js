@@ -20,6 +20,7 @@ const createStaffService = async (input) => {
             timezone: input.timezone,
             isActive: input.isActive ?? true,
             isDeleted: false,
+            phoneNumber: input.phoneNumber
         });
         if (input.avatar) {
             const file = await input.avatar;

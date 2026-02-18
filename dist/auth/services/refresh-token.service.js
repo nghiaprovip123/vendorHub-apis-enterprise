@@ -24,7 +24,9 @@ class RefreshTokenService {
             if (!session) {
                 throw new Error("KHÔNG TÌM THẤY SESSION REFRESH TOKEN");
             }
+            console.log(session);
             const isValid = await argon2_1.default.verify(session.refreshtokenhash, refreshToken);
+            console.log(isValid);
             if (!isValid) {
                 throw new Error("REFRESH TOKEN KHÔNG HỢP LỆ");
             }

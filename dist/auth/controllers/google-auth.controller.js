@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GoogleOAuthCallbackController = void 0;
-const cookie_utils_1 = require("../../common/utils/cookie.utils");
 const google_auth_service_1 = require("../../auth/services/google-auth.service");
 const GoogleOAuthCallbackController = async (req, res, next) => {
     try {
@@ -14,11 +13,11 @@ const GoogleOAuthCallbackController = async (req, res, next) => {
             code,
             userAgent,
         });
-        res.cookie("refreshToken", refreshToken, cookie_utils_1.optionsCookie);
-        return res.status(200).json({
-            success: true,
-            accessToken,
-        });
+        // ✅ FIX: Truyền tokens qua URL params để FE tự set cookie
+        // Dùng encodeURIComponent để encode special characters trong token
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+        const redirectUrl = `${frontendUrl}/auth/callback?accessToken=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`;
+        return res.redirect(redirectUrl);
     }
     catch (err) {
         next(err);

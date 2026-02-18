@@ -73,6 +73,8 @@ const updateStaffService = async (input) => {
             updateData.avatar_url = avatar_url;
         if (avatar_public_id !== undefined)
             updateData.avatar_public_id = avatar_public_id;
+        if (input.phoneNumber !== undefined)
+            updateData.phoneNumber = input.phoneNumber;
         const staff = await staffRepos.updateById(input.id, updateData);
         if (input.services !== undefined) {
             if (input.services.length > 0) {

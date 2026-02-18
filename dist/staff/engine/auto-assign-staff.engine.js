@@ -25,7 +25,7 @@ const AssignStaffEngine = async (input) => {
     }
     const workingStart = date_standard_utils_1.DateTimeStandardizer.toHHmm(input.slot.startTime);
     const workingEnd = date_standard_utils_1.DateTimeStandardizer.toHHmm(input.slot.endTime);
-    const dayOfWeek = input.slot.day.getDay();
+    const dayOfWeek = input.slot.day.getUTCDay();
     const candidateStaff = await prisma_1.prisma.staff.findMany({
         where: {
             isActive: true,

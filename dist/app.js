@@ -25,7 +25,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const rate_limiter_1 = require("./common/guards/rate-limiter");
 const pubsub_1 = require("./pubsub/pubsub");
 const booking_cron_1 = require("./booking/cron/booking.cron");
-const redis_1 = require("./lib/redis");
+// import redisClient, { connectRedis, disconnectRedis } from './lib/redis';
 dotenv_1.default.config();
 (async function () {
     const PORT = Number(process.env.PORT) || 3000;
@@ -38,7 +38,7 @@ dotenv_1.default.config();
         next();
     });
     morgan_1.default.token('request-id', (req) => req.id);
-    await (0, redis_1.connectRedis)();
+    // await connectRedis();
     app.use((0, morgan_1.default)((tokens, req, res) => {
         return JSON.stringify({
             type: 'http_access',
@@ -60,7 +60,7 @@ dotenv_1.default.config();
     }));
     const httpServer = (0, http_1.createServer)(app);
     app.use((0, cors_1.default)({
-        origin: true, // hoặc '*'
+        origin: true,
         credentials: true,
     }));
     const schema = (0, schema_1.makeExecutableSchema)({ typeDefs: typeDefs_1.typeDefs, resolvers: merge_resolvers_1.resolvers });

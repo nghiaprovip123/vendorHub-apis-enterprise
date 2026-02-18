@@ -1,3 +1,4 @@
+scalar DateTime
 input CreateBookingInput { 
   serviceId: String!
   staffId: String                       
@@ -8,6 +9,19 @@ input CreateBookingInput {
   customerPhone: String!
   customerEmail: String!
   notes: String!
+}
+
+input UpdateBookingInput {
+  id: ID!
+  serviceId: String
+  staffId: String                       
+  day: String
+  startTime: String
+  endTime: String
+  customerName: String
+  customerPhone: String
+  customerEmail: String
+  notes: String
 }
 
 type CreateBookingResponse {
@@ -21,15 +35,15 @@ type CreateBookingResponse {
   status: String
   cancelledAt: String
   cancelReason: String
-  createdAt: String
-  updatedAt: String
+  createdAt: DateTime
+  updatedAt: DateTime
   slot: Slot
 }
 
 type Slot {
-  day: String
-  startTime: String
-  endTime: String
+  day: DateTime
+  startTime: DateTime
+  endTime: DateTime
   durationInMinutes: Int
 }
 
@@ -74,6 +88,7 @@ type Mutation {
   createBookingInBackOffice(input: CreateBookingInput): CreateBookingResponse
   assignStaffByBookingRequest(input: AssignStaffForBookingRequestInput): AssignStaffForBookingRequestResponse
   cancelBooking(input: CancelBookingInput): CancelBookingResponse
+  updateBooking(input: UpdateBookingInput): CreateBookingResponse
 }
 
 type Query {
