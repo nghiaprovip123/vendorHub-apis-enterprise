@@ -102,7 +102,10 @@ type ViewServiceListResponse {
   items: [Service]
   total: Int
 }
-#####################################DELETE SERVICE RESPONSE##############################
+#####################################VIEW ALL OF SERVICE RESPONSE##############################
+type ViewAllServiceResponse {
+  items: [Service]
+}#####################################DELETE SERVICE RESPONSE##############################
 type ViewServiceListResponse {
   success: Boolean!
   message: String!
@@ -123,4 +126,5 @@ extend type Query {
   viewServiceList(input: ViewServiceListInput!): ViewServiceListResponse!
   viewServiceDetail(input: ViewServiceDetailInput!): ServiceResponse!
   viewCategoryList: ViewCategoryListResponse!
+  viewAllService: ViewAllServiceResponse!
 }

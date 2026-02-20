@@ -30,6 +30,7 @@ import { UpdateService } from "../service/resolvers/update-service.resolver"
 import { ViewServiceDetail } from "../service/resolvers/view-service-detail.resolver"
 import { DeleteService } from "../service/resolvers/delete-service.resolver"
 import { ViewCategoryList } from "../service/resolvers/view-category-list.resolver"
+import { ViewAllService } from "../service/resolvers/view-all-service.resolver"
 
 // ══════════════════════════════════════════════════════════════════════
 // 🚀 GRAPHQL RESOLVER REGISTRY
@@ -58,5 +59,6 @@ export const resolvers = [
   UpdateService,
   ViewServiceDetail,
   DeleteService,
-  ViewCategoryList
+  ViewCategoryList,
+  ViewAllService
 ]
