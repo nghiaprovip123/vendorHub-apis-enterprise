@@ -53,6 +53,9 @@ export class StaffRepository {
         where : {
           isDeleted : false,
           isActive: true
+        },
+        include : {
+          workingHours: true
         }
       }
     )

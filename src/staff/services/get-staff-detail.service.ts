@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
 import { StaffError } from "@/common/utils/error/staff.error"
+import { WorkingHoursRepository } from "@/staff/repositories/working-hours.repository"
 import ApiError from "@/common/utils/ApiError.utils"
+
 
 export const GetStaffDetailService = async (
     id: string | undefined
@@ -11,8 +13,15 @@ export const GetStaffDetailService = async (
     }
 
     const staffRepo = new StaffRepository(prisma)
+    const workingHourRepo = new WorkingHoursRepository(prisma)
 
     const staffDetail = await staffRepo.findById(id)
 
-    return staffDetail
-}
+    const workingHours = await workingHourRepo.findManyWorkingHour(id)
+
+    console.log(workingHours)
+
+    return {
+        ...staffDetail,
+        workingHours,
+      }}
