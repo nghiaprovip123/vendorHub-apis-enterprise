@@ -20,6 +20,24 @@ export class StaffServiceRepository {
         })
       }
     
+    async getAllServicesOfStaff(
+      staffId: string,
+    ) {
+      return this.prisma.staffService.findMany({
+        where: {
+          staffId,
+        },
+        include : {
+          service : {
+            select : {
+              id: true,
+              name: true
+            }
+          }
+        }
+      })
+    }
+    
     async attachServices(
         staffId: string,
         serviceIds: string[]
