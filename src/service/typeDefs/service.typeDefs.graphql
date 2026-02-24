@@ -109,7 +109,8 @@ type ViewServiceListResponse {
 #####################################VIEW ALL OF SERVICE RESPONSE##############################
 type ViewAllServiceResponse {
   items: [Service]
-}#####################################DELETE SERVICE RESPONSE##############################
+}
+#####################################DELETE SERVICE RESPONSE##############################
 type ViewServiceListResponse {
   success: Boolean!
   message: String!

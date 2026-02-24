@@ -80,6 +80,18 @@ export class ServiceRepository {
         })
     }
 
+    async getAllService() {
+        return this.prisma.service.findMany(
+            {
+                where : {
+                    category : {
+                        level : CategoryLevel.LEVEL_1
+                    }
+                }
+            }
+        )
+    }
+
     async countTotal () {
         return this.prisma.service.count()
     }
