@@ -29,6 +29,7 @@ const update_service_resolver_1 = require("../service/resolvers/update-service.r
 const view_service_detail_resolver_1 = require("../service/resolvers/view-service-detail.resolver");
 const delete_service_resolver_1 = require("../service/resolvers/delete-service.resolver");
 const view_category_list_resolver_1 = require("../service/resolvers/view-category-list.resolver");
+const view_all_service_resolver_1 = require("../service/resolvers/view-all-service.resolver");
 // ══════════════════════════════════════════════════════════════════════
 // 🚀 GRAPHQL RESOLVER REGISTRY
 // ══════════════════════════════════════════════════════════════════════
@@ -54,5 +55,6 @@ exports.resolvers = [
     update_service_resolver_1.UpdateService,
     view_service_detail_resolver_1.ViewServiceDetail,
     delete_service_resolver_1.DeleteService,
-    view_category_list_resolver_1.ViewCategoryList
+    view_category_list_resolver_1.ViewCategoryList,
+    view_all_service_resolver_1.ViewAllService
 ];

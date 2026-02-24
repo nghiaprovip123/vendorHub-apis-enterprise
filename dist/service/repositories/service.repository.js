@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServiceRepository = void 0;
+const client_1 = require("@prisma/client");
 class ServiceRepository {
     constructor(prisma) {
         this.prisma = prisma;
@@ -43,8 +44,21 @@ class ServiceRepository {
             skip,
             take,
             where: {
-                isVisible: true,
-                isDeleted: false
+                isDeleted: false,
+                category: {
+                    level: client_1.CategoryLevel.LEVEL_1
+                }
+            },
+            include: {
+                category: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
             }
         });
     }

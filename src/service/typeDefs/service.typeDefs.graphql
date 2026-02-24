@@ -13,9 +13,13 @@ enum CategoryLevel {
   LEVEL_2
 } 
 #######################################CORE SERVICE ENTITIY#####################################
+type Category {
+  id: ID!
+  name: String!
+}
 type Service {
   id: ID!
-  categoryId: ID!
+  category: Category
   name: String!
   description: String
   currency: String!

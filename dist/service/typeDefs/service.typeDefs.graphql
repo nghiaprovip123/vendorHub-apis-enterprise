@@ -13,9 +13,13 @@ enum CategoryLevel {
   LEVEL_2
 } 
 #######################################CORE SERVICE ENTITIY#####################################
+type Category {
+  id: ID!
+  name: String!
+}
 type Service {
   id: ID!
-  categoryId: ID!
+  category: Category
   name: String!
   description: String
   currency: String!
@@ -102,7 +106,10 @@ type ViewServiceListResponse {
   items: [Service]
   total: Int
 }
-#####################################DELETE SERVICE RESPONSE##############################
+#####################################VIEW ALL OF SERVICE RESPONSE##############################
+type ViewAllServiceResponse {
+  items: [Service]
+}#####################################DELETE SERVICE RESPONSE##############################
 type ViewServiceListResponse {
   success: Boolean!
   message: String!
@@ -123,4 +130,5 @@ extend type Query {
   viewServiceList(input: ViewServiceListInput!): ViewServiceListResponse!
   viewServiceDetail(input: ViewServiceDetailInput!): ServiceResponse!
   viewCategoryList: ViewCategoryListResponse!
+  viewAllService: ViewAllServiceResponse!
 }

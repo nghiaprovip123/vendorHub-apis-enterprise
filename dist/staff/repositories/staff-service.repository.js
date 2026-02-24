@@ -16,6 +16,21 @@ class StaffServiceRepository {
             }
         });
     }
+    async getAllServicesOfStaff(staffId) {
+        return this.prisma.staffService.findMany({
+            where: {
+                staffId,
+            },
+            include: {
+                service: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
+        });
+    }
     async attachServices(staffId, serviceIds) {
         if (serviceIds.length === 0)
             return;

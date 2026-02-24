@@ -41,6 +41,23 @@ class StaffRepository {
             where: {
                 isDeleted: false,
                 isActive: true
+            },
+            include: {
+                workingHours: true,
+                services: {
+                    select: {
+                        serviceId: true,
+                        service: {
+                            select: {
+                                id: true, // ✅ REQUIRED
+                                name: true
+                            }
+                        }
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
             }
         });
     }

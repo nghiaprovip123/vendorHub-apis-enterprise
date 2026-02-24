@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient, CategoryLevel } from '@prisma/client'
 
 type PrismaProvider = PrismaClient | Prisma.TransactionClient
 
@@ -56,20 +56,28 @@ export class ServiceRepository {
         )
     }
 
-    async getServiceList (
-        skip: number,
-        take: number
-    ) {
-        return this.prisma.service.findMany(
-            {
-                skip,
-                take,
-                where : {
-                    isVisible : true,
-                    isDeleted : false
+    async getServiceList(skip: number, take: number) {
+        return this.prisma.service.findMany({
+            skip,
+            take,
+            where: {
+                isDeleted: false,
+                category: {
+                    level: CategoryLevel.LEVEL_1
                 }
+            },
+            include: {
+                category: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            },
+            orderBy : {
+                createdAt : 'desc'
             }
-        )
+        })
     }
 
     async countTotal () {

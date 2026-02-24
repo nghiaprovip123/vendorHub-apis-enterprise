@@ -92,6 +92,9 @@ dotenv_1.default.config();
         maxFiles: 5,
     }));
     app.use('/auth', rate_limiter_1.apiLimiter, auth_route_1.default);
+    app.get("/health", (req, res) => {
+        res.status(200).send("OK");
+    });
     app.use('/graphql', (0, cors_1.default)(), body_parser_1.default.json(), (0, express4_1.expressMiddleware)(server, {
         context: async ({ req, res }) => {
             const contextLogger = (0, logger_1.createContextLogger)({
