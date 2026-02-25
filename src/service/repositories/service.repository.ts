@@ -72,6 +72,14 @@ export class ServiceRepository {
                         id: true,
                         name: true
                     }
+                },
+                medias : {
+                    select : {
+                        id : true,
+                        public_id : true,
+                        order : true,
+                        url : true
+                    }
                 }
             },
             orderBy : {
