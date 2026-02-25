@@ -50,8 +50,8 @@ type Category {
 }
 #######################################CREATE SERVICE INPUT SCHEMA##############################
 input CreateServiceMediaInput {
-  file: Upload!
-  type: ServiceMediaType!
+  file: Upload
+  type: ServiceMediaType
   order: Int
 }
 
@@ -72,6 +72,7 @@ input ViewServiceListInput {
 }
 #####################################UPDATE SERVICE INPUT SCHEMA################################
 input UpdateServiceMediaInput {
+  id: ID
   file: Upload
   type: ServiceMediaType
   order: Int
@@ -87,7 +88,7 @@ input UpdateServiceInput {
   duration: Int
   price: Int
   isVisible: Boolean
-  medias: [CreateServiceMediaInput]
+  medias: [UpdateServiceMediaInput]
 }
 ###################################VIEW SERVICE DETAIL INPUT SCHEMA##############################
 input ViewServiceDetailInput {
@@ -110,7 +111,7 @@ type ViewServiceListResponse {
 type ViewAllServiceResponse {
   items: [Service]
 }
-#####################################DELETE SERVICE RESPONSE##############################
+##############ç#######################DELETE SERVICE RESPONSE##############################
 type ViewServiceListResponse {
   success: Boolean!
   message: String!

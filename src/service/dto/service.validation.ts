@@ -9,6 +9,14 @@ export const CreateServiceMediaDto = z.object(
         order: z.int().optional()
     }
 )
+export const UpdateServiceMediaDto = z.object(
+    {
+        id: z.string(),
+        file: z.any(),
+        type: z.enum(ServiceMediaType),
+        order: z.int().optional()
+    }
+)
 export const CreateServiceDto = z.object(
     {
         categoryId : z.string(ServiceError.SERIVCE_DTO_CATEGORY_ID),
@@ -32,7 +40,7 @@ export const UpdateServiceDto = z.object(
         displayPrice: z.boolean().optional().optional(),
         duration: z.int(ServiceError.SERVICE_DTO_DURATION).optional(),
         isVisible: z.boolean().optional(),
-        medias: z.array(CreateServiceMediaDto).optional(),
+        medias: z.array(UpdateServiceMediaDto).optional(),
         price: z.int(ServiceError.SERVICE_DTO_PRICE).optional()
     }
 )
