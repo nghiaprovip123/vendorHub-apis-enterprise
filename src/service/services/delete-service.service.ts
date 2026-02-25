@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { CloudinaryRest } from "@/common/utils/cloudinary-orchestration.utils"
 import { DeleteServiceDto } from "@/service/dto/service.validation"
 import * as z from "zod"
+import { ServiceError } from "@/common/utils/error/service.error"
 
 import { ServiceRepository } from "@/service/repositories/service.repository"
 import { BookingRepository } from "@/booking/repositories/booking.repository"
@@ -26,7 +27,7 @@ export const DeleteServiceService = async (
 
     return {
       success: true,
-      message: "Service is in use, soft-deleted instead",
+      message: ServiceError.SERVICE_SOFT_DELETE,
     }
   }
 
@@ -50,6 +51,6 @@ export const DeleteServiceService = async (
 
   return {
     success: true,
-    message: "Service deleted permanently",
+    message: ServiceError.SERVICE_DELETE_PERMENANTLY,
   }
 }
