@@ -1,4 +1,33 @@
 scalar DateTime
+type BookingService {
+  id: ID!
+  category: Category
+  name: String!
+  description: String
+  currency: String!
+  displayPrice: Boolean!
+  duration: Int!
+  price: Int!
+  isVisible: Boolean!
+  medias: [ServiceMedia!]!
+  createdAt: DateTime!
+}
+
+type BookingStaff {
+  id: ID!
+  fullName: String!
+  avatar_url: String
+  avatar_public_id: String
+  timezone: String!
+  isActive: Boolean!
+  isDeleted: Boolean!
+  phoneNumber: String
+  services: [StaffService]
+  workingHours: [WorkingHour!]!
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
 input CreateBookingInput { 
   serviceId: String!
   staffId: String                       
@@ -26,8 +55,8 @@ input UpdateBookingInput {
 
 type CreateBookingResponse {
   id: ID!
-  serviceId: String!
-  staffId: String
+  bookingService: BookingService
+  bookingStaff: BookingStaff
   customerName: String
   customerPhone: String
   customerEmail: String

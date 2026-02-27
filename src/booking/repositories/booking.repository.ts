@@ -68,6 +68,10 @@ export class BookingRepository {
                 },
               },
             },
+            include : {
+              bookingService: true,
+              bookingStaff: true,
+            }
           })
     }
 
@@ -92,6 +96,10 @@ export class BookingRepository {
                             }
                         }
                     }
+                },
+                include : {
+                  bookingService : true,
+                  bookingStaff : true
                 }
             }
         )
