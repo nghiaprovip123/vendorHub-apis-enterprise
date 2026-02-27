@@ -127,4 +127,15 @@ export class StaffRepository {
     )
   }
 
+  getAllStaff() {
+    return this.prisma.staff.findMany(
+      {
+        where : {
+          isActive: true,
+          isDeleted: false
+        }
+      }
+    )
+  }
+
 }

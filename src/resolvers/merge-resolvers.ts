@@ -6,6 +6,7 @@ import { UpdateStaff } from "../staff/resolvers/update-staff.resolver"
 import { DeleteStaff } from "../staff/resolvers/delete-staff.resolver"
 import { ViewStaffList } from "../staff/resolvers/get-staff-list.resolver"
 import { GetStaffDetail } from "../staff/resolvers/get-staff-detail.resolver"
+import { GetAllStaff } from "../staff/resolvers/get-all-staff.resolver"
 
 
 // ██████████████████████████████████████████████████████████████████████
@@ -42,6 +43,7 @@ export const resolvers = [
   DeleteStaff,
   ViewStaffList,
   GetStaffDetail,
+  GetAllStaff,
 
   // ──────────────────────── BOOKING ────────────────────────
   GetAvailableStaff,
