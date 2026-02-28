@@ -20,7 +20,7 @@ import { ViewBookingDetail } from "../booking/resolvers/get-booking-detail.resol
 import { GetBookingList } from "../booking/resolvers/get-booking-list.resolver"
 import { bookingSubscription } from '../booking/subscription/booking.subscription'
 import { UpdateBooking } from "../booking/resolvers/update-booking.resolver"
-
+import { GetBookingByStaff } from "@/booking/resolvers/get-booking-by-staff.resolver"
 
 // ██████████████████████████████████████████████████████████████████████
 // █                           SERVICE DOMAIN                           █
@@ -54,6 +54,7 @@ export const resolvers = [
   GetBookingList,
   bookingSubscription,
   UpdateBooking,
+  GetBookingByStaff,
 
   // ──────────────────────── SERVICE ────────────────────────
   CreateService,
