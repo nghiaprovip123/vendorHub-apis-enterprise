@@ -94,7 +94,8 @@ export class ServiceRepository {
                 where : {
                     category : {
                         level : CategoryLevel.LEVEL_1
-                    }
+                    },
+                    isDeleted: false
                 }
             }
         )

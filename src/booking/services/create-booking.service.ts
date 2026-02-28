@@ -55,6 +55,10 @@ export class CreateBooking {
       const bookingStartDate = vnToUtc(`${day}T${startTime}`)
       const bookingEndDate = vnToUtc(`${day}T${endTime}`)
       const bookingDate = vnToUtc(`${day}T00:00:00`)
+      console.log(bookingEndDate)
+      console.log(bookingStartDate)
+      console.log(bookingDate)
+
       const now = new Date()
 
       if (bookingStartDate < now) {
