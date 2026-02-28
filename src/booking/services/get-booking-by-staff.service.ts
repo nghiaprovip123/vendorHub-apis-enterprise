@@ -20,14 +20,16 @@ export const GetBookingByStaffService = async (
     const utcStart = fromZonedTime(vnStart, TZ);
     const utcEnd = fromZonedTime(vnEnd, TZ);
 
-    const service = await prisma.$transaction(
+    return await prisma.$transaction(
         async(tx) => {
             const bookingList = await bookingRepos.getBookingBatchByStaff(staffId, utcStart, utcEnd)
             
             const total = await bookingRepos.countBookingBatchByStaff(staffId, utcStart, utcEnd)
+            return {
+                bookingList,
+                total
+            }
+            
         }
     )
-    return {
-        service
-    }
 }
