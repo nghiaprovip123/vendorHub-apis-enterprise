@@ -6,25 +6,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBookingListService = void 0;
 const prisma_1 = require("../../lib/prisma");
 const date_fns_1 = require("date-fns");
+const date_fns_tz_1 = require("date-fns-tz");
 const booking_error_1 = require("../../common/utils/error/booking.error");
 const booking_repository_1 = require("../../booking/repositories/booking.repository");
 const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
+const TZ = "Asia/Ho_Chi_Minh";
 const getBookingListService = async (input) => {
     const { startDate, endDate } = input;
-    const batchStartDate = (0, date_fns_1.startOfDay)(new Date(`${startDate}`));
-    const batchEndDate = (0, date_fns_1.startOfDay)(new Date(`${endDate}`));
-    if (batchStartDate >= batchEndDate) {
+    if (!startDate || !endDate) {
         throw new ApiError_utils_1.default(400, booking_error_1.BookingError.BOOKING_CREATION_BOOKING_END_DATE_INVALID);
     }
-    const service = await prisma_1.prisma.$transaction(async (tx) => {
+    const vnStart = (0, date_fns_1.startOfDay)(new Date(startDate));
+    const vnEnd = (0, date_fns_1.endOfDay)(new Date(endDate));
+    const utcStart = (0, date_fns_tz_1.fromZonedTime)(vnStart, TZ);
+    const utcEnd = (0, date_fns_tz_1.fromZonedTime)(vnEnd, TZ);
+    if (utcStart >= utcEnd) {
+        throw new ApiError_utils_1.default(400, booking_error_1.BookingError.BOOKING_CREATION_BOOKING_END_DATE_INVALID);
+    }
+    return prisma_1.prisma.$transaction(async (tx) => {
         const bookingRepo = new booking_repository_1.BookingRepository(tx);
-        const getList = await bookingRepo.getBookingBatch(batchStartDate, batchEndDate);
-        const total = await bookingRepo.countBookingBatch(batchStartDate, batchEndDate);
-        return {
-            bookingList: getList,
-            total
-        };
+        const bookingList = await bookingRepo.getBookingBatch(utcStart, utcEnd);
+        const total = await bookingRepo.countBookingBatch(utcStart, utcEnd);
+        return { bookingList, total };
     });
-    return service;
 };
 exports.getBookingListService = getBookingListService;

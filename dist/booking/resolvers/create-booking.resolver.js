@@ -8,8 +8,8 @@ class CreateBookingClass {
             const result = await create_booking_service_1.CreateBooking.createBookingByCustomer(args.input);
             return {
                 id: result.id,
-                serviceId: result.serviceId,
-                staffId: result.staffId,
+                bookingService: result.bookingService,
+                bookingStaff: result.bookingStaff,
                 customerName: result.customerName,
                 customerPhone: result.customerPhone,
                 customerEmail: result.customerEmail,

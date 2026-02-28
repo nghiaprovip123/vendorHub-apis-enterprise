@@ -15,5 +15,38 @@ class ServiceMediaRepository {
             where: { serviceId }
         });
     }
+    async getAllMediaByService(serviceId) {
+        return this.prisma.serviceMedia.findMany({
+            where: {
+                serviceId
+            }
+        });
+    }
+    async deleteById(id) {
+        return this.prisma.serviceMedia.delete({
+            where: {
+                id
+            }
+        });
+    }
+    async deleteManyByIds(ids) {
+        return this.prisma.serviceMedia.deleteMany({
+            where: {
+                id: {
+                    in: ids
+                }
+            }
+        });
+    }
+    async updateOrder(id, order) {
+        return this.prisma.serviceMedia.update({
+            where: {
+                id: id
+            },
+            data: {
+                order: order
+            }
+        });
+    }
 }
 exports.ServiceMediaRepository = ServiceMediaRepository;

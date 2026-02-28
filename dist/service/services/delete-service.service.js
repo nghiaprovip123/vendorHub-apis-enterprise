@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteServiceService = void 0;
 const prisma_1 = require("../../lib/prisma");
 const cloudinary_orchestration_utils_1 = require("../../common/utils/cloudinary-orchestration.utils");
+const service_error_1 = require("../../common/utils/error/service.error");
 const service_repository_1 = require("../../service/repositories/service.repository");
 const DeleteServiceService = async (input) => {
     const { id } = input;
@@ -15,7 +16,7 @@ const DeleteServiceService = async (input) => {
         await serviceRepo.softDeleteById(id);
         return {
             success: true,
-            message: "Service is in use, soft-deleted instead",
+            message: service_error_1.ServiceError.SERVICE_SOFT_DELETE,
         };
     }
     const medias = await serviceRepo.findMediasByServiceId(id);
@@ -27,7 +28,7 @@ const DeleteServiceService = async (input) => {
     await Promise.all(medias.map(media => cloudinary_orchestration_utils_1.CloudinaryRest.DestroyImageInCloudinary(media.public_id, "image")));
     return {
         success: true,
-        message: "Service deleted permanently",
+        message: service_error_1.ServiceError.SERVICE_DELETE_PERMENANTLY,
     };
 };
 exports.DeleteServiceService = DeleteServiceService;

@@ -55,10 +55,28 @@ class ServiceRepository {
                         id: true,
                         name: true
                     }
+                },
+                medias: {
+                    select: {
+                        id: true,
+                        public_id: true,
+                        order: true,
+                        url: true
+                    }
                 }
             },
             orderBy: {
                 createdAt: 'desc'
+            }
+        });
+    }
+    async getAllService() {
+        return this.prisma.service.findMany({
+            where: {
+                category: {
+                    level: client_1.CategoryLevel.LEVEL_1
+                },
+                isDeleted: false
             }
         });
     }

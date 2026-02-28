@@ -113,4 +113,5 @@ type Query {
   getStaffList(input: GetStaffListInput!): GetStaffListResponse!
   getAvailableStaffByBookingTime(input: GetAvailableStaffByBookingtimeInput!): [Staff]!
   getStaffDetail(input : GetStaffDetailInput) : Staff
+  getAllStaff: [Staff]
 }

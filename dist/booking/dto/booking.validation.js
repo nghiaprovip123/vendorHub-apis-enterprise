@@ -31,6 +31,7 @@ exports.UpdateBookingDto = zod_1.default.object({
     notes: zod_1.default.string().optional()
 });
 exports.GetBookingListDto = zod_1.default.object({
+    staffId: zod_1.default.string().optional(),
     startDate: zod_1.default.string(booking_error_1.BookingError.BOOKING_LIST_MISSING_START_DATE_INFORMATION),
     endDate: zod_1.default.string(booking_error_1.BookingError.BOOKING_LIST_MISSISING_END_DATE_INFORMATION)
 });

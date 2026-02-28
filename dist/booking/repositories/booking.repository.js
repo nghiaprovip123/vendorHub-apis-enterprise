@@ -45,6 +45,10 @@ class BookingRepository {
                     },
                 },
             },
+            include: {
+                bookingService: true,
+                bookingStaff: true,
+            }
         });
     }
     async findBookingById(id) {
@@ -55,6 +59,44 @@ class BookingRepository {
     async getBookingBatch(startDate, endDate) {
         return this.prisma.booking.findMany({
             where: {
+                slot: {
+                    is: {
+                        day: {
+                            gte: startDate,
+                            lt: endDate
+                        }
+                    }
+                }
+            },
+            include: {
+                bookingService: true,
+                bookingStaff: true
+            }
+        });
+    }
+    async getBookingBatchByStaff(staffId, startDate, endDate) {
+        return this.prisma.booking.findMany({
+            where: {
+                staffId: staffId,
+                slot: {
+                    is: {
+                        day: {
+                            gte: startDate,
+                            lt: endDate
+                        }
+                    }
+                }
+            },
+            include: {
+                bookingService: true,
+                bookingStaff: true
+            }
+        });
+    }
+    async countBookingBatchByStaff(staffId, startDate, endDate) {
+        return this.prisma.booking.count({
+            where: {
+                staffId: staffId,
                 slot: {
                     is: {
                         day: {

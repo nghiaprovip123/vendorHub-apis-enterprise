@@ -3,11 +3,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DeleteServiceDto = exports.ViewServiceDetail = exports.UpdateServiceDto = exports.CreateServiceDto = exports.CreateServiceMediaDto = void 0;
+exports.DeleteServiceDto = exports.ViewServiceDetail = exports.UpdateServiceDto = exports.CreateServiceDto = exports.UpdateServiceMediaDto = exports.CreateServiceMediaDto = void 0;
 const zod_1 = __importDefault(require("zod"));
 const client_1 = require("@prisma/client");
 const service_error_1 = require("../../common/utils/error/service.error");
 exports.CreateServiceMediaDto = zod_1.default.object({
+    file: zod_1.default.any(),
+    type: zod_1.default.enum(client_1.ServiceMediaType),
+    order: zod_1.default.int().optional()
+});
+exports.UpdateServiceMediaDto = zod_1.default.object({
+    id: zod_1.default.string(),
     file: zod_1.default.any(),
     type: zod_1.default.enum(client_1.ServiceMediaType),
     order: zod_1.default.int().optional()
@@ -32,7 +38,7 @@ exports.UpdateServiceDto = zod_1.default.object({
     displayPrice: zod_1.default.boolean().optional().optional(),
     duration: zod_1.default.int(service_error_1.ServiceError.SERVICE_DTO_DURATION).optional(),
     isVisible: zod_1.default.boolean().optional(),
-    medias: zod_1.default.array(exports.CreateServiceMediaDto).optional(),
+    medias: zod_1.default.array(exports.UpdateServiceMediaDto).optional(),
     price: zod_1.default.int(service_error_1.ServiceError.SERVICE_DTO_PRICE).optional()
 });
 exports.ViewServiceDetail = zod_1.default.object({

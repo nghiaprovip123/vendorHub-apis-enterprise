@@ -39,6 +39,9 @@ class CreateBooking {
             const bookingStartDate = vnToUtc(`${day}T${startTime}`);
             const bookingEndDate = vnToUtc(`${day}T${endTime}`);
             const bookingDate = vnToUtc(`${day}T00:00:00`);
+            console.log(bookingEndDate);
+            console.log(bookingStartDate);
+            console.log(bookingDate);
             const now = new Date();
             if (bookingStartDate < now) {
                 throw new ApiError_utils_1.default(400, booking_error_1.BookingError.BOOKING_CREATION_BOOKING_START_DATE_INVALID);

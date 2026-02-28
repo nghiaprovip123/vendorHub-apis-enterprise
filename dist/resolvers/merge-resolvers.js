@@ -9,6 +9,7 @@ const update_staff_resolver_1 = require("../staff/resolvers/update-staff.resolve
 const delete_staff_resolver_1 = require("../staff/resolvers/delete-staff.resolver");
 const get_staff_list_resolver_1 = require("../staff/resolvers/get-staff-list.resolver");
 const get_staff_detail_resolver_1 = require("../staff/resolvers/get-staff-detail.resolver");
+const get_all_staff_resolver_1 = require("../staff/resolvers/get-all-staff.resolver");
 // ██████████████████████████████████████████████████████████████████████
 // █                           BOOKING DOMAIN                           █
 // ██████████████████████████████████████████████████████████████████████
@@ -20,6 +21,7 @@ const get_booking_detail_resolver_1 = require("../booking/resolvers/get-booking-
 const get_booking_list_resolver_1 = require("../booking/resolvers/get-booking-list.resolver");
 const booking_subscription_1 = require("../booking/subscription/booking.subscription");
 const update_booking_resolver_1 = require("../booking/resolvers/update-booking.resolver");
+const get_booking_by_staff_resolver_1 = require("../booking/resolvers/get-booking-by-staff.resolver");
 // ██████████████████████████████████████████████████████████████████████
 // █                           SERVICE DOMAIN                           █
 // ██████████████████████████████████████████████████████████████████████
@@ -40,6 +42,7 @@ exports.resolvers = [
     delete_staff_resolver_1.DeleteStaff,
     get_staff_list_resolver_1.ViewStaffList,
     get_staff_detail_resolver_1.GetStaffDetail,
+    get_all_staff_resolver_1.GetAllStaff,
     // ──────────────────────── BOOKING ────────────────────────
     get_available_staff_resolver_1.GetAvailableStaff,
     create_booking_resolver_1.CreateBookingResolver,
@@ -49,6 +52,7 @@ exports.resolvers = [
     get_booking_list_resolver_1.GetBookingList,
     booking_subscription_1.bookingSubscription,
     update_booking_resolver_1.UpdateBooking,
+    get_booking_by_staff_resolver_1.GetBookingByStaff,
     // ──────────────────────── SERVICE ────────────────────────
     create_service_resolver_1.CreateService,
     view_service_list_resolver_1.ViewServiceList,

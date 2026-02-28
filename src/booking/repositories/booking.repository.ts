@@ -104,6 +104,53 @@ export class BookingRepository {
             }
         )
     }
+
+    async getBookingBatchByStaff (
+      staffId: string | undefined,
+      startDate: Date,
+      endDate: Date
+  ) {
+      return this.prisma.booking.findMany(
+          {
+              where : {
+                  staffId : staffId,
+                  slot : {
+                      is : {
+                          day : {
+                              gte : startDate,
+                              lt : endDate
+                          }
+                      }
+                  }
+              },
+              include : {
+                bookingService : true,
+                bookingStaff : true
+              }
+          }
+      )
+  }
+  async countBookingBatchByStaff (
+    staffId: string | undefined,
+    startDate: Date,
+    endDate: Date
+) {
+    return this.prisma.booking.count(
+        {
+            where: {
+                staffId : staffId,
+                slot : {
+                    is : {
+                        day : {
+                            gte : startDate,
+                            lt : endDate
+                        }
+                    }
+                }
+            }
+        }
+    )
+}
     
     async countBookingBatch (
         startDate: Date,
