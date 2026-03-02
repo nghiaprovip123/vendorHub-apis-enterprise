@@ -58,7 +58,6 @@ export class StaffRepository {
         take,
         where : {
           isDeleted : false,
-          isActive: true
         },
         include : {
           workingHours: true,
@@ -67,7 +66,7 @@ export class StaffRepository {
               serviceId: true,
               service: {
                 select: {
-                  id: true,        // ✅ REQUIRED
+                  id: true,        
                   name: true
                 }
               }
