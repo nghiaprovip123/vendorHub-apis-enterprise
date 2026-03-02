@@ -1,8 +1,14 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
+import { startOfMonth, endOfMonth } from 'date-fns'
+import { vnToUtc } from '@/common/utils/date-standard.utils'
 import { DateTimeStandardizer } from "@/common/utils/date-standard.utils"
 
 type PrismaProvider = PrismaClient | Prisma.TransactionClient
+
+const firstDayISO = startOfMonth(new Date()).toISOString()
+const lastDayISO = endOfMonth(new Date()).toISOString()
+console.log(firstDayISO, lastDayISO)
 
 export class StaffRepository {
   constructor(private readonly prisma: PrismaProvider = prisma) {}
@@ -77,6 +83,29 @@ export class StaffRepository {
 
   count() {
     return this.prisma.staff.count()
+  }
+
+  countByStatus( isActive: boolean ) {
+    return this.prisma.staff.count(
+      {
+        where : {
+          isActive : isActive
+        }
+      }
+    )
+  }
+
+  countNewInMonth () {
+    return this.prisma.staff.count(
+      {
+        where : {
+          createdAt : {
+            lte : firstDayISO,
+            gte : firstDayISO
+          }
+        }
+      }
+    )
   }
 
   findAvailableForAssignment(

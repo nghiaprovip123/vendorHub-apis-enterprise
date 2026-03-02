@@ -43,6 +43,9 @@ type Staff {
 type GetStaffListResponse {
   items: [Staff]!
   total: Int!
+  totalActive: Int!
+  totalInActive: Int!
+  totalNewInMonth: Int!
 }
 
 type DeleteStaffResponse {

@@ -198,6 +198,10 @@ export class BookingRepository {
                 data : {
                     staffId: staffId,
                     status: BookingStatus.CONFIRMED
+                },
+                include : {
+                  bookingService: true,
+                  bookingStaff: true
                 }
             }
         )

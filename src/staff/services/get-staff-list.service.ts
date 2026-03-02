@@ -13,10 +13,16 @@ export const getStaffListService = async ( page: number) => {
     const staffs = await staffRepos.getPagnition(skip, DEFAULT_PAGE_SIZE)
 
     const total = staffRepos.count()
+    const totalActive = staffRepos.countByStatus(true)
+    const totalInActive = staffRepos.countByStatus(false)
+    const totalNewInMonth = staffRepos.countNewInMonth()
 
     return {
       items: staffs,
-      total
+      total,
+      totalActive,
+      totalInActive,
+      totalNewInMonth
     }
   } catch (error) {
     throw new ApiError(500, StaffError.FETCH_STAFF_LIST_ERROR)
