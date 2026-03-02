@@ -106,6 +106,9 @@ type ServiceResponse {
 type ViewServiceListResponse {
   items: [Service]
   total: Int
+  totalVisible: Int
+  totalNoVisible: Int
+  countTotalDisplay: Int
 }
 #####################################VIEW ALL OF SERVICE RESPONSE##############################
 type ViewAllServiceResponse {

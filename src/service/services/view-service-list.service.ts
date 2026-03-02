@@ -16,9 +16,15 @@ export const ViewServiceListService = async (
     )
 
     const total = await serviceRepo.countTotal()
+    const totalVisible = await serviceRepo.countTotalVisible(true)
+    const totalNoVisible = await serviceRepo.countTotalVisible(false)
+    const countTotalDisplay = await serviceRepo.countTotalDisplay(false)
 
     return {
         items: serviceList,
-        total
+        total,
+        totalVisible,
+        totalNoVisible,
+        countTotalDisplay
     }
 }

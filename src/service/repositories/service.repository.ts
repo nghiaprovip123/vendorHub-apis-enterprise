@@ -102,9 +102,45 @@ export class ServiceRepository {
     }
 
     async countTotal () {
-        return this.prisma.service.count()
+        return this.prisma.service.count(
+            {
+                where : {
+                    category : {
+                        level : CategoryLevel.LEVEL_1
+                    },
+                    isDeleted: false
+                }
+            }
+        )
     }
 
+    async countTotalVisible( isVisible : boolean ) {
+        return this.prisma.service.count(
+            {
+                where : {
+                    category : {
+                        level : CategoryLevel.LEVEL_1
+                    },
+                    isVisible : isVisible,
+                    isDeleted : false
+                }
+            }
+        )
+    }
+
+    async countTotalDisplay (isDisplay : boolean) {
+        return this.prisma.service.count(
+            {
+                where : {
+                    displayPrice : isDisplay,
+                    isDeleted : false,
+                    category : {
+                        level : CategoryLevel.LEVEL_1
+                    },
+                }
+            }
+        )
+    }
     findById(id: string) {
         return this.prisma.service.findUnique({ where: { id } })
     }
