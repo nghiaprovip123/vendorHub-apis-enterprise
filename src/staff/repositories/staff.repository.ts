@@ -80,13 +80,20 @@ export class StaffRepository {
   }
 
   count() {
-    return this.prisma.staff.count()
+    return this.prisma.staff.count(
+      {
+        where : {
+          isDeleted : false,
+        }
+      }
+    )
   }
 
   countByStatus( isActive: boolean ) {
     return this.prisma.staff.count(
       {
         where : {
+          isDeleted : false,
           isActive : isActive
         }
       }
@@ -97,6 +104,7 @@ export class StaffRepository {
     return this.prisma.staff.count(
       {
         where : {
+          isDeleted : false,
           createdAt : {
             gte : firstDayISO,
             lte : lastDayISO
