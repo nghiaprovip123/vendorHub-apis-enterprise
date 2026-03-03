@@ -105,6 +105,9 @@ input ViewBookingDetailInput {
 type getBookingListResponse {
   bookingList: [CreateBookingResponse]
   total: Int
+  totalPending: Int
+  totalNoShow: Int
+  totalCancelled: Int
 }
 
 input getBookingListInput {

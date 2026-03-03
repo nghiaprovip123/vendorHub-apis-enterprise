@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { BookingStatus } from "@prisma/client"
 import { startOfDay, endOfDay } from "date-fns";
 import { fromZonedTime } from "date-fns-tz";
 import { GetBookingListDto } from "@/booking/dto/booking.validation";
@@ -44,11 +45,15 @@ export const getBookingListService = async (
       utcEnd
     );
 
-    const total = await bookingRepo.countBookingBatch(
-      utcStart,
-      utcEnd
-    );
+    const total = await bookingRepo.count();
 
-    return { bookingList, total };
+    const totalPending = await bookingRepo.countByStatus(BookingStatus.PENDING);
+
+    const totalNoShow = await bookingRepo.countByStatus(BookingStatus.NO_SHOW);
+
+    const totalCancelled = await bookingRepo.countByStatus(BookingStatus.CANCELLED);
+
+
+    return { bookingList, total, totalPending, totalNoShow, totalCancelled };
   });
 };

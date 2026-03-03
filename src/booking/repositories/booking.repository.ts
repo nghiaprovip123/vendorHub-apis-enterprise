@@ -87,20 +87,20 @@ export class BookingRepository {
     ) {
         return this.prisma.booking.findMany(
             {
-                where : {
-                    slot : {
-                        is : {
-                            day : {
-                                gte : startDate,
-                                lt : endDate
-                            }
-                        }
-                    }
-                },
-                include : {
-                  bookingService : true,
-                  bookingStaff : true
-                }
+              where : {
+                  slot : {
+                      is : {
+                          day : {
+                              gte : startDate,
+                              lt : endDate
+                          }
+                      }
+                  }
+              },
+              include : {
+                bookingService : true,
+                bookingStaff : true
+              }
             }
         )
     }
@@ -152,24 +152,18 @@ export class BookingRepository {
     )
 }
     
-    async countBookingBatch (
-        startDate: Date,
-        endDate: Date
-    ) {
-        return this.prisma.booking.count(
-            {
-                where : {
-                    slot : {
-                        is : { 
-                            day : {
-                                gte : startDate,
-                                lt : endDate
-                            }
-                        }
-                    }
-                }
-            }
-        )
+    async count () {
+        return this.prisma.booking.count()
+    }
+
+    async countByStatus ( status: BookingStatus ) {
+      return this.prisma.booking.count(
+        {
+          where : {
+            status : status
+          }
+        }
+      )
     }
 
     async findBookingByIdAndStatus (
