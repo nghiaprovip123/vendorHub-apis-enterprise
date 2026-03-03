@@ -8,7 +8,6 @@ type PrismaProvider = PrismaClient | Prisma.TransactionClient
 
 const firstDayISO = startOfMonth(new Date()).toISOString()
 const lastDayISO = endOfMonth(new Date()).toISOString()
-console.log(firstDayISO, lastDayISO)
 
 export class StaffRepository {
   constructor(private readonly prisma: PrismaProvider = prisma) {}
@@ -99,8 +98,8 @@ export class StaffRepository {
       {
         where : {
           createdAt : {
-            lte : firstDayISO,
-            gte : firstDayISO
+            gte : firstDayISO,
+            lte : lastDayISO
           }
         }
       }
