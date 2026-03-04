@@ -141,6 +141,7 @@ export class ServiceRepository {
             }
         )
     }
+    
     findById(id: string) {
         return this.prisma.service.findUnique({ where: { id } })
     }
@@ -190,6 +191,4 @@ export class ServiceRepository {
         where: { id: serviceId }
         })
     }
-  
-  
 }

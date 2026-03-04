@@ -12,7 +12,6 @@ export const AutoAssignStaffService = async (pubsub : PubSub) => {
   const pendingBookings = await prisma.booking.findMany({
     where: {
       status: BookingStatus.PENDING,
-      // staffId: null cccccccccccccccc mẹ nó,
       createdAt: {
         lte: threshold
       }

@@ -22,8 +22,6 @@ export class DateTimeStandardizer {
 
     const utcDate = fromZonedTime(fakeLocalDate, VN_TIMEZONE)
 
-    console.log(utcDate)
-
     return this.toHHmm(utcDate)
   }
 

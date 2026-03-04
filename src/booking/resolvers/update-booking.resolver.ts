@@ -1,21 +1,18 @@
 import { updateBookingService } from "@/booking/services/update-booking.service"
 
-const updateBooking = async (
-    _: unknown,
-    args: { input: any },
-    ctx: any
-  ) => {
-    try {
-        const result = updateBookingService(args.input)  
-        return result
+export class UpdateBookingResolver {
+    static async confirmBooking(_: unknown, args: { input: any }) {
+      return await updateBookingService.confirmBooking(args.input)
     }
-    catch (error : any) {
-        throw error
+  
+    static async cancelBooking(_: unknown, args: { input: any }) {
+      return await updateBookingService.cancelBooking(args.input)
     }
-}
- 
+  }
+  
 export const UpdateBooking = {
-    Mutation : {
-        updateBooking
+    Mutation: {
+        confirmBooking: UpdateBookingResolver.confirmBooking,
+        cancelBooking: UpdateBookingResolver.cancelBooking,
     }
 }

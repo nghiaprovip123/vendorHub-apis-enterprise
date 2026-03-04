@@ -125,8 +125,8 @@ type Mutation {
   createBookingByCustomer(input: CreateBookingInput): CreateBookingResponse
   createBookingInBackOffice(input: CreateBookingInput): CreateBookingResponse
   assignStaffByBookingRequest(input: AssignStaffForBookingRequestInput): AssignStaffForBookingRequestResponse
-  cancelBooking(input: CancelBookingInput): CancelBookingResponse
-  updateBooking(input: UpdateBookingInput): CreateBookingResponse
+  cancelBooking(input: UpdateBookingInput): CreateBookingResponse
+  confirmBooking(input: UpdateBookingInput): CreateBookingResponse
 }
 
 type Query {
