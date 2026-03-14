@@ -81,7 +81,36 @@ class ServiceRepository {
         });
     }
     async countTotal() {
-        return this.prisma.service.count();
+        return this.prisma.service.count({
+            where: {
+                category: {
+                    level: client_1.CategoryLevel.LEVEL_1
+                },
+                isDeleted: false
+            }
+        });
+    }
+    async countTotalVisible(isVisible) {
+        return this.prisma.service.count({
+            where: {
+                category: {
+                    level: client_1.CategoryLevel.LEVEL_1
+                },
+                isVisible: isVisible,
+                isDeleted: false
+            }
+        });
+    }
+    async countTotalDisplay(isDisplay) {
+        return this.prisma.service.count({
+            where: {
+                displayPrice: isDisplay,
+                isDeleted: false,
+                category: {
+                    level: client_1.CategoryLevel.LEVEL_1
+                },
+            }
+        });
     }
     findById(id) {
         return this.prisma.service.findUnique({ where: { id } });

@@ -108,17 +108,13 @@ class BookingRepository {
             }
         });
     }
-    async countBookingBatch(startDate, endDate) {
+    async count() {
+        return this.prisma.booking.count();
+    }
+    async countByStatus(status) {
         return this.prisma.booking.count({
             where: {
-                slot: {
-                    is: {
-                        day: {
-                            gte: startDate,
-                            lt: endDate
-                        }
-                    }
-                }
+                status: status
             }
         });
     }
@@ -138,6 +134,10 @@ class BookingRepository {
             data: {
                 staffId: staffId,
                 status: client_1.BookingStatus.CONFIRMED
+            },
+            include: {
+                bookingService: true,
+                bookingStaff: true
             }
         });
     }

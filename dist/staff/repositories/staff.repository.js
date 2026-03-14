@@ -1,7 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StaffRepository = void 0;
+const date_fns_1 = require("date-fns");
 const date_standard_utils_1 = require("../../common/utils/date-standard.utils");
+const firstDayISO = (0, date_fns_1.startOfMonth)(new Date()).toISOString();
+const lastDayISO = (0, date_fns_1.endOfMonth)(new Date()).toISOString();
 class StaffRepository {
     constructor(prisma = prisma) {
         this.prisma = prisma;
@@ -40,7 +43,6 @@ class StaffRepository {
             take,
             where: {
                 isDeleted: false,
-                isActive: true
             },
             include: {
                 workingHours: true,
@@ -49,7 +51,7 @@ class StaffRepository {
                         serviceId: true,
                         service: {
                             select: {
-                                id: true, // ✅ REQUIRED
+                                id: true,
                                 name: true
                             }
                         }
@@ -62,7 +64,30 @@ class StaffRepository {
         });
     }
     count() {
-        return this.prisma.staff.count();
+        return this.prisma.staff.count({
+            where: {
+                isDeleted: false,
+            }
+        });
+    }
+    countByStatus(isActive) {
+        return this.prisma.staff.count({
+            where: {
+                isDeleted: false,
+                isActive: isActive
+            }
+        });
+    }
+    countNewInMonth() {
+        return this.prisma.staff.count({
+            where: {
+                isDeleted: false,
+                createdAt: {
+                    gte: firstDayISO,
+                    lte: lastDayISO
+                }
+            }
+        });
     }
     findAvailableForAssignment(id, day, endTime, startTime) {
         const daysOfWeek = day.getDay();

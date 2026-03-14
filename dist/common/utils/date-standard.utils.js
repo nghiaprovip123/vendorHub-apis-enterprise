@@ -18,7 +18,6 @@ class DateTimeStandardizer {
     static normalizeVNHHmmToUTC(hhmm) {
         const fakeLocalDate = `2026-01-01T${hhmm}:00`;
         const utcDate = (0, date_fns_tz_1.fromZonedTime)(fakeLocalDate, exports.VN_TIMEZONE);
-        console.log(utcDate);
         return this.toHHmm(utcDate);
     }
     static normalizeUTCHHmmToVN(hhmm) {

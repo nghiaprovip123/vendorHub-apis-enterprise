@@ -13,12 +13,13 @@ const GetBookingByStaffService = async (input) => {
     const vnEnd = (0, date_fns_1.endOfDay)(new Date(endDate));
     const utcStart = (0, date_fns_tz_1.fromZonedTime)(vnStart, TZ);
     const utcEnd = (0, date_fns_tz_1.fromZonedTime)(vnEnd, TZ);
-    const service = await prisma_1.prisma.$transaction(async (tx) => {
+    return await prisma_1.prisma.$transaction(async (tx) => {
         const bookingList = await bookingRepos.getBookingBatchByStaff(staffId, utcStart, utcEnd);
         const total = await bookingRepos.countBookingBatchByStaff(staffId, utcStart, utcEnd);
+        return {
+            bookingList,
+            total
+        };
     });
-    return {
-        service
-    };
 };
 exports.GetBookingByStaffService = GetBookingByStaffService;

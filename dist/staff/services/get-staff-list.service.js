@@ -16,9 +16,15 @@ const getStaffListService = async (page) => {
         const skip = (getPage - 1) * pagnition_1.DEFAULT_PAGE_SIZE;
         const staffs = await staffRepos.getPagnition(skip, pagnition_1.DEFAULT_PAGE_SIZE);
         const total = staffRepos.count();
+        const totalActive = staffRepos.countByStatus(true);
+        const totalInActive = staffRepos.countByStatus(false);
+        const totalNewInMonth = staffRepos.countNewInMonth();
         return {
             items: staffs,
-            total
+            total,
+            totalActive,
+            totalInActive,
+            totalNewInMonth
         };
     }
     catch (error) {
