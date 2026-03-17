@@ -37,6 +37,7 @@ dotenv.config();
     });
     morgan.token('request-id', (req: any) => req.id);
     await connectRedis();
+    // await disconnectRedis();
     app.use(
       morgan((tokens, req: any, res) => {
         return JSON.stringify({
