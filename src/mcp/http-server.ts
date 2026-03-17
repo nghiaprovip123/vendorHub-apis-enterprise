@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
+import cors from 'cors';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import {
@@ -12,14 +13,12 @@ import { getBookingListService } from '@/booking/services/get-booking-list.servi
 import { getAvailableStaffbyBookingTimeService } from '@/staff/services/get-available-staff.service';
 import { GetBookingListDto } from '@/booking/dto/booking.validation';
 
-// ── Factory: tạo server instance mới cho mỗi SSE connection ──────────────────
 function createServer() {
   const server = new Server(
     { name: 'vendorhub', version: '1.0.0' },
     { capabilities: { tools: {}, resources: {} } }
   );
 
-  // List Tools
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
       {
@@ -51,10 +50,8 @@ function createServer() {
     ],
   }));
 
-  // Call Tool
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
-
     try {
       if (name === 'getAvailableStaff') {
         const input = z.object({
@@ -75,10 +72,7 @@ function createServer() {
           startTime: input.startTime,
           endTime,
         });
-
-        return {
-          content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
-        };
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
       }
 
       if (name === 'getBookingList') {
@@ -89,7 +83,6 @@ function createServer() {
         }).parse(args);
 
         const result = await getBookingListService(input as z.infer<typeof GetBookingListDto>);
-
         return {
           content: [{
             type: 'text',
@@ -107,7 +100,6 @@ function createServer() {
       }
 
       throw new Error(`Unknown tool: ${name}`);
-
     } catch (error) {
       return {
         content: [{ type: 'text', text: `Error: ${(error as Error).message}` }],
@@ -116,35 +108,24 @@ function createServer() {
     }
   });
 
-  // List Resources
   server.setRequestHandler(ListResourcesRequestSchema, async () => ({
-    resources: [
-      {
-        uri:         'vendorhub://bookings/today',
-        name:        "Today's Bookings",
-        description: 'Live booking list for today',
-        mimeType:    'application/json',
-      },
-    ],
+    resources: [{
+      uri:         'vendorhub://bookings/today',
+      name:        "Today's Bookings",
+      description: 'Live booking list for today',
+      mimeType:    'application/json',
+    }],
   }));
 
-  // Read Resource
   server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
     const { uri } = request.params;
-
     if (uri === 'vendorhub://bookings/today') {
       const today = new Date().toISOString().split('T')[0];
       const result = await getBookingListService({ startDate: today, endDate: today });
-
       return {
-        contents: [{
-          uri,
-          mimeType: 'application/json',
-          text: JSON.stringify(result.bookingList, null, 2),
-        }],
+        contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(result.bookingList, null, 2) }],
       };
     }
-
     throw new Error(`Unknown resource: ${uri}`);
   });
 
@@ -153,13 +134,49 @@ function createServer() {
 
 // ── Express App ───────────────────────────────────────────────────────────────
 const app = express();
-app.use(express.json());
+
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+// Session store
+const transports: Record<string, SSEServerTransport> = {};
+
+// ── Routes TRƯỚC express.json() ───────────────────────────────────────────────
+
+// Health check
+app.get('/health', (_req: Request, res: Response) => {
+  res.json({ status: 'ok', sessions: Object.keys(transports).length });
+});
+
+// Messages — KHÔNG có express.json() middleware, SSEServerTransport tự đọc raw stream
+app.post('/messages', async (req: Request, res: Response) => {
+  console.log('[MCP] POST /messages sessionId:', req.query.sessionId);
+  const sessionId = req.query.sessionId as string;
+  const transport = transports[sessionId];
+  if (!transport) {
+    console.error('[MCP] Session not found:', sessionId);
+    res.status(404).json({ error: 'Session not found' });
+    return;
+  }
+  try {
+    await transport.handlePostMessage(req, res);
+  } catch (error) {
+    console.error('[MCP] handlePostMessage error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ── express.json() chỉ áp dụng cho các route phía dưới ───────────────────────
+app.use(express.json({ limit: '10mb' }));
 
 // Auth middleware
 const API_KEY = process.env.MCP_API_KEY ?? '';
 app.use((req: Request, res: Response, next: NextFunction) => {
   if (!API_KEY) {
-    console.warn('WARNING: MCP_API_KEY is not set');
+    console.warn('[MCP] WARNING: MCP_API_KEY is not set');
     return next();
   }
   const auth = req.headers['authorization'];
@@ -170,37 +187,18 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// SSE endpoint — Claude Desktop kết nối vào đây
-const transports: Record<string, SSEServerTransport> = {};
-
+// SSE endpoint — cần auth
 app.get('/sse', async (req: Request, res: Response) => {
+  console.log('[MCP] SSE connection established');
   const transport = new SSEServerTransport('/messages', res);
   transports[transport.sessionId] = transport;
-
+  console.log('[MCP] Session created:', transport.sessionId);
   const server = createServer();
   await server.connect(transport);
-
   req.on('close', () => {
+    console.log('[MCP] Session closed:', transport.sessionId);
     delete transports[transport.sessionId];
   });
-});
-
-// Message endpoint — SSE transport dùng để nhận message từ client
-app.post('/messages', async (req: Request, res: Response) => {
-  const sessionId = req.query.sessionId as string;
-  const transport = transports[sessionId];
-
-  if (!transport) {
-    res.status(404).json({ error: 'Session not found' });
-    return;
-  }
-
-  await transport.handlePostMessage(req, res);
-});
-
-// Health check
-app.get('/health', (_req: Request, res: Response) => {
-  res.json({ status: 'ok', sessions: Object.keys(transports).length });
 });
 
 // ── Start ─────────────────────────────────────────────────────────────────────

@@ -4,16 +4,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
 const index_js_1 = require("@modelcontextprotocol/sdk/server/index.js");
 const sse_js_1 = require("@modelcontextprotocol/sdk/server/sse.js");
 const types_js_1 = require("@modelcontextprotocol/sdk/types.js");
 const zod_1 = require("zod");
 const get_booking_list_service_1 = require("../booking/services/get-booking-list.service");
 const get_available_staff_service_1 = require("../staff/services/get-available-staff.service");
-// ── Factory: tạo server instance mới cho mỗi SSE connection ──────────────────
 function createServer() {
     const server = new index_js_1.Server({ name: 'vendorhub', version: '1.0.0' }, { capabilities: { tools: {}, resources: {} } });
-    // List Tools
     server.setRequestHandler(types_js_1.ListToolsRequestSchema, async () => ({
         tools: [
             {
@@ -44,7 +43,6 @@ function createServer() {
             },
         ],
     }));
-    // Call Tool
     server.setRequestHandler(types_js_1.CallToolRequestSchema, async (request) => {
         const { name, arguments: args } = request.params;
         try {
@@ -63,9 +61,7 @@ function createServer() {
                     startTime: input.startTime,
                     endTime,
                 });
-                return {
-                    content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
-                };
+                return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
             }
             if (name === 'getBookingList') {
                 const input = zod_1.z.object({
@@ -98,29 +94,21 @@ function createServer() {
             };
         }
     });
-    // List Resources
     server.setRequestHandler(types_js_1.ListResourcesRequestSchema, async () => ({
-        resources: [
-            {
+        resources: [{
                 uri: 'vendorhub://bookings/today',
                 name: "Today's Bookings",
                 description: 'Live booking list for today',
                 mimeType: 'application/json',
-            },
-        ],
+            }],
     }));
-    // Read Resource
     server.setRequestHandler(types_js_1.ReadResourceRequestSchema, async (request) => {
         const { uri } = request.params;
         if (uri === 'vendorhub://bookings/today') {
             const today = new Date().toISOString().split('T')[0];
             const result = await (0, get_booking_list_service_1.getBookingListService)({ startDate: today, endDate: today });
             return {
-                contents: [{
-                        uri,
-                        mimeType: 'application/json',
-                        text: JSON.stringify(result.bookingList, null, 2),
-                    }],
+                contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(result.bookingList, null, 2) }],
             };
         }
         throw new Error(`Unknown resource: ${uri}`);
@@ -129,12 +117,43 @@ function createServer() {
 }
 // ── Express App ───────────────────────────────────────────────────────────────
 const app = (0, express_1.default)();
-app.use(express_1.default.json());
+app.use((0, cors_1.default)({
+    origin: '*',
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+// Session store
+const transports = {};
+// ── Routes TRƯỚC express.json() ───────────────────────────────────────────────
+// Health check
+app.get('/health', (_req, res) => {
+    res.json({ status: 'ok', sessions: Object.keys(transports).length });
+});
+// Messages — KHÔNG có express.json() middleware, SSEServerTransport tự đọc raw stream
+app.post('/messages', async (req, res) => {
+    console.log('[MCP] POST /messages sessionId:', req.query.sessionId);
+    const sessionId = req.query.sessionId;
+    const transport = transports[sessionId];
+    if (!transport) {
+        console.error('[MCP] Session not found:', sessionId);
+        res.status(404).json({ error: 'Session not found' });
+        return;
+    }
+    try {
+        await transport.handlePostMessage(req, res);
+    }
+    catch (error) {
+        console.error('[MCP] handlePostMessage error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+// ── express.json() chỉ áp dụng cho các route phía dưới ───────────────────────
+app.use(express_1.default.json({ limit: '10mb' }));
 // Auth middleware
 const API_KEY = process.env.MCP_API_KEY ?? '';
 app.use((req, res, next) => {
     if (!API_KEY) {
-        console.warn('WARNING: MCP_API_KEY is not set');
+        console.warn('[MCP] WARNING: MCP_API_KEY is not set');
         return next();
     }
     const auth = req.headers['authorization'];
@@ -144,30 +163,18 @@ app.use((req, res, next) => {
     }
     next();
 });
-// SSE endpoint — Claude Desktop kết nối vào đây
-const transports = {};
+// SSE endpoint — cần auth
 app.get('/sse', async (req, res) => {
+    console.log('[MCP] SSE connection established');
     const transport = new sse_js_1.SSEServerTransport('/messages', res);
     transports[transport.sessionId] = transport;
+    console.log('[MCP] Session created:', transport.sessionId);
     const server = createServer();
     await server.connect(transport);
     req.on('close', () => {
+        console.log('[MCP] Session closed:', transport.sessionId);
         delete transports[transport.sessionId];
     });
-});
-// Message endpoint — SSE transport dùng để nhận message từ client
-app.post('/messages', async (req, res) => {
-    const sessionId = req.query.sessionId;
-    const transport = transports[sessionId];
-    if (!transport) {
-        res.status(404).json({ error: 'Session not found' });
-        return;
-    }
-    await transport.handlePostMessage(req, res);
-});
-// Health check
-app.get('/health', (_req, res) => {
-    res.json({ status: 'ok', sessions: Object.keys(transports).length });
 });
 // ── Start ─────────────────────────────────────────────────────────────────────
 const PORT = Number(process.env.MCP_PORT ?? 3456);
