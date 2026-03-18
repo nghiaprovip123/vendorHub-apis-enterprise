@@ -14,132 +14,132 @@ import dotenv from "dotenv";
 import { graphqlUploadExpress } from 'graphql-upload-minimal';
 import { logger, createContextLogger } from './lib/logger';
 import morgan from 'morgan';
-import AuthRouter from '@/auth/routes/auth.route'
-import { errorHandler } from '@/common/guards/error.guard'
+import AuthRouter from '@/auth/routes/auth.route';
+import { errorHandler } from '@/common/guards/error.guard';
 import cookieParser from "cookie-parser";
-import { apiLimiter } from "@/common/guards/rate-limiter"
-import { pubsub } from '@/pubsub/pubsub'
-import { startBookingStatusCron } from "@/booking/cron/booking.cron"
-import './mcp/http-server';
-import redisClient, { connectRedis, disconnectRedis } from '@/lib/redis';
+import { apiLimiter } from "@/common/guards/rate-limiter";
+import { pubsub } from '@/pubsub/pubsub';
+import { startBookingStatusCron } from "@/booking/cron/booking.cron";
+import './mcp/http-server'; // ← 1 lần duy nhất
+import { connectRedis } from '@/lib/redis';
+import { createBullBoard } from '@bull-board/api';
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
+import { ExpressAdapter } from '@bull-board/express';
+import { avatarQueue } from '@/staff/queues/staff.upload.queue';
+import '@/staff/queues/staff.upload.worker'
 
 dotenv.config();
 
 (async function () {
-    const PORT = Number(process.env.PORT) || 3000;
-    const app = express();
-    app.use(express.json())
-    app.use(cookieParser()); 
-    app.use((req: any, res, next) => {
-        req.id = Math.random().toString(36).substring(7);
-        res.setHeader('X-Request-ID', req.id);
-        next();
-    });
-    morgan.token('request-id', (req: any) => req.id);
-    await connectRedis();
-    // await disconnectRedis();
-    app.use(
-      morgan((tokens, req: any, res) => {
-        return JSON.stringify({
-          type: 'http_access',
-          request_id: req.id,
-          method: tokens.method(req, res),
-          url: tokens.url(req, res),
-          status: Number(tokens.status(req, res)),
-          response_time_ms: Number(tokens['response-time'](req, res)),
-          content_length: tokens.res(req, res, 'content-length'),
-          user_agent: tokens['user-agent'](req, res),
-          ip: tokens['remote-addr'](req, res),
-        });
-      }, {
-        stream: {
-          write: (message: string) => {
-            logger.info('http_request', JSON.parse(message));
-          },
+  const PORT = Number(process.env.PORT) || 3000;
+  const app = express();
+
+  // ── Middleware cơ bản ────────────────────────────────────
+  app.use(express.json());
+  app.use(cookieParser());
+  app.use(cors({ origin: true, credentials: true })); // 1 lần duy nhất
+
+  // Request ID
+  app.use((req: any, res, next) => {
+    req.id = Math.random().toString(36).substring(7);
+    res.setHeader('X-Request-ID', req.id);
+    next();
+  });
+
+  // Morgan logging
+  morgan.token('request-id', (req: any) => req.id);
+  app.use(
+    morgan((tokens, req: any, res) => {
+      return JSON.stringify({
+        type: 'http_access',
+        request_id: req.id,
+        method: tokens.method(req, res),
+        url: tokens.url(req, res),
+        status: Number(tokens.status(req, res)),
+        response_time_ms: Number(tokens['response-time'](req, res)),
+        content_length: tokens.res(req, res, 'content-length'),
+        user_agent: tokens['user-agent'](req, res),
+        ip: tokens['remote-addr'](req, res),
+      });
+    }, {
+      stream: {
+        write: (message: string) => {
+          logger.info('http_request', JSON.parse(message));
         },
-      })
-    );
-    
-    const httpServer = createServer(app);
-    
-    
+      },
+    })
+  );
 
-    interface createNewsEventInput {
-        title: string
-        description: string
-    }
-    app.use(cors({
-      origin: true,
-      credentials: true,
-    }));    
-    
-    const schema = makeExecutableSchema({ typeDefs, resolvers: resolvers });
+  // ── Bull Board ───────────────────────────────────────────
+  const bullBoardAdapter = new ExpressAdapter();
+  bullBoardAdapter.setBasePath('/bull-board');
+  createBullBoard({
+    queues: [new BullMQAdapter(avatarQueue)],
+    serverAdapter: bullBoardAdapter,
+  });
+  app.use('/bull-board', bullBoardAdapter.getRouter());
 
-    // ws Server
-    const wsServer = new WebSocketServer({
-        server: httpServer,
-        path: "/graphql" // localhost:3000/graphql
+  // ── Redis ────────────────────────────────────────────────
+  await connectRedis();
+
+  // ── GraphQL Schema ───────────────────────────────────────
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
+  const httpServer = createServer(app);
+
+  const wsServer = new WebSocketServer({ server: httpServer, path: '/graphql' });
+  const serverCleanup = useServer({ schema }, wsServer);
+
+  const server = new ApolloServer({
+    schema,
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose();
+            },
+          };
+        },
+      },
+    ],
+  });
+
+  await server.start();
+
+  // ── Routes ───────────────────────────────────────────────
+  app.get('/health', (req, res) => res.status(200).send('OK'));
+  app.use('/auth', apiLimiter, AuthRouter);
+
+  // graphqlUploadExpress TRƯỚC expressMiddleware
+  app.use(graphqlUploadExpress({ maxFileSize: 5_000_000, maxFiles: 5 }));
+
+  app.use(
+    '/graphql',
+    bodyParser.json(),
+    expressMiddleware(server, {
+      context: async ({ req, res }: any) => ({
+        req,
+        res,
+        pubsub,
+        logger: createContextLogger({ request_id: req.id }),
+        requestId: req.id,
+      }),
+    })
+  );
+
+  app.use(errorHandler);
+
+  // ── Start ────────────────────────────────────────────────
+  httpServer.listen(PORT, '0.0.0.0', () => {
+    logger.info('Server started', {
+      port: PORT,
+      env: process.env.NODE_ENV,
+      graphql: '/graphql',
+      bullBoard: '/bull-board',
+      loki_enabled: !!process.env.GRAFANA_LOKI_URL,
     });
+  });
 
-    const serverCleanup = useServer({ schema }, wsServer); // dispose
-
-    // apollo server
-    const server = new ApolloServer({
-        schema,
-        plugins: [
-            ApolloServerPluginDrainHttpServer({ httpServer }),
-            {
-                async serverWillStart() {
-                    return {
-                        async drainServer() {
-                            await serverCleanup.dispose();
-                        }
-                    }
-                }
-            }
-        ]
-    });
-
-    await server.start();
-    
-    app.use(
-        graphqlUploadExpress({
-          maxFileSize: 5_000_000,
-          maxFiles: 5,
-        })
-      )
-    app.use('/auth', apiLimiter, AuthRouter)
-    app.get("/health", (req, res) => {
-      res.status(200).send("OK");
-    });
-    app.use('/graphql', cors(), bodyParser.json(), expressMiddleware(server, {
-        context: async ({ req, res }: any) => {
-            const contextLogger = createContextLogger({
-                request_id: req.id,
-            });
-            
-            return {
-                req,
-                res,
-                pubsub,
-                logger: contextLogger, // ← Add logger to context
-                requestId: req.id,
-            };
-        }
-    }));
-
-    app.use(errorHandler)
-
-    httpServer.listen(PORT, "0.0.0.0", () => {
-        logger.info('Server started', {
-            port: PORT,
-            env: process.env.NODE_ENV,
-            graphql: '/graphql',
-            loki_enabled: !!process.env.GRAFANA_LOKI_URL,
-        });
-    });
-    startBookingStatusCron() // ✅ BẮT BUỘC
-    await import('./mcp/http-server');
-
-
+  startBookingStatusCron();
 })();

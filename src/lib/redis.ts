@@ -44,4 +44,6 @@ export const disconnectRedis = async () => {
   }
 };
 
+export const redis = redisClient;
 export default redisClient;
+

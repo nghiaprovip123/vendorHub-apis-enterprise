@@ -1,70 +1,54 @@
-// create-staff.service.ts
+// staff/services/create-staff.service.ts
+import fs from "fs"
+import os from "os"
+import path from "path"
 import { prisma } from "@/lib/prisma"
-import { CloudinaryRest } from "@/common/utils/cloudinary-orchestration.utils"
 import * as z from "zod"
 import { createStaffSchema } from "@/staff/dto/staffs.validation"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
 import { WorkingHoursRepository } from "@/staff/repositories/working-hours.repository"
 import { StaffServiceRepository } from "@/staff/repositories/staff-service.repository"
 import { DateTimeStandardizer } from "@/common/utils/date-standard.utils"
+import { avatarQueue } from "@/staff/queues/staff.upload.queue"
 
 type CreateStaffServiceType = z.infer<typeof createStaffSchema>
 
 export const createStaffService = async (input: CreateStaffServiceType) => {
-  return prisma.$transaction(async (tx) => {
+  // Lưu avatar vào temp file TRƯỚC transaction
+  // → nếu transaction fail, chỉ cần xóa temp file, không có gì lên Cloudinary
+  let tempFilePath: string | null = null
+
+  if (input.avatar) {
+    const file = await input.avatar
+    const buffer = await streamToBuffer(file.createReadStream())
+
+    if (buffer.length > 5 * 1024 * 1024) {
+      throw new Error("File too large (max 5MB)")
+    }
+
+    // Ghi vào temp file — worker sẽ đọc từ đây
+    tempFilePath = path.join(os.tmpdir(), `avatar_${Date.now()}_${Math.random().toString(36).slice(2)}`)
+    fs.writeFileSync(tempFilePath, buffer)
+  }
+
+  // Transaction chỉ chứa DB operations — không có side effects
+  const result = await prisma.$transaction(async (tx) => {
     const staffRepo = new StaffRepository(tx)
     const workingHoursRepo = new WorkingHoursRepository(tx)
     const staffServiceRepo = new StaffServiceRepository(tx)
-    let avatar_url: string | null = null
-    let avatar_public_id: string | null = null
 
     const staff = await staffRepo.create({
       fullName: input.fullName,
       timezone: input.timezone,
       isActive: input.isActive ?? true,
       isDeleted: false,
-      phoneNumber: input.phoneNumber
+      phoneNumber: input.phoneNumber,
     })
 
-    if (input.avatar) {
-      const file = await input.avatar
-      const stream = file.createReadStream()
-
-      const env =
-        process.env.NODE_ENV === "production" ? "prod" : "dev"
-
-      const folder = `${env}/staffs`
-      const public_id = `${staff.id}/avatar`
-
-      const upload = await CloudinaryRest.UploadImageToCloudinary(stream, {
-        folder,
-        public_id,
-        resource_type: "image",
-      })
-
-      avatar_url = upload.secure_url
-      avatar_public_id = upload.public_id
-
-      await staffRepo.updateById(staff.id, {
-        avatar_url: upload.secure_url,
-        avatar_public_id: upload.public_id,
-      })
-    }
-
+    // Staff mới → không cần check duplicate, attach thẳng
     if (input.services?.length) {
-      const existing = await staffServiceRepo.findByStaffAndServices(staff.id, input.services)
-    
-      const existingIds = new Set(existing.map(e => e.serviceId))
-    
-      const data = input.services
-        .filter(serviceId => !existingIds.has(serviceId))
-
-    
-      if (data.length) {
-        await staffServiceRepo.attachServices(staff.id, data)
-      }
+      await staffServiceRepo.attachServices(staff.id, input.services)
     }
-    
 
     await workingHoursRepo.createManyWorkingHour(
       input.workingHours.map((wh) => ({
@@ -77,11 +61,27 @@ export const createStaffService = async (input: CreateStaffServiceType) => {
 
     const workingHours = await workingHoursRepo.findManyWorkingHour(staff.id)
 
-    return {
-      ...staff,
-      avatar_url,
-      avatar_public_id,
-      workingHours,
-    }
+    return { ...staff, workingHours }
+  })
+
+  // Enqueue upload SAU khi transaction thành công
+  // → DB đã có staff, worker update avatar_url sau
+  if (tempFilePath) {
+    await avatarQueue.add("upload", {
+      staffId: result.id,
+      tempFilePath,
+    })
+  }
+
+  return result
+}
+
+// Helper: stream → buffer
+function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = []
+    stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)))
+    stream.on("end", () => resolve(Buffer.concat(chunks)))
+    stream.on("error", reject)
   })
 }
