@@ -1,4 +1,3 @@
-// infrastructure/queues/avatar.queue.ts
 import { Queue } from "bullmq"
 import { bullmqConnection } from "@/lib/bullmq"
 import type { UploadJobData } from "./staff.upload.worker"

@@ -22,11 +22,7 @@ import { pubsub } from '@/pubsub/pubsub';
 import { startBookingStatusCron } from "@/booking/cron/booking.cron";
 import './mcp/http-server'; // ← 1 lần duy nhất
 import { connectRedis } from '@/lib/redis';
-import { createBullBoard } from '@bull-board/api';
-import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
-import { ExpressAdapter } from '@bull-board/express';
-import { avatarQueue } from '@/staff/queues/staff.upload.queue';
-import '@/staff/queues/staff.upload.worker'
+import { board }  from '@/lib/bull-dashboard'
 
 dotenv.config();
 
@@ -71,14 +67,7 @@ dotenv.config();
   );
 
   // ── Bull Board ───────────────────────────────────────────
-  const bullBoardAdapter = new ExpressAdapter();
-  bullBoardAdapter.setBasePath('/bull-board');
-  createBullBoard({
-    queues: [new BullMQAdapter(avatarQueue)],
-    serverAdapter: bullBoardAdapter,
-  });
-  app.use('/bull-board', bullBoardAdapter.getRouter());
-
+  await board(app)
   // ── Redis ────────────────────────────────────────────────
   await connectRedis();
 

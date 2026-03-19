@@ -1,6 +1,5 @@
 // infrastructure/queues/avatar.worker.ts
 import { Worker } from "bullmq"
-import { Readable } from "stream"
 import { bullmqConnection } from "@/lib/bullmq"
 import { CloudinaryRest } from "@/common/utils/cloudinary-orchestration.utils"
 import { prisma } from "@/lib/prisma"
@@ -8,7 +7,7 @@ import { logger } from "@/lib/logger"
 
 export interface UploadJobData {
   staffId: string
-  tempFilePath: string // ← path thay vì buffer
+  tempFilePath: string 
 }
 
 export const avatarWorker = new Worker<UploadJobData>(
@@ -24,7 +23,7 @@ export const avatarWorker = new Worker<UploadJobData>(
     const stat = fs.statSync(tempFilePath)
 
     if (stat.size > 5 * 1024 * 1024) {
-      fs.unlinkSync(tempFilePath) // cleanup
+      fs.unlinkSync(tempFilePath) 
       throw new Error("File too large (max 5MB)")
     }
 

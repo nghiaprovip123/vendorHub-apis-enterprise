@@ -9,7 +9,7 @@ import { OTPRepository } from "@/auth/repositories/otp.repository"
 import { RateLimit } from "@/common/utils/rate-limit.utils"
 import { IdentifiersRepository } from "@/auth/repositories/identifiers.repository"
 import { IdentifierType } from "@/auth/enum/identifier-type.enum"
-
+import { sendOtpQueue } from "@/auth/queues/email.send.queue"
 type SendOTPServiceType = z.infer<typeof SendOTPSchema>
 type SendOTPServiceResult = {
     otp: any,
@@ -103,11 +103,17 @@ export class SendOTPService {
         try {
             switch (type) {
                 case VerifyOTPType.VERIFY_OTP_REGISTERATION: {
-                    await sendOtpEmailRegisteration(email, result.generateOTP)
+                    await sendOtpQueue.add('register', {
+                        email,
+                        generateOTP: result.generateOTP
+                      })
                     break
                 }
                 case VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD: {
-                    await sendOtpEmailForgotPassword(email, result.generateOTP)
+                    await sendOtpQueue.add('forgot-password', {
+                        email,
+                        generateOTP: result.generateOTP
+                      })                    
                     break
                 }
             }
