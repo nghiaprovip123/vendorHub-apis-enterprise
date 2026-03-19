@@ -7,6 +7,7 @@ import { ServiceMediaType } from "@prisma/client"
 import { ServiceRepository } from "@/service/repositories/service.repository"
 import { ServiceMediaRepository } from "@/service/repositories/service-media.repository"
 import ApiError from "@/common/utils/ApiError.utils"
+import redisClient from "@/lib/redis"
 
 type CreateServiceInput = z.infer< typeof CreateServiceDto >
 
@@ -94,5 +95,6 @@ export const CreateServiceService = async (
               return { service: serviceWithMedias }
         }
     )
+    await redisClient.del('service:list:page:1')  
     return service
 }

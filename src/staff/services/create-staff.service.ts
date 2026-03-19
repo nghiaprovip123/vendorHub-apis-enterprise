@@ -10,6 +10,7 @@ import { WorkingHoursRepository } from "@/staff/repositories/working-hours.repos
 import { StaffServiceRepository } from "@/staff/repositories/staff-service.repository"
 import { DateTimeStandardizer } from "@/common/utils/date-standard.utils"
 import { avatarQueue } from "@/staff/queues/staff.upload.queue"
+import redisClient from "@/lib/redis"
 
 type CreateStaffServiceType = z.infer<typeof createStaffSchema>
 
@@ -72,7 +73,7 @@ export const createStaffService = async (input: CreateStaffServiceType) => {
       tempFilePath,
     })
   }
-
+  await redisClient.del('staff:list:page:1')  
   return result
 }
 

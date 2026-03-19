@@ -10,6 +10,7 @@ import { ServiceError } from "@/common/utils/error/service.error"
 import { StaffServiceRepository } from "@/staff/repositories/staff-service.repository"
 import ApiError from "@/common/utils/ApiError.utils"
 import { DateTimeStandardizer } from "@/common/utils/date-standard.utils"
+import redisClient from "@/lib/redis"
 
 type UpdateStaffType = z.infer<typeof updateStaffSchema>
 
@@ -142,6 +143,7 @@ export const updateStaffService = async (input: UpdateStaffType) => {
             services
         };
     });
+    await redisClient.del('staff:list:page:1')  
 
     return result;
 };

@@ -7,6 +7,7 @@ import { ServiceRepository } from "@/service/repositories/service.repository"
 import { UpdateServiceDto } from "@/service/dto/service.validation"
 import * as z from "zod"
 import ApiError from "@/common/utils/ApiError.utils"
+import redisClient from "@/lib/redis"
 
 type UpdateServiceServiceInput = z.infer<typeof UpdateServiceDto>
 
@@ -160,6 +161,7 @@ export const UpdateServiceService = async (
         ServiceError.SERVICE_PRISMA_ERROR
       )
     }
+    await redisClient.del('service:list:page:1')  
 
     return { service: serviceWithMedias }
   })
