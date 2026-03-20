@@ -33,8 +33,23 @@ dotenv.config();
   // ── Middleware cơ bản ────────────────────────────────────
   app.use(express.json());
   app.use(cookieParser());
-  app.use(cors({ origin: true, credentials: true })); // 1 lần duy nhất
-
+  const allowedOrigins = [
+    'https://my-core-is-business.vercel.app',  // prod
+    'http://vh.local:3001',                     // local
+    'http://localhost:3000',                    // local
+    'http://localhost:3001',                    // local
+  ];
+  
+  app.use(cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true
+  }));
   // Request ID
   app.use((req: any, res, next) => {
     req.id = Math.random().toString(36).substring(7);
