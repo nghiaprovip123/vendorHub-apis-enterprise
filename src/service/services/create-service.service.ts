@@ -9,15 +9,13 @@ import { ServiceMediaRepository } from "@/service/repositories/service-media.rep
 import ApiError from "@/common/utils/ApiError.utils"
 import redisClient from "@/lib/redis"
 import { serviceImageQueue } from "@/service/queues/service.upload.queue"
-
+import { UploadJobData } from "@/service/queues/service.upload.worker"
 type CreateServiceInput = z.infer< typeof CreateServiceDto >
 
 export const CreateServiceService = async (input: CreateServiceInput) => {
     const {
         categoryId, name, description,
         currency = "VND", duration, price, medias = [],
-        displayPrice,  // ✅ don't drop these
-        isVisible,     // ✅
     } = input
 
     // 1. Create service
@@ -30,51 +28,32 @@ export const CreateServiceService = async (input: CreateServiceInput) => {
         return created
     })
 
-    // 2. Upload to Cloudinary (streams must be consumed here, not in worker)
-    if (medias.length > 0) {
-        const uploadedMedias = await Promise.allSettled(
-            medias.map(async (media, index) => {
-                const file = await media.file
-                const stream = file.createReadStream()
-                const env = process.env.NODE_ENV === "production" ? "prod" : "dev"
-
-                const upload = await CloudinaryRest.UploadImageToCloudinary(stream, {
-                    folder: `${env}/services/${createdService.id}`,
-                    public_id: `image_${index}`,
-                    resource_type: "image",
-                })
-
-                return {
-                    url: upload.secure_url,
-                    public_id: upload.public_id,
-                    type: media.type as ServiceMediaType,
-                    order: media.order ?? index,
-                }
-            })
-        )
-
-        const successfulUploads = uploadedMedias
-            .filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled")
-            .map((r) => r.value)
-
-        if (successfulUploads.length > 0) {
-            await serviceImageQueue.add("service-media-upload", {
-                serviceId: createdService.id,
-                medias: successfulUploads,
-            })
-        }
-    }
-
-    // 3. Invalidate cache
-    await redisClient.del("service:list:page:1")
-
-    // 4. Return fresh service with medias
-    const result = await prisma.service.findUnique({
-        where: { id: createdService.id },
-        include: { medias: { orderBy: { order: "asc" } } },
+    // 2. Buffer streams + enqueue upload (không block request)
+    const bufferedMedias: UploadJobData['medias'] = await Promise.all(
+        medias.map(async (media, index) => {
+            const file = await media.file
+            const stream = file.createReadStream()
+            const chunks: Buffer[] = []
+            for await (const chunk of stream) chunks.push(chunk)
+    
+            return {
+                buffer: Buffer.concat(chunks).toString('base64'),
+                type: media.type as ServiceMediaType,
+                order: media.order ?? index,
+            }
+        })
+    )
+    
+    await serviceImageQueue.add('service-media-upload', {
+        serviceId: createdService.id,
+        medias: bufferedMedias,
     })
-    
-    if (!result) throw new ApiError(500, "Failed to fetch created service")
-    
-    return { service: result } // ✅ matches ServiceResponse { service: Service! }
+
+    // 3. Invalidate cache — không block nếu fail
+    redisClient.del("service:list:page:1").catch(err =>
+        console.error('Cache invalidation failed:', err)
+    )
+
+    // 4. Return ngay — medias sẽ có sau khi worker xử lý xong
+    return { service: createdService }
 }
