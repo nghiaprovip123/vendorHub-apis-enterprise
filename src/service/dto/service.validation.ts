@@ -4,11 +4,15 @@ import { ServiceError } from "@/common/utils/error/service.error"
 
 export const CreateServiceMediaDto = z.object(
     {
-        file: z.any(),
+        file: z.any().refine((file: any) => {
+            if (!file) return true;
+            // Approximate size check via promise (GraphQLUpload has promiseFileInfo())
+            return file.promiseFileInfo().then(info => info.size <= 10 * 1024 * 1024).catch(() => false);
+        }, { message: "File size must be ≤ 10MB" }),
         type: z.enum(ServiceMediaType),
-        order: z.int().optional()
+        order: z.int().min(0).max(99).optional()
     }
-)
+}
 export const UpdateServiceMediaDto = z.object(
     {
         id: z.string(),
@@ -26,7 +30,7 @@ export const CreateServiceDto = z.object(
         displayPrice: z.boolean().optional(),
         duration: z.int(ServiceError.SERVICE_DTO_DURATION),
         isVisible: z.boolean().optional(),
-        medias: z.array(CreateServiceMediaDto),
+        medias: z.array(CreateServiceMediaDto).max(10, "Max 10 medias"),
         price: z.int(ServiceError.SERVICE_DTO_PRICE)
     }
 )

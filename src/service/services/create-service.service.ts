@@ -9,6 +9,11 @@ import { ServiceMediaRepository } from "@/service/repositories/service-media.rep
 import ApiError from "@/common/utils/ApiError.utils"
 import redisClient from "@/lib/redis"
 import { serviceImageQueue } from "@/service/queues/service.upload.queue"
+import * as fsSync from "fs"
+import * as fs from "fs/promises"
+import * as path from "path"
+import * as crypto from "crypto"
+import * as os from "os"
 import { UploadJobData } from "@/service/queues/service.upload.worker"
 type CreateServiceInput = z.infer< typeof CreateServiceDto >
 
@@ -28,16 +33,31 @@ export const CreateServiceService = async (input: CreateServiceInput) => {
         return created
     })
 
-    // 2. Buffer streams + enqueue upload (không block request)
-    const bufferedMedias: UploadJobData['medias'] = await Promise.all(
-        medias.map(async (media, index) => {
-            const file = await media.file
-            const stream = file.createReadStream()
-            const chunks: Buffer[] = []
-            for await (const chunk of stream) chunks.push(chunk)
+    // 2. Write to temp files + enqueue paths (fast stream pipe)
+    console.log('Processing medias:', medias.map(m => ({type: m.type, file: !!m.file}))) // DEBUG
     
+    const tempMedias: UploadJobData['medias'] = await Promise.all(
+        medias.filter(media => media.file).map(async (media, index) => {  // Skip null files
+            const file = await media.file
+            const fileInfo = await file
+            const stream = fileInfo.createReadStream()
+            
+            // Unique temp filepath
+            const tempDir = os.tmpdir()
+            const filename = `service-media-${crypto.randomUUID()}-${Date.now()}-${index}`
+            const tempPath = path.join(tempDir, filename)
+            
+            // Pipe stream to temp file (non-blocking)
+            await new Promise<void>((resolve, reject) => {
+                const writeStream = fsSync.createWriteStream(tempPath)
+                stream.pipe(writeStream)
+                writeStream.on('finish', () => resolve())
+                writeStream.on('error', reject)
+                stream.on('error', reject)
+            })
+            
             return {
-                buffer: Buffer.concat(chunks).toString('base64'),
+                tempPath,
                 type: media.type as ServiceMediaType,
                 order: media.order ?? index,
             }
@@ -46,7 +66,7 @@ export const CreateServiceService = async (input: CreateServiceInput) => {
     
     await serviceImageQueue.add('service-media-upload', {
         serviceId: createdService.id,
-        medias: bufferedMedias,
+        medias: tempMedias,
     })
 
     // 3. Invalidate cache — không block nếu fail

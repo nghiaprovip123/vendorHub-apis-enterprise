@@ -4,12 +4,13 @@ import { CloudinaryRest } from "@/common/utils/cloudinary-orchestration.utils"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { ServiceMediaType } from "@prisma/client"
-import { Readable } from "stream"
+import * as fs from "fs"
+import * as path from "path"
 
 export interface UploadJobData {
     serviceId: string
     medias: {
-        buffer: string        // base64
+        tempPath: string
         type: ServiceMediaType
         order: number
     }[]
@@ -23,22 +24,35 @@ new Worker<UploadJobData>(
 
         const uploadResults = await Promise.allSettled(
             medias.map(async (media) => {
-                // Deserialize base64 → stream
-                const buffer = Buffer.from(media.buffer, "base64")
-                const stream = Readable.from(buffer)
+                try {
+                    // Verify temp file exists
+                    if (!fs.existsSync(media.tempPath)) {
+                        throw new Error(`Temp file missing: ${media.tempPath}`)
+                    }
 
-                const upload = await CloudinaryRest.UploadImageToCloudinary(stream, {
-                    folder: `${env}/services/${serviceId}`,
-                    public_id: `image_${media.order}`,
-                    resource_type: "image",
-                })
+                    // Create read stream from temp file
+                    const tempStream = fs.createReadStream(media.tempPath)
 
-                return {
-                    serviceId,
-                    url: upload.secure_url,
-                    public_id: upload.public_id,
-                    type: media.type,
-                    order: media.order,
+                    const upload = await CloudinaryRest.UploadImageToCloudinary(tempStream, {
+                        folder: `${env}/services/${serviceId}`,
+                        public_id: `image_${media.order}`,
+                        resource_type: "image",
+                    })
+
+                    // Cleanup temp file
+                    await fs.promises.unlink(media.tempPath).catch(err => logger.warn(`Cleanup failed ${media.tempPath}:`, err))
+
+                    return {
+                        serviceId,
+                        url: upload.secure_url,
+                        public_id: upload.public_id,
+                        type: media.type,
+                        order: media.order,
+                    }
+                } catch (err) {
+                    // Cleanup on error
+                    await fs.promises.unlink(media.tempPath).catch(() => {})
+                    throw err
                 }
             })
         )
@@ -49,12 +63,15 @@ new Worker<UploadJobData>(
 
         const failed = uploadResults.filter((r) => r.status === "rejected")
         if (failed.length > 0) {
-            logger.warn(`[service-media-upload] ${failed.length} upload(s) failed for service ${serviceId}`)
+            logger.warn(`[service-media-upload] ${failed.length} upload(s) failed for service ${serviceId}:`, failed.map(f => f.reason))
         }
 
         if (successful.length > 0) {
             await prisma.serviceMedia.createMany({ data: successful })
         }
     },
-    { connection: bullmqConnection }
+    { 
+        connection: bullmqConnection,
+        concurrency: 3, // Limit parallel Cloudinary uploads
+    }
 )

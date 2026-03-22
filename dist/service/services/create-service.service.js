@@ -42,18 +42,17 @@ const CreateServiceService = async (input) => {
             }
             await serviceMediaRepo.createMany(uploadMedias);
         }
-        const serviceWithMedias = await tx.service.findUnique({
+        const result = await prisma.service.findUnique({
             where: { id: createdService.id },
             include: {
-                medias: {
-                    orderBy: { order: 'asc' }
-                }
-            }
-        });
-        if (!serviceWithMedias) {
-            throw new ApiError_utils_1.default(500, 'Failed to fetch created service');
-        }
-        return { service: serviceWithMedias };
+                medias: { orderBy: { order: 'asc' } },
+                category: true,  // schema cũng có category field
+            },
+        })
+        
+        if (!result) throw new ApiError(500, "Failed to fetch created service")
+        
+        return { service: result }
     });
     return service;
 };
