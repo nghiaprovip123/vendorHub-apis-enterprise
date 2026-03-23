@@ -27,7 +27,7 @@ type Service {
   duration: Int!
   price: Int!
   isVisible: Boolean!
-  medias: [ServiceMedia!]!
+  medias: [ServiceMedia]
   createdAt: DateTime!
 }
 

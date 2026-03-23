@@ -7,12 +7,12 @@ exports.sendOTPService = exports.SendOTPService = void 0;
 const postgresQL_1 = __importDefault(require("../../lib/postgresQL"));
 const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
 const crypto_1 = __importDefault(require("crypto"));
-const send_otp_helper_utils_1 = require("../../common/utils/send-otp-helper.utils");
 const verify_otp_type_enum_1 = require("../../auth/enum/verify-otp-type.enum");
 const otp_repository_1 = require("../../auth/repositories/otp.repository");
 const rate_limit_utils_1 = require("../../common/utils/rate-limit.utils");
 const identifiers_repository_1 = require("../../auth/repositories/identifiers.repository");
 const identifier_type_enum_1 = require("../../auth/enum/identifier-type.enum");
+const email_send_queue_1 = require("../../auth/queues/email.send.queue");
 class SendOTPService {
     async sendOTP(email, phone, type) {
         const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(postgresQL_1.default);
@@ -77,11 +77,17 @@ class SendOTPService {
         try {
             switch (type) {
                 case verify_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_REGISTERATION: {
-                    await (0, send_otp_helper_utils_1.sendOtpEmailRegisteration)(email, result.generateOTP);
+                    await email_send_queue_1.sendOtpQueue.add('register', {
+                        email,
+                        generateOTP: result.generateOTP
+                    });
                     break;
                 }
                 case verify_otp_type_enum_1.VerifyOTPType.VERIFY_OTP_FORGOT_PASSWORD: {
-                    await (0, send_otp_helper_utils_1.sendOtpEmailForgotPassword)(email, result.generateOTP);
+                    await email_send_queue_1.sendOtpQueue.add('forgot-password', {
+                        email,
+                        generateOTP: result.generateOTP
+                    });
                     break;
                 }
             }

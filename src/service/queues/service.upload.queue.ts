@@ -9,13 +9,5 @@ export const serviceImageQueue = new Queue<UploadJobData>("service-media-upload"
     backoff: { type: "exponential", delay: 2000 },
     removeOnComplete: { count: 100 },
     removeOnFail: { count: 50 },
-    timeout: 300000, // 5min for uploads
-  },
-  connection: bullmqConnection,
-  defaultJobOptions: {
-    attempts: 3,
-    backoff: { type: "exponential", delay: 2000 },
-    removeOnComplete: { count: 100 },
-    removeOnFail: { count: 50 },
   },
 })

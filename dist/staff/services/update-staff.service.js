@@ -14,6 +14,7 @@ const service_error_1 = require("../../common/utils/error/service.error");
 const staff_service_repository_1 = require("../../staff/repositories/staff-service.repository");
 const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
 const date_standard_utils_1 = require("../../common/utils/date-standard.utils");
+const redis_1 = __importDefault(require("../../lib/redis"));
 const updateStaffService = async (input) => {
     const existingStaff = await prisma_1.prisma.staff.findUnique({
         where: { id: input.id }
@@ -125,6 +126,7 @@ const updateStaffService = async (input) => {
             services
         };
     });
+    await redis_1.default.del('staff:list:page:1');
     return result;
 };
 exports.updateStaffService = updateStaffService;

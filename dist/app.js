@@ -1,37 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -58,21 +25,25 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const rate_limiter_1 = require("./common/guards/rate-limiter");
 const pubsub_1 = require("./pubsub/pubsub");
 const booking_cron_1 = require("./booking/cron/booking.cron");
-require("./mcp/http-server");
-// import redisClient, { connectRedis, disconnectRedis } from './lib/redis';
+require("./mcp/http-server"); // ← 1 lần duy nhất
+const redis_1 = require("./lib/redis");
+const bull_dashboard_1 = require("./lib/bull-dashboard");
 dotenv_1.default.config();
 (async function () {
     const PORT = Number(process.env.PORT) || 3000;
     const app = (0, express_1.default)();
+    // ── Middleware cơ bản ────────────────────────────────────
     app.use(express_1.default.json());
     app.use((0, cookie_parser_1.default)());
+    app.use((0, cors_1.default)({ origin: true, credentials: true })); // 1 lần duy nhất
+    // Request ID
     app.use((req, res, next) => {
         req.id = Math.random().toString(36).substring(7);
         res.setHeader('X-Request-ID', req.id);
         next();
     });
+    // Morgan logging
     morgan_1.default.token('request-id', (req) => req.id);
-    // await connectRedis();
     app.use((0, morgan_1.default)((tokens, req, res) => {
         return JSON.stringify({
             type: 'http_access',
@@ -92,19 +63,15 @@ dotenv_1.default.config();
             },
         },
     }));
-    const httpServer = (0, http_1.createServer)(app);
-    app.use((0, cors_1.default)({
-        origin: true,
-        credentials: true,
-    }));
+    // ── Bull Board ───────────────────────────────────────────
+    await (0, bull_dashboard_1.board)(app);
+    // ── Redis ────────────────────────────────────────────────
+    await (0, redis_1.connectRedis)();
+    // ── GraphQL Schema ───────────────────────────────────────
     const schema = (0, schema_1.makeExecutableSchema)({ typeDefs: typeDefs_1.typeDefs, resolvers: merge_resolvers_1.resolvers });
-    // ws Server
-    const wsServer = new ws_1.WebSocketServer({
-        server: httpServer,
-        path: "/graphql" // localhost:3000/graphql
-    });
-    const serverCleanup = (0, ws_2.useServer)({ schema }, wsServer); // dispose
-    // apollo server
+    const httpServer = (0, http_1.createServer)(app);
+    const wsServer = new ws_1.WebSocketServer({ server: httpServer, path: '/graphql' });
+    const serverCleanup = (0, ws_2.useServer)({ schema }, wsServer);
     const server = new server_1.ApolloServer({
         schema,
         plugins: [
@@ -114,44 +81,37 @@ dotenv_1.default.config();
                     return {
                         async drainServer() {
                             await serverCleanup.dispose();
-                        }
+                        },
                     };
-                }
-            }
-        ]
+                },
+            },
+        ],
     });
     await server.start();
-    app.use((0, graphql_upload_minimal_1.graphqlUploadExpress)({
-        maxFileSize: 5000000,
-        maxFiles: 5,
-    }));
+    // ── Routes ───────────────────────────────────────────────
+    app.get('/health', (req, res) => res.status(200).send('OK'));
     app.use('/auth', rate_limiter_1.apiLimiter, auth_route_1.default);
-    app.get("/health", (req, res) => {
-        res.status(200).send("OK");
-    });
-    app.use('/graphql', (0, cors_1.default)(), body_parser_1.default.json(), (0, express4_1.expressMiddleware)(server, {
-        context: async ({ req, res }) => {
-            const contextLogger = (0, logger_1.createContextLogger)({
-                request_id: req.id,
-            });
-            return {
-                req,
-                res,
-                pubsub: pubsub_1.pubsub,
-                logger: contextLogger, // ← Add logger to context
-                requestId: req.id,
-            };
-        }
+    // graphqlUploadExpress TRƯỚC expressMiddleware
+    app.use((0, graphql_upload_minimal_1.graphqlUploadExpress)({ maxFileSize: 5000000, maxFiles: 5 }));
+    app.use('/graphql', body_parser_1.default.json(), (0, express4_1.expressMiddleware)(server, {
+        context: async ({ req, res }) => ({
+            req,
+            res,
+            pubsub: pubsub_1.pubsub,
+            logger: (0, logger_1.createContextLogger)({ request_id: req.id }),
+            requestId: req.id,
+        }),
     }));
     app.use(error_guard_1.errorHandler);
-    httpServer.listen(PORT, "0.0.0.0", () => {
+    // ── Start ────────────────────────────────────────────────
+    httpServer.listen(PORT, '0.0.0.0', () => {
         logger_1.logger.info('Server started', {
             port: PORT,
             env: process.env.NODE_ENV,
             graphql: '/graphql',
+            bullBoard: '/bull-board',
             loki_enabled: !!process.env.GRAFANA_LOKI_URL,
         });
     });
-    (0, booking_cron_1.startBookingStatusCron)(); // ✅ BẮT BUỘC
-    await Promise.resolve().then(() => __importStar(require('./mcp/http-server')));
+    (0, booking_cron_1.startBookingStatusCron)();
 })();
