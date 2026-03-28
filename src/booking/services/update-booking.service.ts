@@ -172,4 +172,40 @@ export class updateBookingService {
       }
     )
   }
+
+  static async completeBooking (input: UpdateBookingInput) { 
+    const { 
+      id
+     } = input 
+     
+     const checkBooking = await prisma.booking.findFirst(
+      {
+        where: {
+          id: id
+        }
+      }
+     )
+
+     if (!checkBooking) {
+        throw new ApiError(
+          400,
+          BookingError.BOOKING_VIEW_DETAIL_BOOKING_NOT_EXISTS
+        )
+     }
+
+     if (checkBooking.status === "IN_PROGRESS") {
+      throw new Error("BOOKING IS NOT AVAILABLE FOR COMPLETING")
+     }
+
+     return await prisma.booking.update(
+      {
+        where: {
+          id: checkBooking.id
+        },
+        data: {
+          status: BookingStatus.COMPLETED
+        }
+      }
+     )
+  }
 }

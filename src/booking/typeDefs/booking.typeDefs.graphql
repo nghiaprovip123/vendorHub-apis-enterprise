@@ -127,6 +127,7 @@ type Mutation {
   assignStaffByBookingRequest(input: AssignStaffForBookingRequestInput): AssignStaffForBookingRequestResponse
   cancelBooking(input: UpdateBookingInput): CreateBookingResponse
   confirmBooking(input: UpdateBookingInput): CreateBookingResponse
+  completeBooking(input: UpdateBookingInput): CreateBookingResponse
 }
 
 type Query {
