@@ -10,6 +10,7 @@ import '@/staff/queues/staff.upload.worker'
 import '@/auth/queues/email.send.worker'
 import '@/service/queues/service.upload.worker'
 import '@/booking/queues/email-create-booking.worker'
+import '@/booking/queues/email-update-booking.worker'
 
 export const board = (app: any) => {
     const serverAdapter = new ExpressAdapter();

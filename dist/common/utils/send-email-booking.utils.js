@@ -1,50 +1,42 @@
-import nodemailer from "nodemailer";
-import { BookingStatus } from "@prisma/client"
-
-export const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sendEmailUpdateBookingInformation = exports.sendEmailBookingInformation = exports.transporter = void 0;
+const nodemailer_1 = __importDefault(require("nodemailer"));
+exports.transporter = nodemailer_1.default.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: false,
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+    },
 });
-
-export const sendEmailBookingInformation = async (
-    to: string, 
-    serviceName: string | null | undefined,
-    staffName: string | null | undefined,
-    customerName: string | null,
-    customerPhone: string | null,
-    status: BookingStatus,
-    day: string | null,
-    startTime: string | null,
-    endTime: string | null,
-    duration: number
-) => {
-
-    const getStatusColor = (s: string) => {
+const sendEmailBookingInformation = async (to, serviceName, staffName, customerName, customerPhone, status, day, startTime, endTime, duration) => {
+    const getStatusColor = (s) => {
         const normalized = s.toUpperCase();
-            if (normalized.includes('CONFIRM')) return '#2ECC71'; // Success Green
-            if (normalized.includes('PENDING')) return '#F39C12'; // Warning Amber
-            if (normalized.includes('CANCEL')) return '#E74C3C';  // Error Red
+        if (normalized.includes('CONFIRM'))
+            return '#2ECC71'; // Success Green
+        if (normalized.includes('PENDING'))
+            return '#F39C12'; // Warning Amber
+        if (normalized.includes('CANCEL'))
+            return '#E74C3C'; // Error Red
         return '#3498DB'; // Info Blue default
-  };
-
-  const statusColor = getStatusColor(status);
-
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    to,
-    subject: `[vendorHub] ${status.toUpperCase()}: ${serviceName} - ${day}`,
-    text: `Booking Information for ${customerName}: 
+    };
+    const statusColor = getStatusColor(status);
+    await exports.transporter.sendMail({
+        from: process.env.SMTP_FROM,
+        to,
+        subject: `[vendorHub] ${status.toUpperCase()}: ${serviceName} - ${day}`,
+        text: `Booking Information for ${customerName}: 
            Service: ${serviceName}
            Status: ${status}
            Time: ${startTime} - ${endTime} (${duration} mins)
            Staff: ${staffName}
            Date: ${day}`,
-    html: `
+        html: `
     <div style="background-color: #F8F9FA; padding: 40px 10px; font-family: 'Segoe UI', Arial, sans-serif;">
       <div style="max-width: 600px; margin: 0 auto; background-color: #FFFFFF; border-radius: 12px; overflow: hidden; border: 1px solid #95A5B8; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
         
@@ -111,43 +103,32 @@ export const sendEmailBookingInformation = async (
       </div>
     </div>
   `,
-  });
+    });
 };
-
-export const sendEmailUpdateBookingInformation = async (
-  to: string, 
-  serviceName: string | null | undefined,
-  staffName: string | null | undefined,
-  customerName: string | null,
-  customerPhone: string | null,
-  status: BookingStatus | null,
-  day: string | null,
-  startTime: string | null,
-  endTime: string | null,
-  duration: number
-) => {
-
-  const getStatusColor = (s: string | null) => {
-      const normalized = s?.toUpperCase();
-          if (normalized?.includes('CONFIRM')) return '#2ECC71'; // Success Green
-          if (normalized?.includes('PENDING')) return '#F39C12'; // Warning Amber
-          if (normalized?.includes('CANCEL')) return '#E74C3C';  // Error Red
-      return '#3498DB'; // Info Blue default
-};
-
-const statusColor = getStatusColor(status);
-
-await transporter.sendMail({
-  from: process.env.SMTP_FROM,
-  to,
-  subject: `[vendorHub] ${status?.toUpperCase()}: ${serviceName} - ${day}`,
-  text: `Booking Information for ${customerName}: 
+exports.sendEmailBookingInformation = sendEmailBookingInformation;
+const sendEmailUpdateBookingInformation = async (to, serviceName, staffName, customerName, customerPhone, status, day, startTime, endTime, duration) => {
+    const getStatusColor = (s) => {
+        const normalized = s?.toUpperCase();
+        if (normalized?.includes('CONFIRM'))
+            return '#2ECC71'; // Success Green
+        if (normalized?.includes('PENDING'))
+            return '#F39C12'; // Warning Amber
+        if (normalized?.includes('CANCEL'))
+            return '#E74C3C'; // Error Red
+        return '#3498DB'; // Info Blue default
+    };
+    const statusColor = getStatusColor(status);
+    await exports.transporter.sendMail({
+        from: process.env.SMTP_FROM,
+        to,
+        subject: `[vendorHub] ${status?.toUpperCase()}: ${serviceName} - ${day}`,
+        text: `Booking Information for ${customerName}: 
          Service: ${serviceName}
          Status: ${status}
          Time: ${startTime} - ${endTime} (${duration} mins)
          Staff: ${staffName}
          Date: ${day}`,
-  html: `
+        html: `
   <div style="background-color: #F8F9FA; padding: 40px 10px; font-family: 'Segoe UI', Arial, sans-serif;">
     <div style="max-width: 600px; margin: 0 auto; background-color: #FFFFFF; border-radius: 12px; overflow: hidden; border: 1px solid #95A5B8; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
       
@@ -214,7 +195,6 @@ await transporter.sendMail({
     </div>
   </div>
 `,
-});
+    });
 };
-
-
+exports.sendEmailUpdateBookingInformation = sendEmailUpdateBookingInformation;

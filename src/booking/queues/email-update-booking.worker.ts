@@ -1,25 +1,25 @@
 import { Worker } from "bullmq"
-import { sendEmailBookingInformation } from "@/common/utils/send-email-booking.utils"
+import { sendEmailUpdateBookingInformation } from "@/common/utils/send-email-booking.utils"
 import { bullmqConnection } from "@/lib/bullmq"
 import { BookingStatus } from "@prisma/client"
 
 
-export interface SendEmailBooking {
-    customerEmail: string,  
-    serviceName: string,
-    staffName: string,
-    customerName: string,
-    customerPhone: string,
-    status: BookingStatus,
-    day: string,
-    startTime: string,
-    endTime: string,
-    duration: number
+export interface SendUpdateEmailBooking {
+  customerEmail: string,  
+  serviceName: string | null,
+  staffName: string | null,
+  customerName: string | null,
+  customerPhone: string | null,
+  status: BookingStatus | null,
+  day: any,
+  startTime: any,
+  endTime: any,
+  duration: number
 }
 
 
-new Worker<SendEmailBooking>(
-  'send-booking-email',
+new Worker<SendUpdateEmailBooking>(
+  'send-update-booking-email',
   async (job) => {
     const { 
         serviceName,
@@ -34,7 +34,7 @@ new Worker<SendEmailBooking>(
         duration 
     } = job.data
 
-    await sendEmailBookingInformation(
+    await sendEmailUpdateBookingInformation(
         customerEmail, 
         serviceName,
         staffName,
@@ -51,3 +51,4 @@ new Worker<SendEmailBooking>(
     connection: bullmqConnection
   }
 )
+
