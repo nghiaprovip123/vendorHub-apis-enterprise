@@ -5,6 +5,7 @@ import { avatarQueue } from '@/staff/queues/staff.upload.queue';
 import { sendOtpQueue } from '@/auth/queues/email.send.queue'
 import { serviceImageQueue } from '@/service/queues/service.upload.queue';
 import { sendBookingEmailQueue } from '@/booking/queues/email-create-booking.queue'
+import { sendUpdateBookingEmailQueue } from '@/booking/queues/email-create-booking.queue'
 import '@/staff/queues/staff.upload.worker'
 import '@/auth/queues/email.send.worker'
 import '@/service/queues/service.upload.worker'
@@ -19,7 +20,8 @@ export const board = (app: any) => {
             new BullMQAdapter(avatarQueue),
             new BullMQAdapter(sendOtpQueue),
             new BullMQAdapter(serviceImageQueue),
-            new BullMQAdapter(sendBookingEmailQueue)
+            new BullMQAdapter(sendBookingEmailQueue),
+            new BullMQAdapter(sendUpdateBookingEmailQueue)
         ],
         serverAdapter,
     });
