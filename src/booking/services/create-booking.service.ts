@@ -8,9 +8,8 @@ import { ServiceRepository } from "@/service/repositories/service.repository"
 import { BookingRepository } from "@/booking/repositories/booking.repository"
 import { BookingStatus } from "@prisma/client"
 import { StaffRepository } from "@/staff/repositories/staff.repository"
-import { sendBookingRequestEmail } from "@/common/utils/send-otp-helper.utils"
-import { sendBookingRequestEmailConfirm } from "@/common/utils/send-otp-helper.utils"
-import ApiError from "@/common/utils/ApiError.utils" // Import ApiError
+import { sendBookingEmailQueue } from "@/booking/queues/email-create-booking.queue"
+import ApiError from "@/common/utils/ApiError.utils"
 
 export const VN_TIMEZONE = "Asia/Ho_Chi_Minh"
 
@@ -55,9 +54,6 @@ export class CreateBooking {
       const bookingStartDate = vnToUtc(`${day}T${startTime}`)
       const bookingEndDate = vnToUtc(`${day}T${endTime}`)
       const bookingDate = vnToUtc(`${day}T00:00:00`)
-      console.log(bookingEndDate)
-      console.log(bookingStartDate)
-      console.log(bookingDate)
 
       const now = new Date()
 
@@ -71,6 +67,39 @@ export class CreateBooking {
 
       const duration = differenceInMinutes(bookingEndDate, bookingStartDate)
 
+      if (!staffId) {
+        const booking = await bookingRepo.createBooking({
+          serviceId,
+          staffId,
+          customerName,
+          customerPhone,
+          customerEmail,
+          notes,
+          status: BookingStatus.PENDING,
+          slot: {
+            day: bookingDate,
+            startTime: bookingStartDate,
+            endTime: bookingEndDate,
+            durationInMinutes: duration,
+          },
+        })
+
+        await sendBookingEmailQueue.add("send-booking-email", {
+          customerEmail,
+          serviceName: service.name ?? "",
+          staffName: "No assignment",
+          customerName,
+          customerPhone,
+          status: BookingStatus.PENDING,
+          day,
+          startTime,
+          endTime,
+          duration,
+        })
+
+        return booking
+      }
+
       const isOverlap = await bookingRepo.checkOverlapWorkingHour(
         bookingStartDate,
         bookingEndDate,
@@ -82,49 +111,9 @@ export class CreateBooking {
         throw new ApiError(409, BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION)
       }
 
-      if (!staffId) {
-        const bookingData = {
-            customerName : customerName,
-            serviceName : service.name,
-            day : bookingDate,
-            startTime : bookingStartDate,
-            endTime : bookingEndDate,
-            staffName : 'No assignment',
-            notes : notes,
-            customerEmail : customerEmail
-          }
-          await sendBookingRequestEmail(bookingData)
+      const staff = await staffRepo.findById(staffId)
 
-        return bookingRepo.createBooking({
-            serviceId,
-            staffId,
-            customerName,
-            customerPhone,
-            customerEmail,
-            notes,
-            status: BookingStatus.PENDING,
-            slot: {
-              day: bookingDate,
-              startTime: bookingStartDate,
-              endTime: bookingEndDate,
-              durationInMinutes: duration,
-            },
-          })
-        }
-    const staffName = await staffRepo.findById(staffId)
-    const bookingData = {
-        customerName : customerName,
-        serviceName : service.name,
-        day : bookingDate,
-        startTime : bookingStartDate,
-        endTime : bookingEndDate,
-        staffName : staffName?.fullName,
-        notes : notes,
-        customerEmail : customerEmail
-      }
-      await sendBookingRequestEmailConfirm(bookingData)
-
-      return bookingRepo.createBooking({
+      const booking = await bookingRepo.createBooking({
         serviceId,
         staffId,
         customerName,
@@ -139,6 +128,21 @@ export class CreateBooking {
           durationInMinutes: duration,
         },
       })
+
+      await sendBookingEmailQueue.add("send-booking-email", {
+        customerEmail,
+        serviceName: service.name ?? "",
+        staffName: staff?.fullName ?? "",
+        customerName,
+        customerPhone,
+        status: BookingStatus.PENDING,
+        day,
+        startTime,
+        endTime,
+        duration,
+      })
+
+      return booking
     })
   }
 
@@ -152,17 +156,19 @@ export class CreateBooking {
       customerName,
       customerEmail,
       customerPhone,
+      notes,
     } = input
 
     if (!serviceId || !staffId) {
       throw new ApiError(400, BookingError.BOOKING_CREATION_MISSING_SERVICE_INFORMATION)
     }
 
-    return prisma.$transaction(async (tx) => {
+    const { booking, serviceName, staffName, duration } = await prisma.$transaction(async (tx) => {
       const serviceRepo = new ServiceRepository(tx)
       const bookingRepo = new BookingRepository(tx)
       const staffRepo = new StaffRepository(tx)
 
+      // Query names via repository using the IDs from input
       const service = await serviceRepo.findAvailableService(serviceId)
       if (!service) {
         throw new ApiError(404, BookingError.BOOKING_CREATION_SERVICE_NOT_AVAILABLE)
@@ -205,12 +211,13 @@ export class CreateBooking {
         throw new ApiError(409, BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION)
       }
 
-      return bookingRepo.createBooking({
+      const booking = await bookingRepo.createBooking({
         serviceId,
         staffId,
         customerName,
         customerEmail,
         customerPhone,
+        notes,
         status: BookingStatus.PENDING,
         slot: {
           day: bookingDate,
@@ -219,6 +226,30 @@ export class CreateBooking {
           durationInMinutes: duration,
         },
       })
+
+      // Resolve names from the queried entities and null-coalesce to string
+      return {
+        booking,
+        serviceName: service.name ?? "",
+        staffName: staff.fullName ?? "",
+        duration,
+      }
     })
+
+    // serviceName and staffName are now string (not null) and in scope
+    await sendBookingEmailQueue.add("send-booking-email", {
+      customerEmail,
+      serviceName,
+      staffName,
+      customerName,
+      customerPhone,
+      status: BookingStatus.PENDING,
+      day,
+      startTime,
+      endTime,
+      duration,
+    })
+
+    return booking
   }
 }
