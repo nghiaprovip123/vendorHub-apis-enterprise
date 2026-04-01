@@ -1,6 +1,5 @@
-import { prisma } from "@/lib/prisma"
-import { ServiceError } from "@/common/utils/error/service.error"
 import { ViewServiceDetailService } from "@/service/services/view-service-detail.service"
+import { requireAuth } from '@/common/guards/auth-graph.guard'
 
 const viewServiceDetail = async (
     _: unknown,
@@ -8,6 +7,8 @@ const viewServiceDetail = async (
     ctx : any
 ) => {
     try {
+        requireAuth(ctx)
+
         const result = await ViewServiceDetailService(args.input)
 
         return result
