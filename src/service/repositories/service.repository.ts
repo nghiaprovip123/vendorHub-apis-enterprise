@@ -37,7 +37,7 @@ export class ServiceRepository {
     async createService (
         categoryId: string, 
         name: string, 
-        description: string, 
+        description: string | undefined, 
         currency: string, 
         duration: number, 
         pricing: number   

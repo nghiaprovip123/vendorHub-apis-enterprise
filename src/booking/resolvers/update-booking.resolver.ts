@@ -8,11 +8,16 @@ export class UpdateBookingResolver {
     static async cancelBooking(_: unknown, args: { input: any }) {
       return await updateBookingService.cancelBooking(args.input)
     }
+    
+    static async completeBooking(_: unknown, args: { input: any }) {
+      return await updateBookingService.completeBooking(args.input)
+    }
   }
   
 export const UpdateBooking = {
     Mutation: {
         confirmBooking: UpdateBookingResolver.confirmBooking,
         cancelBooking: UpdateBookingResolver.cancelBooking,
+        completeBooking: UpdateBookingResolver.completeBooking
     }
 }

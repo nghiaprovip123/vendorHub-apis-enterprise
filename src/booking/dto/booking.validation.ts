@@ -24,9 +24,9 @@ export const UpdateBookingDto = z.object(
         day: z.string().optional(),
         startTime: z.string().optional(),
         endTime: z.string().optional(),
-        customerName: z.string().optional(),
-        customerPhone: z.string().optional(),
-        customerEmail: z.string().optional(),
+        customerName: z.string(),
+        customerPhone: z.string(),
+        customerEmail: z.string(),
         notes: z.string().optional()
     }
 )

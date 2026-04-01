@@ -1,5 +1,6 @@
 import { Worker } from "bullmq"
 import { sendOtpEmailForgotPassword, sendOtpEmailRegisteration } from "@/common/utils/send-otp-helper.utils"
+import { bullmqConnection } from "@/lib/bullmq"
 
 export interface SendOTPEmailJobData {
     email: string,
@@ -20,6 +21,6 @@ new Worker<SendOTPEmailJobData>(
     }
   },
   {
-    connection: { host: 'localhost', port: 6379 }
+    connection: bullmqConnection
   }
 )

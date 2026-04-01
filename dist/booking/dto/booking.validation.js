@@ -25,9 +25,9 @@ exports.UpdateBookingDto = zod_1.default.object({
     day: zod_1.default.string().optional(),
     startTime: zod_1.default.string().optional(),
     endTime: zod_1.default.string().optional(),
-    customerName: zod_1.default.string().optional(),
-    customerPhone: zod_1.default.string().optional(),
-    customerEmail: zod_1.default.string().optional(),
+    customerName: zod_1.default.string(),
+    customerPhone: zod_1.default.string(),
+    customerEmail: zod_1.default.string(),
     notes: zod_1.default.string().optional()
 });
 exports.GetBookingListDto = zod_1.default.object({

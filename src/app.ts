@@ -23,6 +23,7 @@ import { startBookingStatusCron } from "@/booking/cron/booking.cron";
 import './mcp/http-server'; // ← 1 lần duy nhất
 import { connectRedis } from '@/lib/redis';
 import { board }  from '@/lib/bull-dashboard'
+import { AuthGuard } from "@/common/guards/auth-core.guard"
 
 dotenv.config();
 
@@ -119,18 +120,35 @@ dotenv.config();
   app.use(graphqlUploadExpress({ maxFileSize: 5_000_000, maxFiles: 5 }));
 
   app.use(
-    '/graphql',
+    "/graphql",
     bodyParser.json(),
     expressMiddleware(server, {
-      context: async ({ req, res }: any) => ({
-        req,
-        res,
-        pubsub,
-        logger: createContextLogger({ request_id: req.id }),
-        requestId: req.id,
-      }),
+      context: async ({ req, res }: any) => {
+        const authHeader = req.headers.authorization || ""
+  
+        let authid = null
+  
+        try {
+          if (authHeader.startsWith("Bearer ")) {
+            const token = authHeader.split(" ")[1]
+            console.log(token)
+            authid = AuthGuard.verifyAccessToken(token)
+          }
+        } catch (e) {
+          authid = null
+        }
+  
+        return {
+          req,
+          res,
+          authid, // ← QUAN TRỌNG
+          pubsub,
+          logger: createContextLogger({ request_id: req.id }),
+          requestId: req.id,
+        }
+      },
     })
-  );
+  )
 
   app.use(errorHandler);
 

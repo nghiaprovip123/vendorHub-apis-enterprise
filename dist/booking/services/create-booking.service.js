@@ -12,9 +12,8 @@ const service_repository_1 = require("../../service/repositories/service.reposit
 const booking_repository_1 = require("../../booking/repositories/booking.repository");
 const client_1 = require("@prisma/client");
 const staff_repository_1 = require("../../staff/repositories/staff.repository");
-const send_otp_helper_utils_1 = require("../../common/utils/send-otp-helper.utils");
-const send_otp_helper_utils_2 = require("../../common/utils/send-otp-helper.utils");
-const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils")); // Import ApiError
+const email_create_booking_queue_1 = require("../../booking/queues/email-create-booking.queue");
+const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
 exports.VN_TIMEZONE = "Asia/Ho_Chi_Minh";
 function vnToUtc(dateTime) {
     return (0, date_fns_tz_1.fromZonedTime)(dateTime, exports.VN_TIMEZONE);
@@ -39,9 +38,6 @@ class CreateBooking {
             const bookingStartDate = vnToUtc(`${day}T${startTime}`);
             const bookingEndDate = vnToUtc(`${day}T${endTime}`);
             const bookingDate = vnToUtc(`${day}T00:00:00`);
-            console.log(bookingEndDate);
-            console.log(bookingStartDate);
-            console.log(bookingDate);
             const now = new Date();
             if (bookingStartDate < now) {
                 throw new ApiError_utils_1.default(400, booking_error_1.BookingError.BOOKING_CREATION_BOOKING_START_DATE_INVALID);
@@ -50,23 +46,8 @@ class CreateBooking {
                 throw new ApiError_utils_1.default(400, booking_error_1.BookingError.BOOKING_CREATION_BOOKING_END_DATE_INVALID);
             }
             const duration = (0, date_fns_1.differenceInMinutes)(bookingEndDate, bookingStartDate);
-            const isOverlap = await bookingRepo.checkOverlapWorkingHour(bookingStartDate, bookingEndDate, staffId, [client_1.BookingStatus.PENDING, client_1.BookingStatus.CONFIRMED, client_1.BookingStatus.UPCOMMING, client_1.BookingStatus.IN_PROGRESS]);
-            if (isOverlap) {
-                throw new ApiError_utils_1.default(409, booking_error_1.BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION);
-            }
             if (!staffId) {
-                const bookingData = {
-                    customerName: customerName,
-                    serviceName: service.name,
-                    day: bookingDate,
-                    startTime: bookingStartDate,
-                    endTime: bookingEndDate,
-                    staffName: 'No assignment',
-                    notes: notes,
-                    customerEmail: customerEmail
-                };
-                await (0, send_otp_helper_utils_1.sendBookingRequestEmail)(bookingData);
-                return bookingRepo.createBooking({
+                const booking = await bookingRepo.createBooking({
                     serviceId,
                     staffId,
                     customerName,
@@ -81,20 +62,26 @@ class CreateBooking {
                         durationInMinutes: duration,
                     },
                 });
+                await email_create_booking_queue_1.sendBookingEmailQueue.add("send-booking-email", {
+                    customerEmail,
+                    serviceName: service.name ?? "",
+                    staffName: "No assignment",
+                    customerName,
+                    customerPhone,
+                    status: client_1.BookingStatus.PENDING,
+                    day,
+                    startTime,
+                    endTime,
+                    duration,
+                });
+                return booking;
             }
-            const staffName = await staffRepo.findById(staffId);
-            const bookingData = {
-                customerName: customerName,
-                serviceName: service.name,
-                day: bookingDate,
-                startTime: bookingStartDate,
-                endTime: bookingEndDate,
-                staffName: staffName?.fullName,
-                notes: notes,
-                customerEmail: customerEmail
-            };
-            await (0, send_otp_helper_utils_2.sendBookingRequestEmailConfirm)(bookingData);
-            return bookingRepo.createBooking({
+            const isOverlap = await bookingRepo.checkOverlapWorkingHour(bookingStartDate, bookingEndDate, staffId, [client_1.BookingStatus.PENDING, client_1.BookingStatus.CONFIRMED, client_1.BookingStatus.UPCOMMING, client_1.BookingStatus.IN_PROGRESS]);
+            if (isOverlap) {
+                throw new ApiError_utils_1.default(409, booking_error_1.BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION);
+            }
+            const staff = await staffRepo.findById(staffId);
+            const booking = await bookingRepo.createBooking({
                 serviceId,
                 staffId,
                 customerName,
@@ -109,17 +96,31 @@ class CreateBooking {
                     durationInMinutes: duration,
                 },
             });
+            await email_create_booking_queue_1.sendBookingEmailQueue.add("send-booking-email", {
+                customerEmail,
+                serviceName: service.name ?? "",
+                staffName: staff?.fullName ?? "",
+                customerName,
+                customerPhone,
+                status: client_1.BookingStatus.PENDING,
+                day,
+                startTime,
+                endTime,
+                duration,
+            });
+            return booking;
         });
     }
     static async createBookingInBackOffice(input) {
-        const { serviceId, staffId, day, startTime, endTime, customerName, customerEmail, customerPhone, } = input;
+        const { serviceId, staffId, day, startTime, endTime, customerName, customerEmail, customerPhone, notes, } = input;
         if (!serviceId || !staffId) {
             throw new ApiError_utils_1.default(400, booking_error_1.BookingError.BOOKING_CREATION_MISSING_SERVICE_INFORMATION);
         }
-        return prisma_1.prisma.$transaction(async (tx) => {
+        const { booking, serviceName, staffName, duration } = await prisma_1.prisma.$transaction(async (tx) => {
             const serviceRepo = new service_repository_1.ServiceRepository(tx);
             const bookingRepo = new booking_repository_1.BookingRepository(tx);
             const staffRepo = new staff_repository_1.StaffRepository(tx);
+            // Query names via repository using the IDs from input
             const service = await serviceRepo.findAvailableService(serviceId);
             if (!service) {
                 throw new ApiError_utils_1.default(404, booking_error_1.BookingError.BOOKING_CREATION_SERVICE_NOT_AVAILABLE);
@@ -149,12 +150,13 @@ class CreateBooking {
             if (isOverlap) {
                 throw new ApiError_utils_1.default(409, booking_error_1.BookingError.BOOKING_CREATION_BOOKING_OVERLAP_CONFLICTION);
             }
-            return bookingRepo.createBooking({
+            const booking = await bookingRepo.createBooking({
                 serviceId,
                 staffId,
                 customerName,
                 customerEmail,
                 customerPhone,
+                notes,
                 status: client_1.BookingStatus.PENDING,
                 slot: {
                     day: bookingDate,
@@ -163,7 +165,28 @@ class CreateBooking {
                     durationInMinutes: duration,
                 },
             });
+            // Resolve names from the queried entities and null-coalesce to string
+            return {
+                booking,
+                serviceName: service.name ?? "",
+                staffName: staff.fullName ?? "",
+                duration,
+            };
         });
+        // serviceName and staffName are now string (not null) and in scope
+        await email_create_booking_queue_1.sendBookingEmailQueue.add("send-booking-email", {
+            customerEmail,
+            serviceName,
+            staffName,
+            customerName,
+            customerPhone,
+            status: client_1.BookingStatus.PENDING,
+            day,
+            startTime,
+            endTime,
+            duration,
+        });
+        return booking;
     }
 }
 exports.CreateBooking = CreateBooking;

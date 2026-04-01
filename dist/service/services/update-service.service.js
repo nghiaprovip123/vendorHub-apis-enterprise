@@ -10,6 +10,7 @@ const cloudinary_orchestration_utils_1 = require("../../common/utils/cloudinary-
 const service_media_repository_1 = require("../../service/repositories/service-media.repository");
 const service_repository_1 = require("../../service/repositories/service.repository");
 const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
+const redis_1 = __importDefault(require("../../lib/redis"));
 const UpdateServiceService = async (input) => {
     const { id, categoryId, name, description, currency, displayPrice, duration, price, isVisible, medias = [] } = input;
     return prisma_1.prisma.$transaction(async (tx) => {
@@ -88,6 +89,7 @@ const UpdateServiceService = async (input) => {
         if (!serviceWithMedias) {
             throw new ApiError_utils_1.default(500, service_error_1.ServiceError.SERVICE_PRISMA_ERROR);
         }
+        await redis_1.default.del('service:list:page:1');
         return { service: serviceWithMedias };
     });
 };
