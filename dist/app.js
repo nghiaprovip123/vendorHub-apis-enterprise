@@ -28,6 +28,7 @@ const booking_cron_1 = require("./booking/cron/booking.cron");
 require("./mcp/http-server"); // ← 1 lần duy nhất
 const redis_1 = require("./lib/redis");
 const bull_dashboard_1 = require("./lib/bull-dashboard");
+const auth_core_guard_1 = require("./common/guards/auth-core.guard");
 dotenv_1.default.config();
 (async function () {
     const PORT = Number(process.env.PORT) || 3000;
@@ -35,7 +36,23 @@ dotenv_1.default.config();
     // ── Middleware cơ bản ────────────────────────────────────
     app.use(express_1.default.json());
     app.use((0, cookie_parser_1.default)());
-    app.use((0, cors_1.default)({ origin: true, credentials: true })); // 1 lần duy nhất
+    const allowedOrigins = [
+        'https://my-core-is-business.vercel.app', // prod
+        'http://vh.local:3001', // local
+        'http://localhost:3000', // local
+        'http://localhost:3001', // local
+    ];
+    app.use((0, cors_1.default)({
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            }
+            else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
+        credentials: true
+    }));
     // Request ID
     app.use((req, res, next) => {
         req.id = Math.random().toString(36).substring(7);
@@ -93,14 +110,30 @@ dotenv_1.default.config();
     app.use('/auth', rate_limiter_1.apiLimiter, auth_route_1.default);
     // graphqlUploadExpress TRƯỚC expressMiddleware
     app.use((0, graphql_upload_minimal_1.graphqlUploadExpress)({ maxFileSize: 5000000, maxFiles: 5 }));
-    app.use('/graphql', body_parser_1.default.json(), (0, express4_1.expressMiddleware)(server, {
-        context: async ({ req, res }) => ({
-            req,
-            res,
-            pubsub: pubsub_1.pubsub,
-            logger: (0, logger_1.createContextLogger)({ request_id: req.id }),
-            requestId: req.id,
-        }),
+    app.use("/graphql", body_parser_1.default.json(), (0, express4_1.expressMiddleware)(server, {
+        context: async ({ req, res }) => {
+            const authHeader = req.headers.authorization || "";
+            let authid = null;
+            try {
+                if (authHeader.startsWith("Bearer ")) {
+                    const token = authHeader.split(" ")[1];
+                    console.log(token);
+                    authid = auth_core_guard_1.AuthGuard.verifyAccessToken(token);
+                }
+            }
+            catch (e) {
+                authid = null;
+            }
+            return {
+                req,
+                res,
+                authid, // ← QUAN TRỌNG
+                pubsub: // ← QUAN TRỌNG
+                pubsub_1.pubsub,
+                logger: (0, logger_1.createContextLogger)({ request_id: req.id }),
+                requestId: req.id,
+            };
+        },
     }));
     app.use(error_guard_1.errorHandler);
     // ── Start ────────────────────────────────────────────────

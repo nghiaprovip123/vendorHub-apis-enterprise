@@ -1,3 +1,4 @@
+import { requireAuth } from "@/common/guards/auth-graph.guard"
 import { ViewAllServiceService } from "@/service/services/view-all-service.service"
 
 const viewAllService = async (
@@ -5,6 +6,8 @@ const viewAllService = async (
     args : { input : any },
     ctx: any
 ) => {
+    requireAuth(ctx) 
+
     const result = await ViewAllServiceService()
     return result
 }

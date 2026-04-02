@@ -2,9 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateBookingResolver = exports.CreateBookingClass = void 0;
 const create_booking_service_1 = require("../../booking/services/create-booking.service");
+const auth_graph_guard_1 = require("../../common/guards/auth-graph.guard");
 class CreateBookingClass {
     async createBookingByCustomer(_, args, ctx) {
         try {
+            (0, auth_graph_guard_1.requireAuth)(ctx);
             const result = await create_booking_service_1.CreateBooking.createBookingByCustomer(args.input);
             return {
                 id: result.id,
@@ -33,6 +35,7 @@ class CreateBookingClass {
     }
     async createBookingInBackOffice(_, args, ctx) {
         try {
+            (0, auth_graph_guard_1.requireAuth)(ctx);
             const result = await create_booking_service_1.CreateBooking.createBookingInBackOffice(args.input);
             return {
                 id: result.id,

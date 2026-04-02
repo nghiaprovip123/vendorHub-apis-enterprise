@@ -32,7 +32,7 @@ export class AuthGuard {
     static verifyRefreshToken(token?: string): AuthUser {
         if (!token) {
           throw new Error(GuardError.MISSING_REFRESH_TOKEN_ERROR)
-        }
+        }   
     
         const decoded = jwtService.verifyRefreshToken(token)
     
@@ -42,101 +42,113 @@ export class AuthGuard {
     
         return decoded as AuthUser
       }
-
-    static RequireRefreshToken ( req: Request, res: Response, next: NextFunction ) {
-        try {
-            const refreshToken = req.cookies?.refreshToken
-
-            if (!refreshToken) {
-                return res.status(401).json(
-                    {
-                        success: false,
-                        message: GuardError.MISSING_REFRESH_TOKEN_ERROR
-                    }
-                )
-            }
     
-            const decoded = jwtService.verifyRefreshToken(refreshToken)
+    // static RequireRefreshToken ( req: Request, res: Response, next: NextFunction ) {
+    //     try {
+    //         const refreshToken = req.cookies?.refreshToken
+
+    //         if (!refreshToken) {
+    //             return res.status(401).json(
+    //                 {
+    //                     success: false,
+    //                     message: GuardError.MISSING_REFRESH_TOKEN_ERROR
+    //                 }
+    //             )
+    //         }
     
-            if (!decoded) {
-                return res.status(401).json(
-                    {
-                        success: false,
-                        message: GuardError.WRONG_REFRESH_TOKEN_INFORMATION
-                    }
-                )
-            }
+    //         const decoded = jwtService.verifyRefreshToken(refreshToken)
+    
+    //         if (!decoded) {
+    //             return res.status(401).json(
+    //                 {
+    //                     success: false,
+    //                     message: GuardError.WRONG_REFRESH_TOKEN_INFORMATION
+    //                 }
+    //             )
+    //         }
             
-            req.user = decoded
-            next()
-        }
-        catch (error: any) {
-            if (error.name === 'TokenExpiredError') {
-                return res.status(401).json({
-                    success: false,
-                    message: GuardError.WRONG_REFRESH_TOKEN_INFORMATION
-                });
-            }
+    //         req.user = decoded
+    //         next()
+    //     }
+    //     catch (error: any) {
+    //         if (error.name === 'TokenExpiredError') {
+    //             return res.status(401).json({
+    //                 success: false,
+    //                 message: GuardError.WRONG_REFRESH_TOKEN_INFORMATION
+    //             });
+    //         }
             
-            return res.status(401).json({
-                success: false,
-                message: 'FAIL TO AUTHENTICATE'
-            });
+    //         return res.status(401).json({
+    //             success: false,
+    //             message: 'FAIL TO AUTHENTICATE'
+    //         });
+    //     }
+
+    // }
+    static verifyResetToken ( resetToken: string ) {
+        if (!resetToken) {
+            throw new Error(GuardError.MISSING_RESET_TOKEN_INFORMATION)
         }
 
+        const decoded = jwtService.verifyResetToken(resetToken)
+
+        if (!decoded) {
+            throw new Error(GuardError.WRONG_RESET_TOKEN_INFORMATION)
+        }
+
+        return decoded as AuthUser
     }
+//     static RequireResetToken ( req: Request, res: Response, next: NextFunction ) {
+//         try {
+//             const authHeader = req.headers.authorization
 
-    static RequireResetToken ( req: Request, res: Response, next: NextFunction ) {
-        try {
-            const authHeader = req.headers.authorization
-
-            if (!authHeader) {
-                return res.status(401).json(
-                    {
-                        success: false,
-                        message: GuardError.MISSING_AUTHENTICATION_ERROR
-                    }
-                )
-            }
+//             if (!authHeader) {
+//                 return res.status(401).json(
+//                     {
+//                         success: false,
+//                         message: GuardError.MISSING_AUTHENTICATION_ERROR
+//                     }
+//                 )
+//             }
     
-            const token = authHeader.split(" ")[1]
+//             const token = authHeader.split(" ")[1]
     
-            if (!token) {
-                return res.status(401).json(
-                    {
-                        success: false,
-                        message: GuardError.MISSING_RESET_TOKEN_INFORMATION
-                    }
-                )
-            }
+//             if (!token) {
+//                 return res.status(401).json(
+//                     {
+//                         success: false,
+//                         message: GuardError.MISSING_RESET_TOKEN_INFORMATION
+//                     }
+//                 )
+//             }
     
-            const decoded = jwtService.verifyResetToken(token)
+//             const decoded = jwtService.verifyResetToken(token)
     
-            if (!decoded) {
-                return res.status(401).json(
-                    {
-                        success: false,
-                        message: GuardError.WRONG_RESET_TOKEN_INFORMATION
-                    }
-                )
-            }
+//             if (!decoded) {
+//                 return res.status(401).json(
+//                     {
+//                         success: false,
+//                         message: GuardError.WRONG_RESET_TOKEN_INFORMATION
+//                     }
+//                 )
+//             }
     
-            req.user = decoded
+//             req.user = decoded
     
-            next()
-        }
-    catch (error: any) {
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({
-                success: false,
-                message: GuardError.WRONG_RESET_TOKEN_INFORMATION
-            });
-        }
+//             next()
+//         }
+//     catch (error: any) {
+//         if (error.name === 'TokenExpiredError') {
+//             return res.status(401).json({
+//                 success: false,
+//                 message: GuardError.WRONG_RESET_TOKEN_INFORMATION
+//             });
+//         }
         
-        return res.status(401).json({
-            success: false,
-            message: 'FAIL TO AUTHENTICATE'
-        });
-    }
-}
+//         return res.status(401).json({
+//             success: false,
+//             message: 'FAIL TO AUTHENTICATE'
+//         });
+//     }
+// }
 }

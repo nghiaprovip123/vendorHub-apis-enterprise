@@ -3,7 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteService = exports.deleteService = void 0;
 const prisma_1 = require("../../lib/prisma");
 const cloudinary_orchestration_utils_1 = require("../../common/utils/cloudinary-orchestration.utils");
+const auth_graph_guard_1 = require("../../common/guards/auth-graph.guard");
 const deleteService = async (_, args, ctx) => {
+    (0, auth_graph_guard_1.requireAuth)(ctx);
     const { id } = args.input;
     const [bookingCount, staffCount] = await Promise.all([
         prisma_1.prisma.booking.count({ where: { serviceId: id } }),
