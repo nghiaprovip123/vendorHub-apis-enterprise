@@ -2,12 +2,14 @@
 import { GraphQLUpload } from "graphql-upload-minimal";
 import { updateStaffService } from "@/staff/services/update-staff.service";
 import { StaffError } from "@/common/utils/error/staff.error"
+import { requireAuth } from "@/common/guards/auth-graph.guard";
 const updateStaff = async (
     _: unknown,
     args: { input: any },
     ctx: any
 ) => {
     try {
+        requireAuth(ctx)
         const result = await updateStaffService(args.input);
         
         if (!result) {

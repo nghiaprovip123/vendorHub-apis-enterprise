@@ -1,11 +1,14 @@
 import { prisma } from "@/lib/prisma"
 import { CloudinaryRest } from "@/common/utils/cloudinary-orchestration.utils"
+import { requireAuth } from "@/common/guards/auth-graph.guard"
 
 export const deleteService = async (
     _: unknown,
     args: { input: { id: string } },
     ctx: any
   ) => {
+    requireAuth(ctx) 
+
     const { id } = args.input
   
     const [bookingCount, staffCount] = await Promise.all([

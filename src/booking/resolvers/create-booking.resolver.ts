@@ -1,4 +1,5 @@
 import { CreateBooking } from "@/booking/services/create-booking.service"
+import { requireAuth } from "@/common/guards/auth-graph.guard";
 import { BookingError } from "@/common/utils/error/booking.error"
 
 export class CreateBookingClass {
@@ -8,6 +9,8 @@ export class CreateBookingClass {
     ctx: any
   ) {
     try {
+      requireAuth(ctx)
+
       const result = await CreateBooking.createBookingByCustomer(args.input);
 
       return {
@@ -41,6 +44,8 @@ export class CreateBookingClass {
     ctx: any
   ) {
     try {
+      requireAuth(ctx)
+
       const result = await CreateBooking.createBookingInBackOffice(args.input);
 
       return {

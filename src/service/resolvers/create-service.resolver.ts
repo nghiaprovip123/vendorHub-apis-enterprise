@@ -1,5 +1,6 @@
 import { GraphQLUpload } from "graphql-upload-minimal"
 import { CreateServiceService } from "@/service/services/create-service.service"
+import { requireAuth } from "@/common/guards/auth-graph.guard"
 
 const createService = async (
     _: unknown, 
@@ -7,6 +8,7 @@ const createService = async (
     ctx: any
 ) => {
     try {
+      requireAuth(ctx)  
       const result = await CreateServiceService(args.input)
       console.log(result)
       return result

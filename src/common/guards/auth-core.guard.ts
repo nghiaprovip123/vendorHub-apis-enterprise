@@ -14,9 +14,7 @@ export type AuthUser = {
     role?: string
     [key: string]: any
   }
-type AuthCoreType = {
-    token: string
-}
+
 export class AuthGuard {
     static verifyAccessToken(token: string): AuthUser {
         if (!token) {

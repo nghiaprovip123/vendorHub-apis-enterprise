@@ -1,3 +1,4 @@
+import { requireAuth } from "@/common/guards/auth-graph.guard"
 import { deleteStaffService } from "@/staff/services/delete-staff.service"
 
 const deleteStaff = async (
@@ -6,6 +7,8 @@ const deleteStaff = async (
   ctx: any
 ) => {
   try {
+    requireAuth(ctx)
+
     const result = await deleteStaffService(args.input)
     return {
       success: true,

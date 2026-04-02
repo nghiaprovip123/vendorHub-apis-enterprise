@@ -1,10 +1,13 @@
 import { viewBookingDetailService } from "@/booking/services/get-booking-detail.service"
+import { requireAuth } from "@/common/guards/auth-graph.guard";
 const viewBookingDetail = async(
     _: unknown,
     args: { input: any },
     ctx: any
 ) => {
     try {
+        requireAuth(ctx)
+
         const result = await viewBookingDetailService(args.input.bookingId)
         return {
             id: result.id,

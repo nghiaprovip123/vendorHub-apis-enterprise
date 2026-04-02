@@ -1,10 +1,13 @@
 import { cancelBookingSerivce } from "@/booking/services/cancel-booking.service"
+import { requireAuth } from "@/common/guards/auth-graph.guard"
 const cancelBooking = async(
     _: unknown,
     args: { input: any },
     ctx: any
 ) => {
     try {
+        requireAuth(ctx)
+
         const result = await cancelBookingSerivce(args.input)
         return {
             success: true,
