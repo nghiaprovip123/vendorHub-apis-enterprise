@@ -36,10 +36,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.avatarWorker = void 0;
 // infrastructure/queues/avatar.worker.ts
 const bullmq_1 = require("bullmq");
-const bullmq_2 = require("../../lib/bullmq");
-const cloudinary_orchestration_utils_1 = require("../../common/utils/cloudinary-orchestration.utils");
-const prisma_1 = require("../../lib/prisma");
-const logger_1 = require("../../lib/logger");
+const bullmq_2 = require("@/lib/bullmq");
+const cloudinary_orchestration_utils_1 = require("@/common/utils/cloudinary-orchestration.utils");
+const prisma_1 = require("@/lib/prisma");
+const logger_1 = require("@/lib/logger");
 exports.avatarWorker = new bullmq_1.Worker("staff-avatar-upload", async (job) => {
     const { staffId, tempFilePath } = job.data;
     if (!staffId || !tempFilePath) {

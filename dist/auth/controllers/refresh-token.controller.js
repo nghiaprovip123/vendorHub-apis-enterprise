@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RefreshTokenController = void 0;
-const refresh_token_service_1 = require("../../auth/services/refresh-token.service");
-const cookie_utils_1 = require("../../common/utils/cookie.utils");
+const refresh_token_service_1 = require("@/auth/services/refresh-token.service");
+const cookie_utils_1 = require("@/common/utils/cookie.utils");
 const RefreshTokenController = async (req, res, next) => {
     try {
         const refreshToken = req.cookies?.refreshToken;

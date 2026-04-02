@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssignStaffEngine = void 0;
-const prisma_1 = require("../../lib/prisma");
-const date_standard_utils_1 = require("../../common/utils/date-standard.utils");
+const prisma_1 = require("@/lib/prisma");
+const date_standard_utils_1 = require("@/common/utils/date-standard.utils");
 const client_1 = require("@prisma/client");
-const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
-const booking_error_1 = require("../../common/utils/error/booking.error");
-const staff_error_1 = require("../../common/utils/error/staff.error");
+const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
+const booking_error_1 = require("@/common/utils/error/booking.error");
+const staff_error_1 = require("@/common/utils/error/staff.error");
 const AssignStaffEngine = async (input) => {
     const booking = await prisma_1.prisma.booking.findUnique({
         where: { id: input.bookingId }

@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IdentifiersRepository = void 0;
-const postgresQL_1 = __importDefault(require("../../lib/postgresQL"));
+const postgresQL_1 = __importDefault(require("@/lib/postgresQL"));
 const identifier_type_enum_1 = require("../enum/identifier-type.enum");
 class IdentifiersRepository {
     constructor(sql) {

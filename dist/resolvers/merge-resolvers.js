@@ -21,7 +21,7 @@ const get_booking_detail_resolver_1 = require("../booking/resolvers/get-booking-
 const get_booking_list_resolver_1 = require("../booking/resolvers/get-booking-list.resolver");
 const booking_subscription_1 = require("../booking/subscription/booking.subscription");
 const update_booking_resolver_1 = require("../booking/resolvers/update-booking.resolver");
-const get_booking_by_staff_resolver_1 = require("../booking/resolvers/get-booking-by-staff.resolver");
+const get_booking_by_staff_resolver_1 = require("@/booking/resolvers/get-booking-by-staff.resolver");
 // ██████████████████████████████████████████████████████████████████████
 // █                           SERVICE DOMAIN                           █
 // ██████████████████████████████████████████████████████████████████████

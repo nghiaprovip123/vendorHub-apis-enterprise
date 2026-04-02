@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStaffListService = void 0;
-const prisma_1 = require("../../lib/prisma");
-const staff_repository_1 = require("../../staff/repositories/staff.repository");
-const staff_error_1 = require("../../common/utils/error/staff.error");
-const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
-const pagnition_1 = require("../../common/utils/constraint/pagnition");
-const redis_1 = __importDefault(require("../../lib/redis"));
+const prisma_1 = require("@/lib/prisma");
+const staff_repository_1 = require("@/staff/repositories/staff.repository");
+const staff_error_1 = require("@/common/utils/error/staff.error");
+const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
+const pagnition_1 = require("@/common/utils/constraint/pagnition");
+const redis_1 = __importDefault(require("@/lib/redis"));
 const getStaffListService = async (page) => {
     try {
         const currentPage = page ?? 1;

@@ -8,13 +8,13 @@ exports.createStaffService = void 0;
 const fs_1 = __importDefault(require("fs"));
 const os_1 = __importDefault(require("os"));
 const path_1 = __importDefault(require("path"));
-const prisma_1 = require("../../lib/prisma");
-const staff_repository_1 = require("../../staff/repositories/staff.repository");
-const working_hours_repository_1 = require("../../staff/repositories/working-hours.repository");
-const staff_service_repository_1 = require("../../staff/repositories/staff-service.repository");
-const date_standard_utils_1 = require("../../common/utils/date-standard.utils");
-const staff_upload_queue_1 = require("../../staff/queues/staff.upload.queue");
-const redis_1 = __importDefault(require("../../lib/redis"));
+const prisma_1 = require("@/lib/prisma");
+const staff_repository_1 = require("@/staff/repositories/staff.repository");
+const working_hours_repository_1 = require("@/staff/repositories/working-hours.repository");
+const staff_service_repository_1 = require("@/staff/repositories/staff-service.repository");
+const date_standard_utils_1 = require("@/common/utils/date-standard.utils");
+const staff_upload_queue_1 = require("@/staff/queues/staff.upload.queue");
+const redis_1 = __importDefault(require("@/lib/redis"));
 const createStaffService = async (input) => {
     // Lưu avatar vào temp file TRƯỚC transaction
     // → nếu transaction fail, chỉ cần xóa temp file, không có gì lên Cloudinary

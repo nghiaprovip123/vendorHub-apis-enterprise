@@ -1,7 +1,5 @@
-import argon2 from "argon2";
 import { IdentifierType } from "@/auth/enum/identifier-type.enum";
 import { VerifyOTPType } from "@/auth/enum/verify-otp-type.enum"
-import { AuthGuard } from "@/common/guards/auth.guard";
 import sql from "@/lib/postgresQL";
 import { PasswordUtilities } from "@/common/utils/password.utils"
 import { IdentifiersRepository } from "@/auth/repositories/identifiers.repository"

@@ -4,16 +4,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateBooking = exports.VN_TIMEZONE = void 0;
-const prisma_1 = require("../../lib/prisma");
-const booking_error_1 = require("../../common/utils/error/booking.error");
+const prisma_1 = require("@/lib/prisma");
+const booking_error_1 = require("@/common/utils/error/booking.error");
 const date_fns_1 = require("date-fns");
 const date_fns_tz_1 = require("date-fns-tz");
-const service_repository_1 = require("../../service/repositories/service.repository");
-const booking_repository_1 = require("../../booking/repositories/booking.repository");
+const service_repository_1 = require("@/service/repositories/service.repository");
+const booking_repository_1 = require("@/booking/repositories/booking.repository");
 const client_1 = require("@prisma/client");
-const staff_repository_1 = require("../../staff/repositories/staff.repository");
-const email_create_booking_queue_1 = require("../../booking/queues/email-create-booking.queue");
-const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
+const staff_repository_1 = require("@/staff/repositories/staff.repository");
+const email_create_booking_queue_1 = require("@/booking/queues/email-create-booking.queue");
+const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
 exports.VN_TIMEZONE = "Asia/Ho_Chi_Minh";
 function vnToUtc(dateTime) {
     return (0, date_fns_tz_1.fromZonedTime)(dateTime, exports.VN_TIMEZONE);

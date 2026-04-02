@@ -5,8 +5,8 @@ const index_js_1 = require("@modelcontextprotocol/sdk/server/index.js");
 const stdio_js_1 = require("@modelcontextprotocol/sdk/server/stdio.js");
 const types_js_1 = require("@modelcontextprotocol/sdk/types.js");
 const zod_1 = require("zod");
-const get_booking_list_service_1 = require("../booking/services/get-booking-list.service");
-const get_available_staff_service_1 = require("../staff/services/get-available-staff.service");
+const get_booking_list_service_1 = require("@/booking/services/get-booking-list.service");
+const get_available_staff_service_1 = require("@/staff/services/get-available-staff.service");
 const server = new index_js_1.Server({ name: 'vendorhub', version: '1.0.0' }, { capabilities: { tools: {}, resources: {} } });
 // ── List Tools ────────────────────────────────────────────────────────────────
 server.setRequestHandler(types_js_1.ListToolsRequestSchema, async () => ({

@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteServiceService = void 0;
-const prisma_1 = require("../../lib/prisma");
-const cloudinary_orchestration_utils_1 = require("../../common/utils/cloudinary-orchestration.utils");
-const service_error_1 = require("../../common/utils/error/service.error");
-const service_repository_1 = require("../../service/repositories/service.repository");
+const prisma_1 = require("@/lib/prisma");
+const cloudinary_orchestration_utils_1 = require("@/common/utils/cloudinary-orchestration.utils");
+const service_error_1 = require("@/common/utils/error/service.error");
+const service_repository_1 = require("@/service/repositories/service.repository");
 const DeleteServiceService = async (input) => {
     const { id } = input;
     const serviceRepo = new service_repository_1.ServiceRepository(prisma_1.prisma);

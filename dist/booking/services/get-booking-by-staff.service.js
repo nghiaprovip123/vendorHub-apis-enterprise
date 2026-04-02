@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetBookingByStaffService = void 0;
-const prisma_1 = require("../../lib/prisma");
+const prisma_1 = require("@/lib/prisma");
 const date_fns_1 = require("date-fns");
 const date_fns_tz_1 = require("date-fns-tz");
-const booking_repository_1 = require("../../booking/repositories/booking.repository");
+const booking_repository_1 = require("@/booking/repositories/booking.repository");
 const TZ = "Asia/Ho_Chi_Minh";
 const GetBookingByStaffService = async (input) => {
     const { staffId, startDate, endDate } = input;

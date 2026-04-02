@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createPasswordController = exports.CreatePasswordController = void 0;
-const create_password_service_1 = require("../../auth/services/create-password.service");
+const create_password_service_1 = require("@/auth/services/create-password.service");
 class CreatePasswordController {
     async createNewPasswordByRegisterationFlow(req, res, next) {
         try {

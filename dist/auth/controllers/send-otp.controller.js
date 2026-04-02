@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendOTPController = exports.SendOTPController = void 0;
-const send_otp_service_1 = require("../../auth/services/send-otp.service");
+const send_otp_service_1 = require("@/auth/services/send-otp.service");
 class SendOTPController {
     async SendOTPByRegisterationFlow(req, res, next) {
         try {

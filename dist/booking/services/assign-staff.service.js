@@ -4,13 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.assignStaffByBookingRequestService = void 0;
-const prisma_1 = require("../../lib/prisma");
+const prisma_1 = require("@/lib/prisma");
 const client_1 = require("@prisma/client");
-const booking_error_1 = require("../../common/utils/error/booking.error");
-const staff_repository_1 = require("../../staff/repositories/staff.repository");
-const staff_error_1 = require("../../common/utils/error/staff.error");
-const booking_repository_1 = require("../../booking/repositories/booking.repository");
-const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
+const booking_error_1 = require("@/common/utils/error/booking.error");
+const staff_repository_1 = require("@/staff/repositories/staff.repository");
+const staff_error_1 = require("@/common/utils/error/staff.error");
+const booking_repository_1 = require("@/booking/repositories/booking.repository");
+const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
 const assignStaffByBookingRequestService = async (input) => {
     const staffRepo = new staff_repository_1.StaffRepository(prisma_1.prisma);
     const service = await prisma_1.prisma.$transaction(async (tx) => {

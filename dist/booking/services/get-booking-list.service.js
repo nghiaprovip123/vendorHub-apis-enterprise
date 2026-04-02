@@ -4,13 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBookingListService = void 0;
-const prisma_1 = require("../../lib/prisma");
+const prisma_1 = require("@/lib/prisma");
 const client_1 = require("@prisma/client");
 const date_fns_1 = require("date-fns");
 const date_fns_tz_1 = require("date-fns-tz");
-const booking_error_1 = require("../../common/utils/error/booking.error");
-const booking_repository_1 = require("../../booking/repositories/booking.repository");
-const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
+const booking_error_1 = require("@/common/utils/error/booking.error");
+const booking_repository_1 = require("@/booking/repositories/booking.repository");
+const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
 const TZ = "Asia/Ho_Chi_Minh";
 const getBookingListService = async (input) => {
     const { startDate, endDate } = input;

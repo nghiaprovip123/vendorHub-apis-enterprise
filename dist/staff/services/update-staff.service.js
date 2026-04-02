@@ -4,17 +4,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateStaffService = void 0;
-const prisma_1 = require("../../lib/prisma");
-const cloudinary_orchestration_utils_1 = require("../../common/utils/cloudinary-orchestration.utils");
-const staff_repository_1 = require("../../staff/repositories/staff.repository");
-const working_hours_repository_1 = require("../../staff/repositories/working-hours.repository");
-const staff_error_1 = require("../../common/utils/error/staff.error");
-const service_repository_1 = require("../../service/repositories/service.repository");
-const service_error_1 = require("../../common/utils/error/service.error");
-const staff_service_repository_1 = require("../../staff/repositories/staff-service.repository");
-const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
-const date_standard_utils_1 = require("../../common/utils/date-standard.utils");
-const redis_1 = __importDefault(require("../../lib/redis"));
+const prisma_1 = require("@/lib/prisma");
+const cloudinary_orchestration_utils_1 = require("@/common/utils/cloudinary-orchestration.utils");
+const staff_repository_1 = require("@/staff/repositories/staff.repository");
+const working_hours_repository_1 = require("@/staff/repositories/working-hours.repository");
+const staff_error_1 = require("@/common/utils/error/staff.error");
+const service_repository_1 = require("@/service/repositories/service.repository");
+const service_error_1 = require("@/common/utils/error/service.error");
+const staff_service_repository_1 = require("@/staff/repositories/staff-service.repository");
+const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
+const date_standard_utils_1 = require("@/common/utils/date-standard.utils");
+const redis_1 = __importDefault(require("@/lib/redis"));
 const updateStaffService = async (input) => {
     const existingStaff = await prisma_1.prisma.staff.findUnique({
         where: { id: input.id }

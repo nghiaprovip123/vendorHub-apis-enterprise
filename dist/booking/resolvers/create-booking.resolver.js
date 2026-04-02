@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateBookingResolver = exports.CreateBookingClass = void 0;
-const create_booking_service_1 = require("../../booking/services/create-booking.service");
-const auth_graph_guard_1 = require("../../common/guards/auth-graph.guard");
+const create_booking_service_1 = require("@/booking/services/create-booking.service");
+const auth_graph_guard_1 = require("@/common/guards/auth-graph.guard");
 class CreateBookingClass {
     async createBookingByCustomer(_, args, ctx) {
         try {

@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ViewBookingDetail = void 0;
-const get_booking_detail_service_1 = require("../../booking/services/get-booking-detail.service");
-const auth_graph_guard_1 = require("../../common/guards/auth-graph.guard");
+const get_booking_detail_service_1 = require("@/booking/services/get-booking-detail.service");
+const auth_graph_guard_1 = require("@/common/guards/auth-graph.guard");
 const viewBookingDetail = async (_, args, ctx) => {
     try {
         (0, auth_graph_guard_1.requireAuth)(ctx);

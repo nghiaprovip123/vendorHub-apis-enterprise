@@ -19,16 +19,16 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const graphql_upload_minimal_1 = require("graphql-upload-minimal");
 const logger_1 = require("./lib/logger");
 const morgan_1 = __importDefault(require("morgan"));
-const auth_route_1 = __importDefault(require("./auth/routes/auth.route"));
-const error_guard_1 = require("./common/guards/error.guard");
+const auth_route_1 = __importDefault(require("@/auth/routes/auth.route"));
+const error_guard_1 = require("@/common/guards/error.guard");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const rate_limiter_1 = require("./common/guards/rate-limiter");
-const pubsub_1 = require("./pubsub/pubsub");
-const booking_cron_1 = require("./booking/cron/booking.cron");
+const rate_limiter_1 = require("@/common/guards/rate-limiter");
+const pubsub_1 = require("@/pubsub/pubsub");
+const booking_cron_1 = require("@/booking/cron/booking.cron");
 require("./mcp/http-server"); // ← 1 lần duy nhất
-const redis_1 = require("./lib/redis");
-const bull_dashboard_1 = require("./lib/bull-dashboard");
-const auth_core_guard_1 = require("./common/guards/auth-core.guard");
+const redis_1 = require("@/lib/redis");
+const bull_dashboard_1 = require("@/lib/bull-dashboard");
+const auth_core_guard_1 = require("@/common/guards/auth-core.guard");
 dotenv_1.default.config();
 (async function () {
     const PORT = Number(process.env.PORT) || 3000;

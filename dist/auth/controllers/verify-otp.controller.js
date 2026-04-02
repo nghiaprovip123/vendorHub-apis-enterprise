@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyOTPController = exports.VerifyOTPController = void 0;
-const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
-const verify_otp_service_1 = require("../../auth/services/verify-otp.service");
+const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
+const verify_otp_service_1 = require("@/auth/services/verify-otp.service");
 class VerifyOTPController {
     async verifyOTPByRegisterationFlow(req, res, next) {
         try {

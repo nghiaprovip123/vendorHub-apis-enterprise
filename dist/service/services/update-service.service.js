@@ -4,13 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateServiceService = void 0;
-const prisma_1 = require("../../lib/prisma");
-const service_error_1 = require("../../common/utils/error/service.error");
-const cloudinary_orchestration_utils_1 = require("../../common/utils/cloudinary-orchestration.utils");
-const service_media_repository_1 = require("../../service/repositories/service-media.repository");
-const service_repository_1 = require("../../service/repositories/service.repository");
-const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
-const redis_1 = __importDefault(require("../../lib/redis"));
+const prisma_1 = require("@/lib/prisma");
+const service_error_1 = require("@/common/utils/error/service.error");
+const cloudinary_orchestration_utils_1 = require("@/common/utils/cloudinary-orchestration.utils");
+const service_media_repository_1 = require("@/service/repositories/service-media.repository");
+const service_repository_1 = require("@/service/repositories/service.repository");
+const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
+const redis_1 = __importDefault(require("@/lib/redis"));
 const UpdateServiceService = async (input) => {
     const { id, categoryId, name, description, currency, displayPrice, duration, price, isVisible, medias = [] } = input;
     return prisma_1.prisma.$transaction(async (tx) => {

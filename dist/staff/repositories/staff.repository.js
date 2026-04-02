@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StaffRepository = void 0;
 const date_fns_1 = require("date-fns");
-const date_standard_utils_1 = require("../../common/utils/date-standard.utils");
+const date_standard_utils_1 = require("@/common/utils/date-standard.utils");
 const firstDayISO = (0, date_fns_1.startOfMonth)(new Date()).toISOString();
 const lastDayISO = (0, date_fns_1.endOfMonth)(new Date()).toISOString();
 class StaffRepository {

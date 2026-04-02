@@ -37,11 +37,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateServiceService = void 0;
-const prisma_1 = require("../../lib/prisma");
-const service_error_1 = require("../../common/utils/error/service.error");
-const service_repository_1 = require("../../service/repositories/service.repository");
-const redis_1 = __importDefault(require("../../lib/redis"));
-const service_upload_queue_1 = require("../../service/queues/service.upload.queue");
+const prisma_1 = require("@/lib/prisma");
+const service_error_1 = require("@/common/utils/error/service.error");
+const service_repository_1 = require("@/service/repositories/service.repository");
+const redis_1 = __importDefault(require("@/lib/redis"));
+const service_upload_queue_1 = require("@/service/queues/service.upload.queue");
 const fsSync = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const crypto = __importStar(require("crypto"));

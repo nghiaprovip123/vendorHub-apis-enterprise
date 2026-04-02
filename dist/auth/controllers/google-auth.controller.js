@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GoogleOAuthCallbackController = void 0;
-const google_auth_service_1 = require("../../auth/services/google-auth.service");
+const google_auth_service_1 = require("@/auth/services/google-auth.service");
 const GoogleOAuthCallbackController = async (req, res, next) => {
     try {
         const code = req.query.code;

@@ -4,14 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateBookingService = exports.VN_TIMEZONE = void 0;
-const prisma_1 = require("../../lib/prisma");
+const prisma_1 = require("@/lib/prisma");
 const client_1 = require("@prisma/client");
-const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
-const booking_error_1 = require("../../common/utils/error/booking.error");
+const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
+const booking_error_1 = require("@/common/utils/error/booking.error");
 const date_fns_tz_1 = require("date-fns-tz");
-const booking_repository_1 = require("../../booking/repositories/booking.repository");
+const booking_repository_1 = require("@/booking/repositories/booking.repository");
 const date_fns_1 = require("date-fns");
-const email_create_booking_queue_1 = require("../../booking/queues/email-create-booking.queue");
+const email_create_booking_queue_1 = require("@/booking/queues/email-create-booking.queue");
 exports.VN_TIMEZONE = "Asia/Ho_Chi_Minh";
 function vnToUtc(dateTime) {
     const date = (0, date_fns_tz_1.fromZonedTime)(dateTime, exports.VN_TIMEZONE);

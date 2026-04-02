@@ -34,10 +34,10 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const bullmq_1 = require("bullmq");
-const bullmq_2 = require("../../lib/bullmq");
-const cloudinary_orchestration_utils_1 = require("../../common/utils/cloudinary-orchestration.utils");
-const prisma_1 = require("../../lib/prisma");
-const logger_1 = require("../../lib/logger");
+const bullmq_2 = require("@/lib/bullmq");
+const cloudinary_orchestration_utils_1 = require("@/common/utils/cloudinary-orchestration.utils");
+const prisma_1 = require("@/lib/prisma");
+const logger_1 = require("@/lib/logger");
 const fs = __importStar(require("fs"));
 new bullmq_1.Worker("service-media-upload", async (job) => {
     const { serviceId, medias } = job.data;

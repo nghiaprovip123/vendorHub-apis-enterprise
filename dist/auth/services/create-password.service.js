@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createPasswordService = exports.CreatePasswordService = void 0;
-const identifier_type_enum_1 = require("../../auth/enum/identifier-type.enum");
-const verify_otp_type_enum_1 = require("../../auth/enum/verify-otp-type.enum");
-const postgresQL_1 = __importDefault(require("../../lib/postgresQL"));
-const password_utils_1 = require("../../common/utils/password.utils");
-const identifiers_repository_1 = require("../../auth/repositories/identifiers.repository");
+const identifier_type_enum_1 = require("@/auth/enum/identifier-type.enum");
+const verify_otp_type_enum_1 = require("@/auth/enum/verify-otp-type.enum");
+const postgresQL_1 = __importDefault(require("@/lib/postgresQL"));
+const password_utils_1 = require("@/common/utils/password.utils");
+const identifiers_repository_1 = require("@/auth/repositories/identifiers.repository");
 class CreatePasswordService {
     async createPasswordByRegisterationFlow(params) {
         const { userId, password } = params;

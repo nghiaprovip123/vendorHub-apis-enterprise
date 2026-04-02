@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.assignStaffByBookingRequestDto = exports.GetBookingListDto = exports.UpdateBookingDto = exports.CreateBookingDto = void 0;
 const zod_1 = __importDefault(require("zod"));
-const booking_error_1 = require("../../common/utils/error/booking.error");
-const staff_error_1 = require("../../common/utils/error/staff.error");
+const booking_error_1 = require("@/common/utils/error/booking.error");
+const staff_error_1 = require("@/common/utils/error/staff.error");
 exports.CreateBookingDto = zod_1.default.object({
     serviceId: zod_1.default.string(),
     staffId: zod_1.default.string().optional(),

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.bookingSubscription = void 0;
-const pubsub_1 = require("../../pubsub/pubsub");
+const pubsub_1 = require("@/pubsub/pubsub");
 exports.bookingSubscription = {
     Subscription: {
         bookingStatusChanged: {

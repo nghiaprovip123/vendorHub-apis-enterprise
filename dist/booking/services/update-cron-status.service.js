@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CronUpdateBookingStatus = void 0;
-const booking_repository_1 = require("../../booking/repositories/booking.repository");
+const booking_repository_1 = require("@/booking/repositories/booking.repository");
 const client_1 = require("@prisma/client");
-const pubsub_1 = require("../../pubsub/pubsub");
-const prisma_1 = require("../../lib/prisma");
+const pubsub_1 = require("@/pubsub/pubsub");
+const prisma_1 = require("@/lib/prisma");
 class CronUpdateBookingStatus {
     static async updateConfirmedToUpcoming(pubsub) {
         const bookingRepo = new booking_repository_1.BookingRepository(prisma_1.prisma);

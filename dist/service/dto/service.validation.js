@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteServiceDto = exports.ViewServiceDetail = exports.UpdateServiceDto = exports.CreateServiceDto = exports.UpdateServiceMediaDto = exports.CreateServiceMediaDto = void 0;
 const zod_1 = __importDefault(require("zod"));
 const client_1 = require("@prisma/client");
-const service_error_1 = require("../../common/utils/error/service.error");
+const service_error_1 = require("@/common/utils/error/service.error");
 exports.CreateServiceMediaDto = zod_1.default.object({
     file: zod_1.default.any().optional(),
     type: zod_1.default.nativeEnum(client_1.ServiceMediaType),

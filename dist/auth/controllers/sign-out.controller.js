@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SignOutController = void 0;
-const sign_out_service_1 = require("../../auth/services/sign-out.service");
-const cookie_utils_1 = require("../../common/utils/cookie.utils");
+const sign_out_service_1 = require("@/auth/services/sign-out.service");
+const cookie_utils_1 = require("@/common/utils/cookie.utils");
 const SignOutController = async (req, res, next) => {
     try {
         const extractedUser = req.user;

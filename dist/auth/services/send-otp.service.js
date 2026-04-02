@@ -4,15 +4,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendOTPService = exports.SendOTPService = void 0;
-const postgresQL_1 = __importDefault(require("../../lib/postgresQL"));
-const ApiError_utils_1 = __importDefault(require("../../common/utils/ApiError.utils"));
+const postgresQL_1 = __importDefault(require("@/lib/postgresQL"));
+const ApiError_utils_1 = __importDefault(require("@/common/utils/ApiError.utils"));
 const crypto_1 = __importDefault(require("crypto"));
-const verify_otp_type_enum_1 = require("../../auth/enum/verify-otp-type.enum");
-const otp_repository_1 = require("../../auth/repositories/otp.repository");
-const rate_limit_utils_1 = require("../../common/utils/rate-limit.utils");
-const identifiers_repository_1 = require("../../auth/repositories/identifiers.repository");
-const identifier_type_enum_1 = require("../../auth/enum/identifier-type.enum");
-const email_send_queue_1 = require("../../auth/queues/email.send.queue");
+const verify_otp_type_enum_1 = require("@/auth/enum/verify-otp-type.enum");
+const otp_repository_1 = require("@/auth/repositories/otp.repository");
+const rate_limit_utils_1 = require("@/common/utils/rate-limit.utils");
+const identifiers_repository_1 = require("@/auth/repositories/identifiers.repository");
+const identifier_type_enum_1 = require("@/auth/enum/identifier-type.enum");
+const email_send_queue_1 = require("@/auth/queues/email.send.queue");
 class SendOTPService {
     async sendOTP(email, phone, type) {
         const identifiersRepo = new identifiers_repository_1.IdentifiersRepository(postgresQL_1.default);
